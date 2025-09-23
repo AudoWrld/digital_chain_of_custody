@@ -47,7 +47,3 @@ This project is developed as part of a Computer Security and Forensics course.
 
 ## Licence
 This project is for academic purposes only and not intended for production use.
-```pgsql
-
-Would you like me to make a **longer, polished version** with screenshots sections, contribution guidelines, and future work — or keep it minimal like this?
-```
