@@ -19,7 +19,7 @@ This project is developed as part of a Computer Security and Forensics course.
 ## Setup
 1. Clone the repository:
    ```bash
-   git clone https://github.com/KenyanAudo03/digital_chain_of_custody.git
+   git clone https://github.com/AudoWrld/digital_chain_of_custody.git
    cd digital_chain_of_custody
    ```
 
