@@ -73,3 +73,10 @@ class User(AbstractUser):
         related_name="custom_user_permissions",
         blank=True,
     )
+    objects = UserProfileManager()
+
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["first_name", "last_name", "role"]
+
+    def __str__(self):
+        return self.email
