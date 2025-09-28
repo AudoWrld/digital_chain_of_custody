@@ -51,7 +51,7 @@ class User(AbstractUser):
     ]
     first_name = models.CharField(null=False, max_length=15, blank=False)
     last_name = models.CharField(null=False, max_length=15, blank=False)
-    username = models.CharField(null=False, unique=True, blank=False)
+    username = models.CharField(max_length=150, unique=False, blank=True, null=True)
     email = models.EmailField(null=False, unique=True, blank=False)
     verified = models.BooleanField(default=False, blank=True, null=True)
     two_factor_authentication = models.BooleanField(default=False)
