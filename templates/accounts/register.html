@@ -10,7 +10,7 @@
   </ul>
 {% endif %}
 
-<form method="POST">
+<form method="POST" action="{% url 'register' %}">
   {% csrf_token %}
   {{ form.as_p }}  <!-- renders all form fields -->
   <button type="submit">Register</button>
