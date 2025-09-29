@@ -1,7 +1,20 @@
-Hi {{ user.first_name }},
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Email Verification Sent</title>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Verification Email Sent</h2>
 
-Please click the link below to verify your account:
-
-http://{{ domain }}{% url 'verify_email' uidb64=uid token=token %}
-
-If you didn't sign up, please ignore this email.
+      <div class="alert alert-info">
+        <p>We've sent a verification email to your registered email address.</p>
+        <p>
+          Please check your inbox and click the verification link to activate
+          your account.
+        </p>
+        <p>If you don't see the email, please check your spam folder.</p>
+      </div>
+    </div>
+  </body>
+</html>
