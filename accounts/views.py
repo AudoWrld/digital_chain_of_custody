@@ -29,18 +29,25 @@ def register(request):
         if form.is_valid():
             user = form.save(commit=False)
             user.is_active = False
-            user.set_password(form.cleaned_data["password"])  # hash password
+            user.set_password(form.cleaned_data["password"])
             user.save()
 
             current_site = get_current_site(request)
-            subject = "verify your email"
+            subject = "Verify your email"
+
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = account_activation_token.make_token(user)
+
+            protocol = "https" if request.is_secure() else "http"
+
             message = render_to_string(
                 "emails/verification_email.html",
                 {
                     "user": user,
                     "domain": current_site.domain,
-                    "uid": urlsafe_base64_encode(force_bytes(user.pk)),
-                    "token": account_activation_token.make_token(user),
+                    "protocol": protocol,
+                    "uid": uid,
+                    "token": token,
                 },
             )
 
@@ -55,7 +62,7 @@ def register(request):
             messages.success(
                 request, "Account created! Please check your email to verify."
             )
-            return redirect("verification_sent")  # redirect after success
+            return redirect("verification_sent")
         else:
             messages.error(request, "Please correct the errors below.")
     else:
@@ -74,12 +81,14 @@ def verify_email(request, uidb64, token):
         user = User.objects.get(pk=uid)
     except (TypeError, ValueError, OverflowError, User.DoesNotExist):
         user = None
-        
-    
+
     if user and account_activation_token.check_token(user, token):
         user.is_active = True
+        user.verified = True
         user.save()
-        messages.success(request, "Email verified successfully! please proceed to login.")
+        messages.success(
+            request, "Email verified successfully! Please proceed to complete 2FA."
+        )
         return redirect("second_authentication")
     else:
         messages.error(request, "Verification link is invalid or has expired.")
