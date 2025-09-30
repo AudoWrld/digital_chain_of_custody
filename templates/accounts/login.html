@@ -1,3 +1,4 @@
 {% extends 'base.html' %} {% block content %}
 <h1>Login Page</h1>
+<p>Didn't receive the verification email? <a href="{% url 'resend_verification' %}">Resend it</a></p>
 {% endblock %}
