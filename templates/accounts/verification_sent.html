@@ -1,18 +1,21 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Email Verification Sent</title>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Verification Email Sent</h2>
 
-{% block title %}Verification Sent{% endblock %}
+      <div class="alert alert-info">
+        <p>We've sent a verification email to your registered email address.</p>
+        <p>
+          Please check your inbox and click the verification link to activate
+          your account.
+        </p>
+        <p>If you don't see the email, please check your spam folder.</p>
+      </div>
+    </div>
+  </body>
+</html>
 
-{% block content %}
-<div class="verification-message">
-    <h2>Check your email</h2>
-    <p>
-        We’ve sent you a verification link. Please check your inbox to complete
-        your registration.
-    </p>
-
-    <p>
-        Didn't receive the email?
-        <a href="{% url 'resend_verification' %}">Click here to resend</a>
-    </p>
-</div>
-{% endblock %}

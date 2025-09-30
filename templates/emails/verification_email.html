@@ -1,6 +1,10 @@
 Hi {{ user.first_name }},
-please click the link below to verify your account:
 
-http://{{ domain }}{% url 'verify_email' uidb64=uidb64 token=token %}
+Please click the link below to verify your account:
 
-if you didn't sign up , please ignore this email.
+{{ protocol }}://{{ domain }}{% url 'verify_email' uidb64=uid token=token %}
+
+If you didn't sign up, please ignore this email.
+
+Best regards,
+Your Team
