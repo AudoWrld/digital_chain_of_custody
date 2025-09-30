@@ -96,17 +96,17 @@ def verify_email(request, uidb64, token):
     except (TypeError, ValueError, OverflowError, User.DoesNotExist):
         user = None
 
-     if user and account_activation_token.check_token(user, token):
-        user.is_active = True
-        user.verified = True
-        user.save()
-        messages.success(
-            request, "Email verified successfully! Please proceed to complete 2FA."
-        )
-        return redirect("second_authentication")
-     else:
-        messages.error(request, "Verification link is invalid or has expired.")
-        return redirect("register")
+        if user and account_activation_token.check_token(user, token):
+            user.is_active = True
+            user.verified = True
+            user.save()
+            messages.success(
+                request, "Email verified successfully! Please proceed to complete 2FA."
+            )
+            return redirect("second_authentication")
+        else:
+            messages.error(request, "Verification link is invalid or has expired.")
+            return redirect("register")
 
 
 
