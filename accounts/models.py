@@ -41,7 +41,7 @@ class UserProfileManager(BaseUserManager):
         return self.create_user(email, first_name, last_name, password, **extra_fields)
 
 
-class User(AbstractUser):
+class User(AbstractUser, PermissionsMixin):
     ROLE = [
         ("investigator", "Investigator"),
         ("analyst", "Analyst"),
@@ -63,6 +63,10 @@ class User(AbstractUser):
     profile_picture = models.ImageField(
         upload_to="profile_pics/", blank=True, null=True
     )
+    two_factor_secret = models.CharField(max_length=16, blank=True, null=True)
+    two_factor_enabled = models.BooleanField(default=False)
+    recovery_codes = models.TextField(blank=True, null=True)
+    
     groups = models.ManyToManyField(
         "auth.Group",
         related_name="custom_user_groups",
@@ -74,9 +78,11 @@ class User(AbstractUser):
         blank=True,
     )
     objects = UserProfileManager()
-
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name", "role"]
+    
+ 
+
 
     def __str__(self):
         return self.email
