@@ -1,7 +1,18 @@
-Hi {{ user.first_name }},
+{% extends 'base.html' %}
 
-Please click the link below to verify your account:
+{% block title %}Verification Sent{% endblock %}
 
-http://{{ domain }}{% url 'verify_email' uidb64=uid token=token %}
+{% block content %}
+<div class="verification-message">
+    <h2>Check your email</h2>
+    <p>
+        We’ve sent you a verification link. Please check your inbox to complete
+        your registration.
+    </p>
 
-If you didn't sign up, please ignore this email.
+    <p>
+        Didn't receive the email?
+        <a href="{% url 'resend_verification' %}">Click here to resend</a>
+    </p>
+</div>
+{% endblock %}
