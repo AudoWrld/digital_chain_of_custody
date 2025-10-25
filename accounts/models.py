@@ -54,7 +54,6 @@ class User(AbstractUser, PermissionsMixin):
     username = models.CharField(max_length=150, unique=False, blank=True, null=True)
     email = models.EmailField(null=False, unique=True, blank=False)
     verified = models.BooleanField(default=False, blank=True, null=True)
-    two_factor_authentication = models.BooleanField(default=False)
     role = models.CharField(
         max_length=20,
         choices=ROLE,
