@@ -12,7 +12,7 @@ from .tokens import account_activation_token
 from django.utils.encoding import force_bytes, force_str
 from django.urls import reverse
 from django.conf import settings
-from django.contrib.auth import get_user_model, login
+from django.contrib.auth import login as auth_login, get_user_model
 from django.contrib.auth.tokens import default_token_generator
 import pyotp
 import qrcode
@@ -96,34 +96,33 @@ def verify_email(request, uidb64, token):
     except (TypeError, ValueError, OverflowError, User.DoesNotExist):
         user = None
 
-        if user and account_activation_token.check_token(user, token):
-            user.is_active = True
-            user.verified = True
-            user.save()
-            messages.success(
-                request, "Email verified successfully! Please proceed to complete 2FA."
-            )
-            return redirect("second_authentication")
-        else:
-            messages.error(request, "Verification link is invalid or has expired.")
-            return redirect("register")
-
-
+    if user and account_activation_token.check_token(user, token):
+        user.is_active = True
+        user.verified = True
+        user.save()
+        auth_login(request, user)
+        messages.success(
+            request, "Email verified successfully! Please proceed to complete 2FA."
+        )
+        return redirect("second_authentication")
+    else:
+        messages.error(request, "Verification link is invalid or has expired.")
+        return redirect("register")
 
 
 def resend_verification_email(request):
     if request.method == "POST":
-        email =  request.POST.get("email")
+        email = request.POST.get("email")
         try:
             user = User.objects.get(email=email)
             if user.is_active:
                 messages.info(request, "this account is verified. please log in")
-                return redirect('login')
-            
-            
+                return redirect("login")
+
             current_site = get_current_site(request)
             subject = "verify your email (Recent)"
-            message = render_to_string( "emails/verification_email.html",
+            message = render_to_string(
+                "emails/verification_email.html",
                 {
                     "user": user,
                     "domain": current_site.domain,
@@ -131,10 +130,17 @@ def resend_verification_email(request):
                     "token": account_activation_token.make_token(user),
                 },
             )
-            send_mail(subject,message,settings.EMAIL_HOST_USER, [user.email],fail_silently=False)
-            
+            send_mail(
+                subject,
+                message,
+                settings.EMAIL_HOST_USER,
+                [user.email],
+                fail_silently=False,
+            )
+
             messages.success(
-                request, "a new verification email has been sent. Please check your email."
+                request,
+                "a new verification email has been sent. Please check your email.",
             )
             return redirect("verification_sent")
         except User.DoesNotExist:
@@ -147,67 +153,50 @@ def resend_verification_email(request):
 def second_authentication(request):
     user = request.user
 
+    # Step 1: if 2FA not yet enabled, show QR and handle setup
     if not user.two_factor_enabled:
-        print(f"2FA not enabled for user {user.email}, generating QR code")
+        if not user.two_factor_secret:
+            # Generate new secret if user doesn't have one
+            user.two_factor_secret = pyotp.random_base32()
+            user.save()
+
+        totp = pyotp.TOTP(user.two_factor_secret)
+        totp_uri = totp.provisioning_uri(name=user.email, issuer_name="ChainProof")
+
+        # Generate QR code
+        img = qrcode.make(totp_uri)
+        buffer = io.BytesIO()
+        img.save(buffer, format="PNG")
+        qr_base64 = base64.b64encode(buffer.getvalue()).decode()
+
         if request.method == "POST":
             token = request.POST.get("token")
-            totp = pyotp.TOTP(user.two_factor_secret)
             if totp.verify(token):
                 user.two_factor_enabled = True
-                user.recovery_codes = generate_recovery_codes()
                 user.save()
                 messages.success(request, "Two-factor authentication setup complete!")
                 return redirect("dashboard")
             else:
-                messages.error(request, "Invalid token. Please try again.")
-        else:
-            if not user.two_factor_secret:
-                user.two_factor_secret = pyotp.random_base32()
-                user.save()
-                print(f"Generated new secret: {user.two_factor_secret}")
-            totp_uri = pyotp.totp.TOTP(user.two_factor_secret).provisioning_uri(
-                name=user.email, issuer_name="YourAppName"
-            )
-            print(f"TOTP URI: {totp_uri}")
-            img = qrcode.make(totp_uri)
-            buffer = io.BytesIO()
-            img.save(buffer, format="PNG")
-            qr_base64 = base64.b64encode(buffer.getvalue()).decode()
-            print(f"QR base64 length: {len(qr_base64)}")
-            return render(
-                request,
-                "accounts/second_auth.html",
-                {
-                    "qr_code": qr_base64,
-                    "secret": user.two_factor_secret,
-                    "show_recovery": True,
-                },
-            )
-    # Subsequent logins → only ask for 2FA token
+                messages.error(request, "Invalid code. Please try again.")
+
+        return render(
+            request,
+            "accounts/second_auth.html",
+            {"qr_code": qr_base64, "secret": user.two_factor_secret},
+        )
+
+    # Step 2: If 2FA already enabled, verify token during login
     else:
         if request.method == "POST":
             token = request.POST.get("token")
-            recovery = request.POST.get("recovery_code")
             totp = pyotp.TOTP(user.two_factor_secret)
-
-            if token and totp.verify(token):
+            if totp.verify(token):
                 messages.success(request, "Two-factor authentication verified!")
                 return redirect("dashboard")
-            elif recovery:
-                codes = json.loads(user.recovery_codes or "[]")
-                if recovery in codes:
-                    codes.remove(recovery)  # one-time use
-                    user.recovery_codes = json.dumps(codes)
-                    user.save()
-                    messages.success(request, "Logged in using recovery code!")
-                    return redirect("dashboard")
-                else:
-                    messages.error(request, "Invalid recovery code!")
             else:
-                messages.error(request, "Invalid token or recovery code!")
+                messages.error(request, "Invalid code. Please try again.")
 
-        return render(request, "accounts/second_auth.html", {"qr_code": None})
-
+        return render(request, "accounts/second_auth.html")
 
 
 def generate_recovery_codes():
