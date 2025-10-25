@@ -95,8 +95,12 @@ USE_I18N = True
 USE_TZ = True
 
 # Email Config
-DEFAULT_EMAIL = config("DEFAULT_EMAIL")
-DEFAULT_PASSWORD = config("DEFAULT_PASSWORD")
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = config("DEFAULT_EMAIL")
+EMAIL_HOST_PASSWORD = config("DEFAULT_PASSWORD")
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = "/static/"
@@ -124,13 +128,6 @@ AUTH_USER_MODEL = "accounts.User"
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
 ]
-
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = DEFAULT_EMAIL
-EMAIL_HOST_PASSWORD = DEFAULT_PASSWORD
 
 # Password reset timeout
 PASSWORD_RESET_TIMEOUT = 60
