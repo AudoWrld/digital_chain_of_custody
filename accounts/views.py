@@ -20,7 +20,9 @@ import io
 import base64
 import secrets
 import json
-
+from django.http import HttpResponse
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
 
 User = get_user_model()
 
@@ -149,6 +151,12 @@ def resend_verification_email(request):
     return render(request, "accounts/resend_verification.html")
 
 
+# Generate Codes
+def generate_recovery_codes():
+    codes = [secrets.token_hex(4).upper() for _ in range(5)]
+    return json.dumps(codes)
+
+
 @login_required
 def second_authentication(request):
     user = request.user
@@ -174,8 +182,11 @@ def second_authentication(request):
             if totp.verify(token):
                 user.two_factor_enabled = True
                 user.save()
-                messages.success(request, "Two-factor authentication setup complete!")
-                return redirect("dashboard")
+                user.recovery_codes = generate_recovery_codes()
+                messages.success(
+                    request, "2FA setup complete! Please save your recovery codes."
+                )
+                return redirect("recovery_codes_view")
             else:
                 messages.error(request, "Invalid code. Please try again.")
 
@@ -199,6 +210,53 @@ def second_authentication(request):
         return render(request, "accounts/second_auth.html")
 
 
-def generate_recovery_codes():
-    codes = [secrets.token_hex(4) for _ in range(8)]
-    return json.dumps(codes)
+@login_required
+def recovery_codes_view(request):
+    user = request.user
+    if not user.recovery_codes:
+        messages.error(request, "No recovery codes found.")
+        return redirect("dashboard")
+
+    codes = json.loads(user.recovery_codes)
+    return render(request, "accounts/recovery_codes.html", {"codes": codes})
+
+
+@login_required
+def download_recovery_codes(request):
+    user = request.user
+
+    # Make sure the user has recovery codes
+    if not user.recovery_codes:
+        messages.error(request, "No recovery codes found.")
+        return redirect("dashboard")
+
+    codes = json.loads(user.recovery_codes)
+
+    # Create a PDF in memory
+    buffer = io.BytesIO()
+    p = canvas.Canvas(buffer, pagesize=letter)
+    width, height = letter
+
+    p.setFont("Helvetica-Bold", 16)
+    p.drawString(72, height - 72, "Your Recovery Codes")
+
+    p.setFont("Helvetica", 12)
+    p.drawString(72, height - 100, "Keep these codes in a safe place.")
+    p.drawString(
+        72,
+        height - 120,
+        "Each can be used once if you lose access to your authenticator app.",
+    )
+    y = height - 160
+
+    for code in codes:
+        p.drawString(100, y, f"• {code}")
+        y -= 20
+
+    p.showPage()
+    p.save()
+
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type="application/pdf")
+    response["Content-Disposition"] = 'attachment; filename="recovery_codes.pdf"'
+    return response
