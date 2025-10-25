@@ -1,21 +1,41 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Email Verification Sent</title>
-  </head>
-  <body>
-    <div class="container">
-      <h2>Verification Email Sent</h2>
+{% extends 'base.html' %}
+{% block title %}Email Verification Sent{% endblock %}
 
-      <div class="alert alert-info">
-        <p>We've sent a verification email to your registered email address.</p>
-        <p>
-          Please check your inbox and click the verification link to activate
-          your account.
-        </p>
-        <p>If you don't see the email, please check your spam folder.</p>
-      </div>
-    </div>
-  </body>
-</html>
+{% block content %}
+<div class="container">
 
+  {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
+          {{ message }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  <h2>Verification Email Sent</h2>
+
+  <div class="alert alert-info">
+    {% if email %}
+      <p>We've sent a verification email to <strong>{{ email }}</strong>.</p>
+    {% else %}
+      <p>We've sent a verification email to your registered email address.</p>
+    {% endif %}
+    <p>Please check your inbox and click the verification link to activate your account.</p>
+    <p>If you don't see the email, please check your spam folder.</p>
+  </div>
+
+  {% if email %}
+    <p>
+      Didn’t get the email?
+      <a href="{% url 'resend_verification' %}?email={{ email }}">Resend Verification Email</a>
+    </p>
+  {% else %}
+    <p>
+      Didn’t get the email?
+      <a href="{% url 'resend_verification' %}">Resend</a>
+    </p>
+  {% endif %}
+</div>
+{% endblock %}
