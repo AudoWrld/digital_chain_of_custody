@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Your Recovery Codes{% endblock %}
+
+{% block content %}
+<h3>Your Recovery Codes</h3>
+<p>Keep these safe! Each code can be used once if you lose your authenticator app.</p>
+
+<ul>
+  {% for code in codes %}
+    <li><strong>{{ code }}</strong></li>
+  {% endfor %}
+</ul>
+
+<form action="{% url 'download_recovery_codes' %}" method="post" style="margin-top: 20px;">
+  {% csrf_token %}
+  <button type="submit">Download as PDF</button>
+</form>
+
+{% endblock %}
