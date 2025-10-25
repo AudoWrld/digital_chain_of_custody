@@ -1,53 +1,27 @@
 {% extends 'base.html' %}
-
 {% block title %}Two-Factor Authentication{% endblock %}
 
 {% block content %}
 <h2>Two-Factor Authentication</h2>
 
 {% if qr_code %}
-    <p>Scan this QR code with your authenticator app:</p>
-    <img src="data:image/png;base64,{{ qr_code }} alt=QR Code">
-    <p>Or enter this secret manually: <strong>{{ secret }}</strong></p>
+  <p>Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.):</p>
+  <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code">
+  <p>Or enter this secret manually: <strong>{{ secret }}</strong></p>
 {% endif %}
 
-
-<form method="POST">
-    {% csrf_token %}
-    <label for="token">Enter the 6-digit code from your authenticator app:</label>
-    <input type="text", name="token", id="token", required>
-    <button type="submit">Verify</button>
+<form method="POST" style="margin-top: 20px;">
+  {% csrf_token %}
+  <label for="token">Enter the 6-digit code from your app:</label><br>
+  <input type="text" name="token" id="token" required>
+  <button type="submit">Verify</button>
 </form>
-
 
 {% if messages %}
-<ul>
+  <ul style="margin-top: 15px; color: red;">
     {% for message in messages %}
-        <li>{{ message }}</li>
+      <li>{{ message }}</li>
     {% endfor %}
-</ul>
+  </ul>
 {% endif %}
-
-{% if show_recovery %}
-<h3>Save these recovery codes safely</h3>
-<p>Each code can be used once if you lose access to your authenticator app:</p>
-<ul>
-  {% for code in user.recovery_codes|default:"[]"|safe|json_script:"codes" %}
-    <li>{{ code }}</li>
-  {% endfor %}
-</ul>
-{% endif %}
-
-<form method="POST">
-    {% csrf_token %}
-    <label for="token">Authenticator code:</label>
-    <input type="text" name="token" id="token">
-
-    <p>OR use a recovery code:</p>
-    <input type="text" name="recovery_code">
-
-    <button type="submit">Verify</button>
-</form>
-
-
 {% endblock %}
