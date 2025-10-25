@@ -65,6 +65,7 @@ class User(AbstractUser, PermissionsMixin):
     two_factor_secret = models.CharField(max_length=16, blank=True, null=True)
     two_factor_enabled = models.BooleanField(default=False)
     recovery_codes = models.TextField(blank=True, null=True)
+    recovery_codes_downloaded = models.BooleanField(default=False, blank=True, null=True)
     
     groups = models.ManyToManyField(
         "auth.Group",
