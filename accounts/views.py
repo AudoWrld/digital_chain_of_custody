@@ -79,6 +79,7 @@ def register(request):
                 request, "Account created! Please check your email to verify."
             )
 
+            request.session["pending_verification_email"] = user.email
             return redirect("verification_sent")
 
         else:
@@ -90,7 +91,55 @@ def register(request):
 
 
 def verification_sent(request):
-    return render(request, "accounts/verification_sent.html")
+    email = request.session.get("pending_verification_email")
+    return render(request, "accounts/verification_sent.html", {"email": email})
+
+
+# Resend Verification token
+def resend_verification_email(request):
+    email = request.GET.get("email") or request.POST.get("email")
+
+    if not email:
+        messages.error(request, "Email is required.")
+        return redirect("verification_sent")
+
+    try:
+        user = User.objects.get(email=email)
+        if user.is_active:
+            messages.info(request, "This account is already verified. Please log in.")
+            return redirect("login")
+
+        current_site = get_current_site(request)
+        subject = "Verify your email (Recent)"
+        uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+        token = account_activation_token.make_token(user)
+        protocol = "https" if request.is_secure() else "http"
+
+        message = render_to_string(
+            "emails/verification_email.html",
+            {
+                "user": user,
+                "domain": current_site.domain,
+                "protocol": protocol,
+                "uid": uidb64,
+                "token": token,
+            },
+        )
+
+        send_mail(
+            subject,
+            message,
+            settings.EMAIL_HOST_USER,
+            [user.email],
+            fail_silently=False,
+        )
+
+        messages.success(request, f"A new verification email was sent to {user.email}.")
+        return redirect(f"{reverse('verification_sent')}?email={user.email}")
+
+    except User.DoesNotExist:
+        messages.error(request, "No account found with this email.")
+        return redirect("register")
 
 
 # Verify email
@@ -113,46 +162,6 @@ def verify_email(request, uidb64, token):
     else:
         messages.error(request, "Verification link is invalid or has expired.")
         return redirect("register")
-
-
-# Resend Verification token
-def resend_verification_email(request):
-    if request.method == "POST":
-        email = request.POST.get("email")
-        try:
-            user = User.objects.get(email=email)
-            if user.is_active:
-                messages.info(request, "this account is verified. please log in")
-                return redirect("login")
-
-            current_site = get_current_site(request)
-            subject = "verify your email (Recent)"
-            message = render_to_string(
-                "emails/verification_email.html",
-                {
-                    "user": user,
-                    "domain": current_site.domain,
-                    "uidb64": urlsafe_base64_encode(force_bytes(user.pk)),
-                    "token": account_activation_token.make_token(user),
-                },
-            )
-            send_mail(
-                subject,
-                message,
-                settings.EMAIL_HOST_USER,
-                [user.email],
-                fail_silently=False,
-            )
-
-            messages.success(
-                request,
-                "a new verification email has been sent. Please check your email.",
-            )
-            return redirect("verification_sent")
-        except User.DoesNotExist:
-            messages.error(request, "No account found with this email.")
-            return redirect("resend_verification")
-    return render(request, "accounts/resend_verification.html")
 
 
 # Generate Codes
