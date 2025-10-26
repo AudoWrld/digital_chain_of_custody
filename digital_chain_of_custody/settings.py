@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     "custody",
     "evidence",
     "reports",
+    "dashboard",
 ]
 
 MIDDLEWARE = [
@@ -131,4 +132,3 @@ AUTHENTICATION_BACKENDS = [
 
 # Password reset timeout
 PASSWORD_RESET_TIMEOUT = 60
-
