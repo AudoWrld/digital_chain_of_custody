@@ -1,4 +1,19 @@
-{% extends "base.html" %}{% block content %}
-<h1>Dahboard Page</h1>
- <a href="{% url 'logout' %}">Logout</a>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Dashboard</title>
+  </head>
+  <body>
+    {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    <h1>Dahboard Page</h1>
+    <a href="{% url 'logout' %}">Logout</a>
+  </body>
+</html>
