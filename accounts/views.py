@@ -248,7 +248,7 @@ def second_authentication(request):
             token = request.POST.get("token")
             totp = pyotp.TOTP(user.two_factor_secret)
             if totp.verify(token):
-                messages.success(request, "Two-factor authentication verified!")
+                messages.success(request, "Two-factor authentication verified! Login successful.")
                 return redirect("dashboard")
             else:
                 messages.error(request, "Invalid code. Please try again.")
