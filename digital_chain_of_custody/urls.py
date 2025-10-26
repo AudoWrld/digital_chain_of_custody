@@ -8,6 +8,7 @@ from django.urls.conf import re_path
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("accounts.urls")),
+    path("", include("dashboard.urls")),
     path("cases/", include("cases.urls")),
     path("custody/", include("custody.urls")),
     path("evidence/", include("evidence.urls")),
