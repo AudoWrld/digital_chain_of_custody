@@ -33,52 +33,6 @@ from datetime import datetime
 User = get_user_model()
 
 
-# Login
-def login_view(request):
-    if request.method == "POST":
-        email = request.POST.get("email")
-        password = request.POST.get("password")
-
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            messages.error(request, "No account found with this email.")
-            return redirect("login")
-        if not user.verified:
-            request.session["pending_verification_email"] = user.email
-            messages.warning(
-                request,
-                "Your account isn’t verified yet. Please check your email or resend the verification link.",
-            )
-            return redirect("verification_sent")
-        user = authenticate(request, email=email, password=password)
-        if user is not None:
-            auth_login(request, user)
-            if not user.two_factor_enabled:
-                messages.info(
-                    request, "You must enable two-factor authentication to continue."
-                )
-                return redirect("second_authentication")
-
-            return redirect("second_authentication")
-
-        else:
-            messages.error(request, "Invalid email or password.")
-            return redirect("login")
-
-    return render(request, "accounts/login.html")
-
-
-# Logout
-def logout_view(request):
-    if request.user.is_authenticated:
-        logout(request)
-        messages.success(request, "You’ve been logged out successfully.")
-    else:
-        messages.info(request, "You’re not logged in.")
-    return redirect("login")
-
-
 # Registar
 def register(request):
     if request.method == "POST":
@@ -432,3 +386,49 @@ def reset_password(request, uidb64, token):
     else:
         messages.error(request, "This reset link is invalid or has expired.")
         return render(request, "accounts/reset_password.html", {"validlink": False})
+
+
+# Login
+def login_view(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            messages.error(request, "No account found with this email.")
+            return redirect("login")
+        if not user.verified:
+            request.session["pending_verification_email"] = user.email
+            messages.warning(
+                request,
+                "Your account isn’t verified yet. Please check your email or resend the verification link.",
+            )
+            return redirect("verification_sent")
+        user = authenticate(request, email=email, password=password)
+        if user is not None:
+            auth_login(request, user)
+            if not user.two_factor_enabled:
+                messages.info(
+                    request, "You must enable two-factor authentication to continue."
+                )
+                return redirect("second_authentication")
+
+            return redirect("second_authentication")
+
+        else:
+            messages.error(request, "Invalid email or password.")
+            return redirect("login")
+
+    return render(request, "accounts/login.html")
+
+
+# Logout
+def logout_view(request):
+    if request.user.is_authenticated:
+        logout(request)
+        messages.success(request, "You’ve been logged out successfully.")
+    else:
+        messages.info(request, "You’re not logged in.")
+    return redirect("homepage")
