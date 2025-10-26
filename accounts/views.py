@@ -12,7 +12,7 @@ from .tokens import account_activation_token
 from django.utils.encoding import force_bytes, force_str
 from django.urls import reverse
 from django.conf import settings
-from django.contrib.auth import login as auth_login, get_user_model
+from django.contrib.auth import login as auth_login, get_user_model, authenticate, logout
 import pyotp
 import qrcode
 import io
@@ -28,14 +28,49 @@ from datetime import datetime
 User = get_user_model()
 
 
-@login_required
-def dashboard(request):
-    return render(request, "accounts/dashboard.html")
-
-
+# Login
 def login_view(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            messages.error(request, "No account found with this email.")
+            return redirect("login")
+        if not user.verified:
+            request.session["pending_verification_email"] = user.email
+            messages.warning(
+                request,
+                "Your account isn’t verified yet. Please check your email or resend the verification link.",
+            )
+            return redirect("verification_sent")
+        user = authenticate(request, email=email, password=password)
+        if user is not None:
+            auth_login(request, user)
+            if not user.two_factor_enabled:
+                messages.info(
+                    request, "You must enable two-factor authentication to continue."
+                )
+                return redirect("second_authentication")
+
+            return redirect("second_authentication")
+
+        else:
+            messages.error(request, "Invalid email or password.")
+            return redirect("login")
+
     return render(request, "accounts/login.html")
 
+# Logout
+def logout_view(request):
+    if request.user.is_authenticated:
+        logout(request)
+        messages.success(request, "You’ve been logged out successfully.")
+    else:
+        messages.info(request, "You’re not logged in.")
+    return redirect("login")
 
 # Registar
 def register(request):
