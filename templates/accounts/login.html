@@ -7,12 +7,13 @@
   </head>
   <body>
     {% if messages %}
-    <ul class="messages">
-      {% for message in messages %}
-      <li>{{ message }}</li>
-      {% endfor %}
-    </ul>
+      <ul class="messages">
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
     {% endif %}
+
     <h2>Login</h2>
 
     <form method="post">
@@ -25,5 +26,12 @@
 
       <button type="submit">Login</button>
     </form>
+
+    <p>
+      Don't have an account? <a href="{% url 'register' %}">Register here</a>
+    </p>
+    <p>
+      Forgot your password? <a href="{% url 'forgot_password' %}">Reset it</a>
+    </p>
   </body>
 </html>
