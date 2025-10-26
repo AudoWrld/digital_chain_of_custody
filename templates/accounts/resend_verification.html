@@ -1,35 +1,36 @@
-{% extends 'base.html' %}
-{% block title %}Resend Verification{% endblock %}
-
-{% block content %}
-
-  {% if messages %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Resend Verification</title>
+  </head>
+  <body>
+    {% if messages %}
     <ul class="messages">
       {% for message in messages %}
-        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
-          {{ message }}
-        </li>
+      <li>{{ message }}</li>
       {% endfor %}
     </ul>
-  {% endif %}
-  
-<div class="resend-form">
-  <h2>Resend Verification Email</h2>
+    {% endif %}
 
-  {% if email %}
-    <p>
-      We’ll resend a verification link to:
-      <strong>{{ email }}</strong>
-    </p>
-  {% else %}
-    <p>We’re resending a verification link to your email address.</p>
-  {% endif %}
+    <div class="resend-form">
+      <h2>Resend Verification Email</h2>
 
-  <form method="post">
-    {% csrf_token %}
-    <input type="hidden" name="email" value="{{ email }}">
-    <button type="submit">Resend</button>
-  </form>
+      {% if email %}
+      <p>
+        We’ll resend a verification link to:
+        <strong>{{ email }}</strong>
+      </p>
+      {% else %}
+      <p>We’re resending a verification link to your email address.</p>
+      {% endif %}
 
-</div>
-{% endblock %}
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="email" value="{{ email }}" />
+        <button type="submit">Resend</button>
+      </form>
+    </div>
+  </body>
+</html>
