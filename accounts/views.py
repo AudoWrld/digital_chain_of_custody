@@ -8,11 +8,16 @@ from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
-from .tokens import account_activation_token
+from .tokens import account_activation_token, password_reset_token
 from django.utils.encoding import force_bytes, force_str
 from django.urls import reverse
 from django.conf import settings
-from django.contrib.auth import login as auth_login, get_user_model, authenticate, logout
+from django.contrib.auth import (
+    login as auth_login,
+    get_user_model,
+    authenticate,
+    logout,
+)
 import pyotp
 import qrcode
 import io
@@ -27,50 +32,6 @@ from datetime import datetime
 
 User = get_user_model()
 
-
-# Login
-def login_view(request):
-    if request.method == "POST":
-        email = request.POST.get("email")
-        password = request.POST.get("password")
-
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            messages.error(request, "No account found with this email.")
-            return redirect("login")
-        if not user.verified:
-            request.session["pending_verification_email"] = user.email
-            messages.warning(
-                request,
-                "Your account isn’t verified yet. Please check your email or resend the verification link.",
-            )
-            return redirect("verification_sent")
-        user = authenticate(request, email=email, password=password)
-        if user is not None:
-            auth_login(request, user)
-            if not user.two_factor_enabled:
-                messages.info(
-                    request, "You must enable two-factor authentication to continue."
-                )
-                return redirect("second_authentication")
-
-            return redirect("second_authentication")
-
-        else:
-            messages.error(request, "Invalid email or password.")
-            return redirect("login")
-
-    return render(request, "accounts/login.html")
-
-# Logout
-def logout_view(request):
-    if request.user.is_authenticated:
-        logout(request)
-        messages.success(request, "You’ve been logged out successfully.")
-    else:
-        messages.info(request, "You’re not logged in.")
-    return redirect("login")
 
 # Registar
 def register(request):
@@ -248,7 +209,9 @@ def second_authentication(request):
             token = request.POST.get("token")
             totp = pyotp.TOTP(user.two_factor_secret)
             if totp.verify(token):
-                messages.success(request, "Two-factor authentication verified!")
+                messages.success(
+                    request, "Two-factor authentication verified! Login successful."
+                )
                 return redirect("dashboard")
             else:
                 messages.error(request, "Invalid code. Please try again.")
@@ -265,6 +228,37 @@ def recovery_codes_view(request):
 
     codes = json.loads(user.recovery_codes)
     return render(request, "accounts/recovery_codes.html", {"codes": codes})
+
+
+# Use Codes if user auth app is lost
+@login_required
+def verify_recovery_code(request):
+    user = request.user
+    if not user.two_factor_enabled:
+        messages.error(
+            request, "Two-factor authentication is not enabled for your account."
+        )
+        return redirect("second_authentication")
+
+    if request.method == "POST":
+        code = request.POST.get("recovery_code").strip().upper()
+
+        try:
+            recovery_codes = json.loads(user.recovery_codes or "[]")
+        except json.JSONDecodeError:
+            recovery_codes = []
+
+        if code in recovery_codes:
+            recovery_codes.remove(code)
+            user.recovery_codes = json.dumps(recovery_codes)
+            user.save()
+
+            messages.success(request, "Recovery code verified! You are now logged in.")
+            return redirect("dashboard")
+        else:
+            messages.error(request, "Invalid recovery code. Please try again.")
+
+    return render(request, "accounts/verify_recovery_code.html")
 
 
 # Download recovery codes
@@ -353,3 +347,119 @@ def download_recovery_codes(request):
     )
 
     return response
+
+
+# Forgot Password
+def forgot_password(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            messages.error(request, "No account found with that email.")
+            return redirect("forgot_password")
+
+        current_site = get_current_site(request)
+        subject = "Reset your password"
+        uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+        token = password_reset_token.make_token(user)
+        protocol = "https" if request.is_secure() else "http"
+
+        message = render_to_string(
+            "emails/reset_password_email.html",
+            {
+                "user": user,
+                "domain": current_site.domain,
+                "protocol": protocol,
+                "uid": uidb64,
+                "token": token,
+            },
+        )
+
+        send_mail(
+            subject,
+            message,
+            settings.EMAIL_HOST_USER,
+            [user.email],
+            fail_silently=False,
+        )
+
+        messages.success(request, "Password reset email sent. Check your inbox.")
+        return redirect("login")
+
+    return render(request, "accounts/forgot_password.html")
+
+
+# Reset password form
+def reset_password(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user and password_reset_token.check_token(user, token):
+        if request.method == "POST":
+            new_password = request.POST.get("password")
+            confirm_password = request.POST.get("confirm_password")
+
+            if new_password != confirm_password:
+                messages.error(request, "Passwords do not match.")
+                return redirect(request.path)
+
+            user.set_password(new_password)
+            user.save()
+            messages.success(request, "Password reset successful. You can now log in.")
+            return redirect("login")
+
+        return render(request, "accounts/reset_password.html", {"validlink": True})
+    else:
+        messages.error(request, "This reset link is invalid or has expired.")
+        return render(request, "accounts/reset_password.html", {"validlink": False})
+
+
+# Login
+def login_view(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            messages.error(request, "No account found with this email.")
+            return redirect("login")
+        if not user.verified:
+            request.session["pending_verification_email"] = user.email
+            messages.warning(
+                request,
+                "Your account isn’t verified yet. Please check your email or resend the verification link.",
+            )
+            return redirect("verification_sent")
+        user = authenticate(request, email=email, password=password)
+        if user is not None:
+            auth_login(request, user)
+            if not user.two_factor_enabled:
+                messages.info(
+                    request, "You must enable two-factor authentication to continue."
+                )
+                return redirect("second_authentication")
+
+            return redirect("second_authentication")
+
+        else:
+            messages.error(request, "Invalid email or password.")
+            return redirect("login")
+
+    return render(request, "accounts/login.html")
+
+
+# Logout
+def logout_view(request):
+    if request.user.is_authenticated:
+        logout(request)
+        messages.success(request, "You’ve been logged out successfully.")
+    else:
+        messages.info(request, "You’re not logged in.")
+    return redirect("homepage")
