@@ -19,4 +19,6 @@ urlpatterns = [
         name="resend_verification",
     ),
     path("logout", views.logout_view, name="logout"),
+    path("forgot-password/", views.forgot_password, name="forgot_password"),
+    path("reset/<uidb64>/<token>/", views.reset_password, name="reset_password"),
 ]
