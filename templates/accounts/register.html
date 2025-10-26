@@ -1,41 +1,37 @@
-{% extends 'base.html' %}
 {% load static %}
-{% block title %}Register{% endblock %}
-{% block content %}
- <link rel="stylesheet" href="{% static 'css/register.css' %}">
-<nav class="navbar">
-  <div style="display: flex; align-items: center; gap: 16px;">
-    <img src="{% static 'css/images/logo.png' %}" alt="Logo" class="logo">
-    <span style="color: #2980b9; font-size: 1.5rem; font-weight: 700;">Chain of Custody</span>
-  </div>
-  <ul class="nav-links">
-    <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-    <li><a href="{% url 'login' %}">Login</a></li>
-    <li><a href="{% url 'register' %}">Register</a></li>
-  </ul>
-</nav>
-
-<div class="split-container">
-  <div class="split-image">
-    <img src="{% static 'css/images/investigation.jpeg' %}" alt="Investigation" />
-  </div>
-
-  <div class="split-form">
-    <h1>Register Page</h1>
-
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="{% static 'css/register.css' %}" />
+  </head>
+  <body>
     {% if messages %}
-      <ul>
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-      </ul>
+    <ul>
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
     {% endif %}
 
-    <form method="POST" action="{% url 'register' %}">
-      {% csrf_token %}
-      {{ form.as_p }}
-      <button type="submit">Register</button>
-    </form>
-  </div>
-</div>
-{% endblock %}
+    <div class="split-container">
+      <div class="split-image">
+        <img
+          src="{% static 'images/investigation.jpeg' %}"
+          alt="Investigation"
+        />
+      </div>
+
+      <div class="split-form">
+        <h1>Register Page</h1>
+
+        <form method="POST" action="{% url 'register' %}">
+          {% csrf_token %} {{ form.as_p }}
+          <button type="submit">Register</button>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

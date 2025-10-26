@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    {% load static %}
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block title %}ChainProof{% endblock %}</title>
+    <title>My Dashboard</title>
   </head>
   <body>
     {% if messages %}
@@ -13,6 +12,8 @@
       <li>{{ message }}</li>
       {% endfor %}
     </ul>
-    {% endif %} {% block content %} {% endblock %}
+    {% endif %}
+    <h1>Dahboard Page</h1>
+    <a href="{% url 'logout' %}">Logout</a>
   </body>
 </html>

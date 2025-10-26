@@ -1,12 +1,15 @@
-{% extends 'base.html'%}
-{% block title %}VerificationError{% endblock %}
-
-{% block content %}
-
-<h2>{{ message }}</h2>
-{% if resend_link %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VerificationError</title>
+  </head>
+  <body>
+    <h2>{{ message }}</h2>
+    {% if resend_link %}
     <a href="{% url 'resend_verification' %}">Resend Verification Email</a>
-{% endif %}
-
-{% endblock %}
-
+    {% endif %}
+  </body>
+</html>
+]

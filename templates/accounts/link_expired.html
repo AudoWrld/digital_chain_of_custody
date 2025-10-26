@@ -1,26 +1,35 @@
-{% extends 'base.html' %}
-{% block title %}Link Expired{% endblock %}
-
-{% block content %}
-  <h2>Verification Link Expired</h2>
-  <p>Sorry, your verification link is invalid or has expired.</p>
-
-  {% if email %}
-    <p>You registered with <strong>{{ email }}</strong>.</p>
-  {% endif %}
-
-  <p>
-    Click below to request a new verification link:
-  </p>
-
-  <form method="POST" action="{% url 'resend_verification' %}">
-    {% csrf_token %}
-    {% if email %}
-      <input type="hidden" name="email" value="{{ email }}">
-    {% else %}
-      <label for="email">Enter your email:</label>
-      <input type="email" name="email" id="email" required>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Verification Link Expired</title>
+  </head>
+  <body>
+    {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
     {% endif %}
-    <button type="submit">Resend Verification Email</button>
-  </form>
-{% endblock %}
+
+    <h2>Verification Link Expired</h2>
+    <p>Sorry, your verification link is invalid or has expired.</p>
+
+    {% if email %}
+    <p>You registered with <strong>{{ email }}</strong>.</p>
+    {% endif %}
+
+    <p>Click below to request a new verification link:</p>
+
+    <form method="POST" action="{% url 'resend_verification' %}">
+      {% csrf_token %} {% if email %}
+      <input type="hidden" name="email" value="{{ email }}" />
+      {% else %}
+      <label for="email">Enter your email:</label>
+      <input type="email" name="email" id="email" required />
+      {% endif %}
+      <button type="submit">Resend Verification Email</button>
+    </form>
+  </body>
+</html>
