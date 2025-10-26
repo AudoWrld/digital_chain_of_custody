@@ -47,7 +47,6 @@ class User(AbstractUser, PermissionsMixin):
         ("analyst", "Analyst"),
         ("custodian", "Custodian"),
         ("auditor", "Auditor"),
-        ("admin", "Admin"),
     ]
     first_name = models.CharField(null=False, max_length=15, blank=False)
     last_name = models.CharField(null=False, max_length=15, blank=False)
