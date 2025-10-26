@@ -12,6 +12,9 @@ urlpatterns = [
         views.download_recovery_codes,
         name="download_recovery_codes",
     ),
+    path(
+        "verify-recovery-code/", views.verify_recovery_code, name="verify_recovery_code"
+    ),
     path("verify/<uidb64>/<token>/", views.verify_email, name="verify_email"),
     path(
         "resend_verification",

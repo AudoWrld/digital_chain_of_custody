@@ -230,6 +230,37 @@ def recovery_codes_view(request):
     return render(request, "accounts/recovery_codes.html", {"codes": codes})
 
 
+# Use Codes if user auth app is lost
+@login_required
+def verify_recovery_code(request):
+    user = request.user
+    if not user.two_factor_enabled:
+        messages.error(
+            request, "Two-factor authentication is not enabled for your account."
+        )
+        return redirect("second_authentication")
+
+    if request.method == "POST":
+        code = request.POST.get("recovery_code").strip().upper()
+
+        try:
+            recovery_codes = json.loads(user.recovery_codes or "[]")
+        except json.JSONDecodeError:
+            recovery_codes = []
+
+        if code in recovery_codes:
+            recovery_codes.remove(code)
+            user.recovery_codes = json.dumps(recovery_codes)
+            user.save()
+
+            messages.success(request, "Recovery code verified! You are now logged in.")
+            return redirect("dashboard")
+        else:
+            messages.error(request, "Invalid recovery code. Please try again.")
+
+    return render(request, "accounts/verify_recovery_code.html")
+
+
 # Download recovery codes
 @login_required
 def download_recovery_codes(request):
