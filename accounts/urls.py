@@ -15,6 +15,10 @@ urlpatterns = [
     path(
         "verify-recovery-code/", views.verify_recovery_code, name="verify_recovery_code"
     ),
+    path(
+        "proceed-to-dashboard", views.proceed_to_dashboard, name="proceed_to_dashboard"
+    ),
+    path("setup-new-2fa", views.setup_new_2fa, name="setup_new_2fa"),
     path("verify/<uidb64>/<token>/", views.verify_email, name="verify_email"),
     path(
         "resend_verification",
