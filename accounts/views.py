@@ -254,12 +254,25 @@ def verify_recovery_code(request):
             user.save()
 
             messages.success(request, "Recovery code verified! You are now logged in.")
-            return redirect("dashboard")
+            return redirect("proceed_to_dashboard")
         else:
             messages.error(request, "Invalid recovery code. Please try again.")
 
     return render(request, "accounts/verify_recovery_code.html")
 
+# Proceed or setup new 2fa
+def proceed_to_dashboard(request):
+    return render(request, 'accounts/proceed_to_dashboard.html')
+
+def setup_new_2fa(request):
+    user = request.user
+    user.two_factor_enabled = False
+    user.recovery_codes_downloaded = False
+    user.recovery_codes = ""
+    user.save()
+    return redirect('second_authentication')
+    
+    
 
 # Download recovery codes
 @login_required
