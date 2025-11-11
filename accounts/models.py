@@ -43,18 +43,17 @@ class UserProfileManager(BaseUserManager):
 
 class User(AbstractUser, PermissionsMixin):
     ROLE = [
+        ("regular_user", "Regular User"),
         ("investigator", "Investigator"),
         ("analyst", "Analyst"),
         ("custodian", "Custodian"),
         ("auditor", "Auditor"),
-        ("admin", "Admin"),
     ]
     first_name = models.CharField(null=False, max_length=15, blank=False)
     last_name = models.CharField(null=False, max_length=15, blank=False)
     username = models.CharField(max_length=150, unique=False, blank=True, null=True)
     email = models.EmailField(null=False, unique=True, blank=False)
     verified = models.BooleanField(default=False, blank=True, null=True)
-    two_factor_authentication = models.BooleanField(default=False)
     role = models.CharField(
         max_length=20,
         choices=ROLE,
@@ -66,6 +65,7 @@ class User(AbstractUser, PermissionsMixin):
     two_factor_secret = models.CharField(max_length=16, blank=True, null=True)
     two_factor_enabled = models.BooleanField(default=False)
     recovery_codes = models.TextField(blank=True, null=True)
+    recovery_codes_downloaded = models.BooleanField(default=False, blank=True, null=True)
     
     groups = models.ManyToManyField(
         "auth.Group",

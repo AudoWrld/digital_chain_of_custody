@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Recovery Codes</title>
+  </head>
+  <body>
+    {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    <h3>Your Recovery Codes</h3>
+    <p>
+      Keep these safe! Each code can be used once if you lose your authenticator
+      app.
+    </p>
+
+    <ul>
+      {% for code in codes %}
+      <li><strong>{{ code }}</strong></li>
+      {% endfor %}
+    </ul>
+    <form
+      id="download-form"
+      action="{% url 'download_recovery_codes' %}"
+      method="post"
+      style="margin-top: 20px"
+    >
+      {% csrf_token %}
+      <button type="submit">Download as PDF</button>
+    </form>
+
+    {% if user.recovery_codes_downloaded %}
+    <a
+      href="{% url 'dashboard' %}"
+      class="btn btn-primary"
+      style="margin-top: 15px"
+    >
+      Proceed to Dashboard
+    </a>
+    {% endif %}
+
+    <script>
+      document
+        .getElementById("download-form")
+        .addEventListener("submit", function () {
+          // Wait 1 seconds after clicking Download, then refresh the page
+          setTimeout(() => {
+            location.reload();
+          }, 1000);
+        });
+    </script>
+  </body>
+</html>

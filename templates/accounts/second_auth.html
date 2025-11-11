@@ -1,53 +1,44 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Two-Factor Authentication</title>
+  </head>
+  <body>
+    {% if messages %}
+    <ul>
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
 
-{% block title %}Two-Factor Authentication{% endblock %}
+    <h2>Two-Factor Authentication</h2>
 
-{% block content %}
-<h2>Two-Factor Authentication</h2>
-
-{% if qr_code %}
-    <p>Scan this QR code with your authenticator app:</p>
-    <img src="data:image/png;base64,{{ qr_code }} alt=QR Code">
+    {% if qr_code %}
+    <p>
+      Scan this QR code with your authenticator app (Google Authenticator,
+      Authy, etc.):
+    </p>
+    <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code" />
     <p>Or enter this secret manually: <strong>{{ secret }}</strong></p>
-{% endif %}
+    {% endif %}
 
+    <form method="POST" style="margin-top: 20px">
+      {% csrf_token %}
+      <label for="token"
+        >Enter the 6-digit code from your app or a recovery code:</label
+      ><br />
+      <input type="text" name="token" id="token" required />
+      <button type="submit">Verify</button>
+    </form>
 
-<form method="POST">
-    {% csrf_token %}
-    <label for="token">Enter the 6-digit code from your authenticator app:</label>
-    <input type="text", name="token", id="token", required>
-    <button type="submit">Verify</button>
-</form>
-
-
-{% if messages %}
-<ul>
-    {% for message in messages %}
-        <li>{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
-
-{% if show_recovery %}
-<h3>Save these recovery codes safely</h3>
-<p>Each code can be used once if you lose access to your authenticator app:</p>
-<ul>
-  {% for code in user.recovery_codes|default:"[]"|safe|json_script:"codes" %}
-    <li>{{ code }}</li>
-  {% endfor %}
-</ul>
-{% endif %}
-
-<form method="POST">
-    {% csrf_token %}
-    <label for="token">Authenticator code:</label>
-    <input type="text" name="token" id="token">
-
-    <p>OR use a recovery code:</p>
-    <input type="text" name="recovery_code">
-
-    <button type="submit">Verify</button>
-</form>
-
-
-{% endblock %}
+    {% if user.two_factor_enabled %}
+    <p style="margin-top: 20px;">
+      Lost access to your authenticator app?
+      <a href="{% url 'verify_recovery_code' %}">Verify using a recovery code</a>
+    </p>
+    {% endif %}
+  </body>
+</html>
