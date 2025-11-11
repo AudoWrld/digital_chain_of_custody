@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+<<<<<<< Updated upstream
 {% block title %}Register{% endblock %}
 {% block content %}
 
@@ -39,3 +40,67 @@
   </div>
 </div>
 {% endblock %}
+=======
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register — Chain of Custody</title>
+    <link rel="stylesheet" href="{% static 'css/register.css' %}" />
+  </head>
+  <body>
+    <nav class="brand-nav">
+      <div class="brand-left">
+        <img src="{% static 'images/logo.png' %}" alt="logo" class="nav-logo" />
+        <span class="brand-title">Chain of Custody</span>
+      </div>
+      <ul class="nav-right">
+        <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+        <li><a href="{% url 'login' %}">Login</a></li>
+        <li class="active"><a href="{% url 'register' %}">Register</a></li>
+      </ul>
+    </nav>
+
+    <main class="split-container">
+      <section class="split-image">
+        <div class="image-overlay"></div>
+        <img src="{% static 'images/investigation.jpeg' %}" alt="Investigation" />
+        <div class="image-content">
+          <h2>Secure. Verifiable. Reliable.</h2>
+          <p>Track evidence and custody with confidence.</p>
+        </div>
+      </section>
+
+      <section class="split-form">
+        <div class="form-card">
+          <h1>Create your account</h1>
+
+          {% if messages %}
+            <ul class="messages">
+              {% for message in messages %}
+                <li>{{ message }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+
+          <form method="POST" action="{% url 'register' %}">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <div class="form-fields">
+              {{ form.as_p }}
+            </div>
+
+            <button type="submit" class="btn-primary">Register</button>
+
+            <div class="form-footer">
+              <span>Already have an account?</span>
+              <a href="{% url 'login' %}" class="link">Login</a>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
+>>>>>>> Stashed changes
