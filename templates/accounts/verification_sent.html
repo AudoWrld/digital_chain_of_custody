@@ -1,21 +1,48 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Email Verification Sent</title>
   </head>
   <body>
     <div class="container">
+      {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+
       <h2>Verification Email Sent</h2>
 
       <div class="alert alert-info">
+        {% if email %}
+        <p>We've sent a verification email to <strong>{{ email }}</strong>.</p>
+        {% else %}
         <p>We've sent a verification email to your registered email address.</p>
+        {% endif %}
         <p>
           Please check your inbox and click the verification link to activate
           your account.
         </p>
         <p>If you don't see the email, please check your spam folder.</p>
       </div>
+
+      {% if email %}
+      <p>
+        Didn’t get the email?
+        <a href="{% url 'resend_verification' %}?email={{ email }}"
+          >Resend Verification Email</a
+        >
+      </p>
+      {% else %}
+      <p>
+        Didn’t get the email?
+        <a href="{% url 'resend_verification' %}">Resend</a>
+      </p>
+      {% endif %}
     </div>
   </body>
 </html>
-
