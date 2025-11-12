@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Proceed to Dashboard — Chain of Custody</title>
+    <link rel="stylesheet" href="{% static 'css/proceed_to_dashboard.css' %}" />
+  </head>
+  <body>
+    <nav class="brand-nav" role="navigation" aria-label="Main">
+      <div class="brand-left">
+        <img src="{% static 'images/logo.png' %}" alt="Chain of Custody logo" class="nav-logo" />
+        <span class="brand-title">Chain of Custody</span>
+      </div>
+      <ul class="nav-right" role="menubar">
+        <li role="none"><a role="menuitem" href="{% url 'dashboard' %}">Dashboard</a></li>
+        <li role="none"><a role="menuitem" href="{% url 'login' %}">Login</a></li>
+      </ul>
+    </nav>
+
+    <main class="ptd-wrapper" role="main">
+      <div class="ptd-card" role="region" aria-labelledby="ptd-heading">
+        <h1 id="ptd-heading">Proceed to Dashboard</h1>
+        <p class="lead">If you have lost your authenticator app you can set up two‑factor authentication again, or proceed to your dashboard if you've recovered access.</p>
+
+        {% if messages %}
+          <ul class="messages" role="status" aria-live="polite">
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+
+        <div class="ptd-actions">
+          <a class="btn btn-primary" href="{% url 'setup_new_2fa' %}">Setup new 2FA</a>
+          <a class="btn btn-ghost" href="{% url 'dashboard' %}">Proceed to Dashboard</a>
+        </div>
+
+        <p class="note">If you are unsure which option to choose, contact support for assistance.</p>
+      </div>
+    </main>
+  </body>
+</html>

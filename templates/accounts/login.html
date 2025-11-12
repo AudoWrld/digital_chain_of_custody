@@ -1,37 +1,55 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login</title>
+    <link rel="stylesheet" href="{% static 'css/login.css' %}" />
   </head>
   <body>
-    {% if messages %}
-      <ul class="messages">
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-      </ul>
-    {% endif %}
+    <div class="login-wrapper">
+      <div class="login-card">
+        <div class="login-brand">
+          <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo" />
+          <div class="title">Chain of Custody</div>
+        </div>
 
-    <h2>Login</h2>
+        {% if messages %}
+          <ul class="messages">
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
 
-    <form method="post">
-      {% csrf_token %}
-      <label for="email">Email:</label>
-      <input type="email" id="email" name="email" required />
+        <h2>Welcome back</h2>
 
-      <label for="password">Password:</label>
-      <input type="password" id="password" name="password" required />
+        <form method="post" action="{% url 'login' %}">
+          {% csrf_token %}
 
-      <button type="submit">Login</button>
-    </form>
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="you@example.com" required />
 
-    <p>
-      Don't have an account? <a href="{% url 'register' %}">Register here</a>
-    </p>
-    <p>
-      Forgot your password? <a href="{% url 'forgot_password' %}">Reset it</a>
-    </p>
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="••••••••" required />
+
+          <div class="form-row">
+            <div class="small">
+              <label><input type="checkbox" name="remember" /> Remember me</label>
+            </div>
+            <a href="{% url 'forgot_password' %}">Forgot?</a>
+          </div>
+
+          <button type="submit">Login</button>
+
+          <div class="login-links">
+            <span class="login-note">Don't have an account?</span>
+            <a href="{% url 'register' %}">Register here</a>
+          </div>
+        </form>
+      </div>
+    </div>
   </body>
 </html>
+>>>>>>> Stashed changes

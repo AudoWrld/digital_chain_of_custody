@@ -1,58 +1,72 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Your Recovery Codes</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Your Recovery Codes — Chain of Custody</title>
+    <link rel="stylesheet" href="{% static 'css/recovery_codes.css' %}" />
   </head>
   <body>
-    {% if messages %}
-    <ul class="messages">
-      {% for message in messages %}
-      <li>{{ message }}</li>
-      {% endfor %}
-    </ul>
-    {% endif %}
-    <h3>Your Recovery Codes</h3>
-    <p>
-      Keep these safe! Each code can be used once if you lose your authenticator
-      app.
-    </p>
+    <main class="rc-wrapper">
+      <div class="rc-card">
+        <header class="rc-header">
+          <h1>Recovery Codes</h1>
+          <p class="rc-sub">Keep these safe — each code can be used once if you lose access to your authenticator.</p>
+        </header>
 
-    <ul>
-      {% for code in codes %}
-      <li><strong>{{ code }}</strong></li>
-      {% endfor %}
-    </ul>
-    <form
-      id="download-form"
-      action="{% url 'download_recovery_codes' %}"
-      method="post"
-      style="margin-top: 20px"
-    >
-      {% csrf_token %}
-      <button type="submit">Download as PDF</button>
-    </form>
+        {% if messages %}
+          <ul class="messages">
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
 
-    {% if user.recovery_codes_downloaded %}
-    <a
-      href="{% url 'dashboard' %}"
-      class="btn btn-primary"
-      style="margin-top: 15px"
-    >
-      Proceed to Dashboard
-    </a>
-    {% endif %}
+        <section class="code-area">
+          <div class="code-grid" aria-live="polite">
+            {% for code in codes %}
+              <div class="code-item">
+                <code class="code-value">{{ code }}</code>
+                <button type="button" class="btn-copy" data-code="{{ code }}" title="Copy code">Copy</button>
+              </div>
+            {% endfor %}
+          </div>
+          <p class="rc-note">Store these somewhere safe. You can download them as a PDF.</p>
+        </section>
+
+        <footer class="rc-actions">
+          <form id="download-form" action="{% url 'download_recovery_codes' %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Download as PDF</button>
+          </form>
+
+          {% if user.recovery_codes_downloaded %}
+            <a href="{% url 'dashboard' %}" class="btn btn-ghost">Proceed to Dashboard</a>
+          {% endif %}
+        </footer>
+      </div>
+    </main>
 
     <script>
-      document
-        .getElementById("download-form")
-        .addEventListener("submit", function () {
-          // Wait 1 seconds after clicking Download, then refresh the page
-          setTimeout(() => {
-            location.reload();
-          }, 1000);
+      document.addEventListener('click', function (e) {
+        if (!e.target.matches('.btn-copy')) return;
+        const code = e.target.getAttribute('data-code');
+        navigator.clipboard?.writeText(code).then(() => {
+          e.target.textContent = 'Copied';
+          setTimeout(() => (e.target.textContent = 'Copy'), 1200);
+        }).catch(() => {
+          alert('Copy failed — select and copy manually.');
         });
+      });
+
+      // After clicking download, reload the page after a short delay
+      const downloadForm = document.getElementById('download-form');
+      if (downloadForm) {
+        downloadForm.addEventListener('submit', () => {
+          setTimeout(() => location.reload(), 900);
+        });
+      }
     </script>
   </body>
 </html>

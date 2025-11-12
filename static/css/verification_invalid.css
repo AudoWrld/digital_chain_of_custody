@@ -1,0 +1,43 @@
+:root{
+  --accent:#2980b9;
+  --accent-2:#6dd5fa;
+  --muted:#6c757d;
+  --card:#ffffff;
+  --radius:12px;
+  --shadow:0 10px 30px rgba(20,30,40,0.08);
+  --font-sans:"Segoe UI", Roboto, Arial, sans-serif;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:var(--font-sans);-webkit-font-smoothing:antialiased}
+body{background:#f4f6f8;color:#163a57}
+
+/* top nav */
+.brand-nav{display:flex;justify-content:space-between;align-items:center;padding:12px 28px}
+.brand-left{display:flex;align-items:center;gap:10px}
+.nav-logo{height:30px;width:auto;object-fit:contain}
+.brand-title{font-weight:800;color:var(--accent);font-size:1rem}
+.nav-right{display:flex;gap:12px;align-items:center}
+.nav-right a{color:#22303b;text-decoration:none;font-weight:600;opacity:0.9;padding:6px 8px;border-radius:6px}
+.nav-right a:hover{background:rgba(41,128,185,0.06);color:var(--accent)}
+
+/* layout */
+.vi-wrapper{min-height:calc(100vh - 64px);display:flex;align-items:center;justify-content:center;padding:28px}
+.vi-card{width:100%;max-width:640px;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px;border:1px solid rgba(22,42,64,0.04);text-align:center}
+
+/* content */
+.vi-card h1{margin:0 0 12px;font-size:1.4rem;color:#163a57;font-weight:800}
+.vi-message{margin:0 0 18px;color:var(--muted);font-size:1rem}
+
+/* actions */
+.vi-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-block;text-decoration:none;padding:10px 16px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
+.btn-primary{background:linear-gradient(90deg,var(--accent) 0%,var(--accent-2) 100%);color:#fff;box-shadow:0 8px 24px rgba(41,128,185,0.12)}
+.btn-ghost{background:transparent;color:var(--accent);border:1px solid rgba(41,128,185,0.12);padding:10px 14px;border-radius:10px}
+
+/* responsive */
+@media (max-width:520px){
+  .vi-card{padding:20px;margin:0 12px}
+  .nav-logo{height:26px}
+  .vi-actions{flex-direction:column;gap:12px;align-items:center}
+}
