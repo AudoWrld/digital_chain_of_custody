@@ -1,44 +1,87 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Two-Factor Authentication</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Two‑Factor Authentication — Chain of Custody</title>
+    <link rel="stylesheet" href="{% static 'css/second_auth.css' %}" />
   </head>
   <body>
-    {% if messages %}
-    <ul>
-      {% for message in messages %}
-      <li>{{ message }}</li>
-      {% endfor %}
-    </ul>
-    {% endif %}
+    <nav class="brand-nav" role="navigation" aria-label="Main">
+      <div class="brand-left">
+        <img src="{% static 'images/logo.png' %}" alt="Chain of Custody logo" class="nav-logo" />
+        <span class="brand-title">Chain of Custody</span>
+      </div>
+      <ul class="nav-right">
+        <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+        <li><a href="{% url 'logout' %}">Logout</a></li>
+      </ul>
+    </nav>
 
-    <h2>Two-Factor Authentication</h2>
+    <main class="auth-wrapper">
+      <section class="auth-card" aria-labelledby="auth-heading">
+        <h1 id="auth-heading">Two‑Factor Authentication</h1>
 
-    {% if qr_code %}
-    <p>
-      Scan this QR code with your authenticator app (Google Authenticator,
-      Authy, etc.):
-    </p>
-    <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code" />
-    <p>Or enter this secret manually: <strong>{{ secret }}</strong></p>
-    {% endif %}
+        {% if messages %}
+          <ul class="messages" role="status" aria-live="polite">
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
 
-    <form method="POST" style="margin-top: 20px">
-      {% csrf_token %}
-      <label for="token"
-        >Enter the 6-digit code from your app or a recovery code:</label
-      ><br />
-      <input type="text" name="token" id="token" required />
-      <button type="submit">Verify</button>
-    </form>
+        {% if qr_code %}
+          <p class="muted">Scan the QR code with your authenticator (Google Authenticator, Authy, etc.)</p>
+          <div class="qr-row">
+            <div class="qr-wrap" aria-hidden="false">
+              <img src="data:image/png;base64,{{ qr_code }}" alt="Authenticator QR code" />
+            </div>
 
-    {% if user.two_factor_enabled %}
-    <p style="margin-top: 20px;">
-      Lost access to your authenticator app?
-      <a href="{% url 'verify_recovery_code' %}">Verify using a recovery code</a>
-    </p>
-    {% endif %}
+            <div class="secret-col">
+              <label class="label">Manual secret</label>
+              <div class="secret-box">
+                <code id="totp-secret">{{ secret }}</code>
+                <button type="button" class="btn-ghost" id="copy-secret" data-secret="{{ secret }}">Copy</button>
+              </div>
+
+              <p class="muted small">If your authenticator cannot scan QR codes, enter the secret above.</p>
+            </div>
+          </div>
+        {% endif %}
+
+        <form method="post" class="verify-form" novalidate>
+          {% csrf_token %}
+          <label for="token" class="label">Enter 6‑digit code or recovery code</label>
+          <input id="token" name="token" inputmode="numeric" pattern="\d{6}" maxlength="16" placeholder="123456" required />
+
+          <button type="submit" class="btn-primary">Verify</button>
+        </form>
+
+        {% if user.two_factor_enabled %}
+          <p class="muted small" style="margin-top:12px;">
+            Lost access to your authenticator app?
+            <a href="{% url 'verify_recovery_code' %}" class="link">Verify using a recovery code</a>
+          </p>
+        {% endif %}
+      </section>
+    </main>
+
+    <script>
+      document.addEventListener('click', function (e) {
+        if (!e.target.matches('#copy-secret')) return;
+        const secret = e.target.getAttribute('data-secret') || document.getElementById('totp-secret')?.textContent;
+        if (!secret) return;
+        navigator.clipboard?.writeText(secret).then(() => {
+          const btn = e.target;
+          const old = btn.textContent;
+          btn.textContent = 'Copied';
+          setTimeout(() => (btn.textContent = old), 1200);
+        }).catch(() => {
+          alert('Copy failed — select and copy manually.');
+        });
+      });
+    </script>
   </body>
 </html>
+// ...existing code...
