@@ -1,15 +1,39 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VerificationError</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Verification Error — Chain of Custody</title>
+    <link rel="stylesheet" href="{% static 'css/verification_invalid.css' %}" />
   </head>
   <body>
-    <h2>{{ message }}</h2>
-    {% if resend_link %}
-    <a href="{% url 'resend_verification' %}">Resend Verification Email</a>
-    {% endif %}
+    <nav class="brand-nav" role="navigation" aria-label="Main">
+      <div class="brand-left">
+        <img src="{% static 'images/logo.png' %}" alt="Chain of Custody logo" class="nav-logo" />
+        <span class="brand-title">Chain of Custody</span>
+      </div>
+      <ul class="nav-right">
+        <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+        <li><a href="{% url 'login' %}">Login</a></li>
+      </ul>
+    </nav>
+
+    <main class="vi-wrapper" role="main">
+      <div class="vi-card" role="region" aria-labelledby="vi-heading">
+        <h1 id="vi-heading">Verification problem</h1>
+
+        <p class="vi-message" role="status" aria-live="polite">
+          {{ message|default:"The verification link is invalid or has expired." }}
+        </p>
+
+        <div class="vi-actions">
+          {% if resend_link %}
+            <a class="btn btn-primary" href="{% url 'resend_verification' %}">Resend verification email</a>
+          {% endif %}
+          <a class="btn btn-ghost" href="{% url 'login' %}">Back to Login</a>
+        </div>
+      </div>
+    </main>
   </body>
 </html>
-]

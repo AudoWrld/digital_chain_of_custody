@@ -1,36 +1,55 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Resend Verification</title>
+    <title>Resend Verification — Chain of Custody</title>
+    <link rel="stylesheet" href="{% static 'css/resend_verification.css' %}" />
   </head>
   <body>
-    {% if messages %}
-    <ul class="messages">
-      {% for message in messages %}
-      <li>{{ message }}</li>
-      {% endfor %}
-    </ul>
-    {% endif %}
+    <nav class="brand-nav" role="navigation" aria-label="Main">
+      <div class="brand-left">
+        <img src="{% static 'images/logo.png' %}" alt="Chain of Custody logo" class="nav-logo" />
+        <span class="brand-title">Chain of Custody</span>
+      </div>
+      <ul class="nav-right">
+        <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+        <li><a href="{% url 'login' %}">Login</a></li>
+      </ul>
+    </nav>
 
-    <div class="resend-form">
-      <h2>Resend Verification Email</h2>
+    <main class="resend-wrapper">
+      <div class="resend-card" role="region" aria-labelledby="resend-heading">
+        <h1 id="resend-heading">Resend Verification Email</h1>
 
-      {% if email %}
-      <p>
-        We’ll resend a verification link to:
-        <strong>{{ email }}</strong>
-      </p>
-      {% else %}
-      <p>We’re resending a verification link to your email address.</p>
-      {% endif %}
+        {% if messages %}
+          <ul class="messages" role="status" aria-live="polite">
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
 
-      <form method="post">
-        {% csrf_token %}
-        <input type="hidden" name="email" value="{{ email }}" />
-        <button type="submit">Resend</button>
-      </form>
-    </div>
+        <p class="lead">
+          {% if email %}
+            We'll resend a verification link to <strong>{{ email }}</strong>.
+          {% else %}
+            We'll resend a verification link to your email address.
+          {% endif %}
+        </p>
+
+        <form method="post" class="resend-form">
+          {% csrf_token %}
+          <input type="hidden" name="email" value="{{ email }}" />
+          <div class="form-row">
+            <button type="submit" class="btn-primary">Resend</button>
+            <a class="btn-ghost" href="{% url 'login' %}">Back to Login</a>
+          </div>
+        </form>
+
+        <p class="note">Didn't receive it? Check your spam folder or try again in a few minutes.</p>
+      </div>
+    </main>
   </body>
 </html>

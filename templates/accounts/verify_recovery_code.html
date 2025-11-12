@@ -1,33 +1,61 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Verify Recovery Code</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Verify Recovery Code — Chain of Custody</title>
+    <link rel="stylesheet" href="{% static 'css/verify_recovery_code.css' %}" />
   </head>
   <body>
-    {% if messages %}
-    <ul>
-      {% for message in messages %}
-      <li>{{ message }}</li>
-      {% endfor %}
-    </ul>
-    {% endif %}
+    <nav class="brand-nav" role="navigation" aria-label="Main">
+      <div class="brand-left">
+        <img src="{% static 'images/logo.png' %}" alt="Chain of Custody logo" class="nav-logo" />
+        <span class="brand-title">Chain of Custody</span>
+      </div>
+      <ul class="nav-right">
+        <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+        <li><a href="{% url 'login' %}">Login</a></li>
+      </ul>
+    </nav>
 
-    <h2>Verify Recovery Code</h2>
-    <p>
-      Enter one of your unused recovery codes to log in. Each code can only be used once.
-    </p>
+    <main class="verify-wrapper">
+      <section class="verify-card" aria-labelledby="verify-heading">
+        <h1 id="verify-heading">Verify Recovery Code</h1>
+        <p class="lead">Enter one of your unused recovery codes. Each code can be used only once.</p>
 
-    <form method="POST" style="margin-top: 20px;">
-      {% csrf_token %}
-      <label for="recovery_code">Recovery Code:</label><br />
-      <input type="text" name="recovery_code" id="recovery_code" required />
-      <button type="submit">Verify</button>
-    </form>
+        {% if messages %}
+          <ul class="messages" role="status" aria-live="polite">
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
 
-    <p>
-      Lost your recovery codes? Contact support to regain access to your account.
-    </p>
+        <form method="POST" class="verify-form" novalidate>
+          {% csrf_token %}
+          <label for="recovery_code" class="label">Recovery code</label>
+          <input
+            id="recovery_code"
+            name="recovery_code"
+            type="text"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            placeholder="XXXX-XXXX-XXXX"
+            maxlength="32"
+            required
+          />
+
+          <div class="form-row">
+            <button type="submit" class="btn-primary">Verify</button>
+            <a href="{% url 'login' %}" class="btn-ghost">Back to Login</a>
+          </div>
+        </form>
+
+        <p class="note">
+          Lost your recovery codes? Contact support or generate new codes from your account settings after signing in.
+        </p>
+      </section>
+    </main>
   </body>
 </html>
