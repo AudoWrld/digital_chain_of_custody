@@ -21,133 +21,44 @@ body{
 
 /* NAV */
 .brand-nav{
-  /* Ensures Logo Left and Links Right */
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:14px 36px;
+  padding:12px 28px;
   background:transparent;
+  width:100%;
 }
-.brand-left{display:flex;align-items:center;gap:12px}
-.nav-logo{height:40px;width:auto}
-.brand-title{font-weight:800;color:var(--accent);font-size:1.15rem}
-
-/* Links List Container */
-.nav-right{
-  /* Ensures links are on a single line */
-  display:flex;
-  gap:16px;
-  list-style:none;
-  margin:0;
-  padding:0;
-  align-items:center
+.brand-left{display:flex;align-items:center;gap:10px}
+.nav-logo{
+  height:32px;
+  width:auto;
+  object-fit:contain;
+  display:block;
 }
-
-/* 🛑 Crucial Fixes for Nav Links 🛑 */
-/* Reset any button/block styling that might be applied globally to <li> or <a> */
-.nav-right li {
-    /* Ensures list items don't take up full width or get block button styling */
-    display: inline-block; 
-    padding: 0;
-    margin: 0;
-    background: none; /* Remove background color */
-}
-
-<<<<<<< Updated upstream
-.split-form {
-  position: relative;
-  /* Allow navbar absolute positioning inside it */
-  padding-top: 100px;
-}
-
-
-h1 {
-  color: #2980b9;
-  text-align: center;
-  margin-bottom: 18px;
-  font-size: 2.3rem;
-  font-weight: 800;
-  letter-spacing: 1.5px;
-  background: none;
-=======
+.brand-title{font-weight:800;color:var(--accent);font-size:1rem}
+.nav-right{display:flex;gap:14px;list-style:none;margin:0;padding:0;align-items:center}
+.nav-right li{display:inline-block}
 .nav-right a{
-  /* Reset link appearance to text, not a button block */
-  display: inline; 
->>>>>>> Stashed changes
-  padding: 0;
-  border-radius: 0;
-  border: none;
-  background: none; /* Remove red background seen in the image */
   color:#22303b;
   text-decoration:none;
   font-weight:600;
   opacity:0.9;
-  box-shadow: none;
+  padding:6px 8px;
+  border-radius:6px;
 }
-<<<<<<< Updated upstream
-
-form {
-  background: #fff;
-  padding: 36px 44px;
-  border-radius: 18px;
-  box-shadow: 0 4px 24px rgba(44, 62, 80, 0.18);
-  width: 100%;
-  margin-top: 18px;
-  font-size: 1.15rem;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-form input,
-form select,
-form textarea {
-  width: 100%;
-  padding: 14px;
-  margin-bottom: 12px;
-  border: 1.5px solid #dfe6e9;
-  border-radius: 8px;
-  font-size: 1.15rem;
-  background: #f4f6fa;
-  transition: border 0.2s;
-}
-
-form input:focus,
-form select:focus,
-form textarea:focus {
-  border-color: #2980b9;
-  outline: none;
-}
-
-button[type="submit"] {
-  background: linear-gradient(90deg, #2980b9 0%, #6dd5fa 100%);
-  color: #fff;
-  border: none;
-  padding: 14px 0;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 1.2rem;
-  font-weight: 700;
-  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.10);
-  width: 100%;
-  transition: background 0.3s;
-  margin-top: 10px;
-=======
-/* Ensure the active link still stands out */
-.nav-right .active a{
-  color:var(--accent);
-}
+.nav-right a:hover{ background: rgba(41,128,185,0.06); color:var(--accent) }
+.nav-right .active a{ color:var(--accent) }
 
 /* SPLIT LAYOUT */
 .split-container{
   display:flex;
-  min-height:calc(100vh - 72px);
+  min-height:calc(100vh - 64px);
   gap:0;
 }
 
-/* Left: image - UPDATED FOR 2/3 WIDTH */
+/* Left: image */
 .split-image{
-  flex:2; /* Takes 2 parts (approx 66.67%) */
+  flex: 2;
   position:relative;
   overflow:hidden;
   display:flex;
@@ -187,20 +98,15 @@ button[type="submit"] {
   font-weight:800;
   letter-spacing:0.6px;
 }
-.image-content p{
-  margin:0;
-  font-size:1.05rem;
-  opacity:0.95;
->>>>>>> Stashed changes
-}
+.image-content p{ margin:0; font-size:1.05rem; opacity:0.95 }
 
-/* Right: form - UPDATED FOR 1/3 WIDTH */
+/* Right: form */
 .split-form{
-  flex:1; /* Takes 1 part (approx 33.33%) */
+  flex: 1;
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:48px 56px;
+  padding:40px 44px;
   background: linear-gradient(180deg, #fbfdff 0%, #ffffff 100%);
 }
 .form-card{
@@ -209,35 +115,23 @@ button[type="submit"] {
   background:var(--glass);
   border-radius:calc(var(--radius) - 4px);
   box-shadow:var(--shadow);
-  padding:34px 38px;
+  padding:30px 34px;
   border:1px solid rgba(22,42,64,0.04);
 }
 
 /* Heading */
 .form-card h1{
-  margin:0 0 16px 0;
-  font-size:1.9rem;
+  margin:0 0 14px 0;
+  font-size:1.75rem;
   color:#163a57;
   font-weight:800;
 }
 
-<<<<<<< Updated upstream
-li {
-  background: #e74c3c;
-  color: #fff;
-  padding: 10px;
-  border-radius: 6px;
-  margin-bottom: 7px;
-  text-align: center;
-  box-shadow: 0 1px 4px rgba(44, 62, 80, 0.10);
-  font-size: 1.1rem;
-=======
 /* messages */
-.messages{list-style:none;padding:0;margin:8px 0 18px 0}
+.messages{list-style:none;padding:0;margin:8px 0 14px 0}
 .messages li{
   background:#e74c3c;color:#fff;padding:10px 12px;border-radius:10px;margin-bottom:10px;
   font-weight:700;font-size:0.98rem;box-shadow:0 2px 8px rgba(0,0,0,0.06);
->>>>>>> Stashed changes
 }
 
 /* Form fields (Django's form.as_p output) */
@@ -261,41 +155,24 @@ li {
   box-shadow:0 8px 24px rgba(41,128,185,0.08);
 }
 
-/* Responsive for mobile */
-@media (max-width: 900px) {
-  .split-container {
-    flex-direction: column;
-  }
+/* Button */
+.btn-primary{
+  display:inline-block;
+  width:100%;
+  margin-top:8px;
+  padding:14px 16px;
+  border-radius:10px;
+  border:none;
+  color:#fff;
+  font-weight:800;
+  font-size:1.05rem;
+  background: linear-gradient(90deg,var(--accent) 0%, var(--accent-2) 100%);
+  box-shadow:0 10px 30px rgba(41,128,185,0.14);
+  cursor:pointer;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.btn-primary:hover{ transform: translateY(-3px) }
 
-  .split-image,
-  .split-form {
-    max-width: 100vw;
-    min-width: 0;
-    width: 100vw;
-    height: 50vh;
-  }
-
-  .split-image img {
-    height: 50vh;
-  }
-
-  .split-form {
-    border-radius: 0 0 24px 24px;
-    padding: 30px 10px;
-    min-width: 0;
-    max-width: 100vw;
-  }
-
-  form {
-    padding: 24px 10px;
-    font-size: 1rem;
-  }
-
-  h1 {
-    font-size: 1.7rem;
-    margin: 18px auto 12px auto;
-  }
-=======
 /* footer of form */
 .form-footer{
   margin-top:14px;
@@ -307,12 +184,206 @@ li {
 }
 .form-footer .link{ color:var(--accent); font-weight:700; text-decoration:none; margin-left:6px }
 
-/* Responsive - Still collapses to column-reverse on smaller screens */
+/* Responsive */
 @media (max-width:980px){
   .split-container{ flex-direction:column-reverse; min-height:initial }
-  .split-image{ height:42vh; min-height:260px }
+  .split-image{ height:36vh; min-height:240px }
   .split-form{ padding:28px 20px }
   .form-card{ padding:22px }
   .image-content h2{ font-size:1.6rem }
->>>>>>> Stashed changes
+}
+ /* ```// filepath: /home/gachogu/digital_chain_of_custody/static/css/register.css */
+:root{
+  --accent:#2980b9;
+  --accent-2:#6dd5fa;
+  --muted:#6c757d;
+  --card:#ffffff;
+  --radius:14px;
+  --shadow: 0 10px 30px rgba(20,30,40,0.12);
+  --glass: rgba(255,255,255,0.92);
+  --font-sans: "Segoe UI", Roboto, Arial, sans-serif;
+} 
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:var(--font-sans);
+  background:#f4f6f8;
+  color:#163a57;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* NAV */
+.brand-nav{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 28px;
+  background:transparent;
+  width:100%;
+}
+.brand-left{display:flex;align-items:center;gap:10px}
+.nav-logo{
+  height:32px;
+  width:auto;
+  object-fit:contain;
+  display:block;
+}
+.brand-title{font-weight:800;color:var(--accent);font-size:1rem}
+.nav-right{display:flex;gap:14px;list-style:none;margin:0;padding:0;align-items:center}
+.nav-right li{display:inline-block}
+.nav-right a{
+  color:#22303b;
+  text-decoration:none;
+  font-weight:600;
+  opacity:0.9;
+  padding:6px 8px;
+  border-radius:6px;
+}
+.nav-right a:hover{ background: rgba(41,128,185,0.06); color:var(--accent) }
+.nav-right .active a{ color:var(--accent) }
+
+/* SPLIT LAYOUT */
+.split-container{
+  display:flex;
+  min-height:calc(100vh - 64px);
+  gap:0;
+}
+
+/* Left: image */
+.split-image{
+  flex: 2;
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:540px;
+}
+.split-image img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  transform:scale(1.03);
+  transition:transform .6s ease;
+}
+.split-image:hover img{ transform:scale(1.06) }
+
+.image-overlay{
+  position:absolute;
+  inset:0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.32) 0%, rgba(0,0,0,0.44) 100%);
+  z-index:1;
+}
+
+.image-content{
+  position:relative;
+  z-index:2;
+  color:#fff;
+  text-align:center;
+  padding:32px;
+  max-width:420px;
+}
+.image-content h2{
+  margin:0 0 8px;
+  font-size:2rem;
+  font-weight:800;
+  letter-spacing:0.6px;
+}
+.image-content p{ margin:0; font-size:1.05rem; opacity:0.95 }
+
+/* Right: form */
+.split-form{
+  flex: 1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:40px 44px;
+  background: linear-gradient(180deg, #fbfdff 0%, #ffffff 100%);
+}
+.form-card{
+  width:100%;
+  max-width:520px;
+  background:var(--glass);
+  border-radius:calc(var(--radius) - 4px);
+  box-shadow:var(--shadow);
+  padding:30px 34px;
+  border:1px solid rgba(22,42,64,0.04);
+}
+
+/* Heading */
+.form-card h1{
+  margin:0 0 14px 0;
+  font-size:1.75rem;
+  color:#163a57;
+  font-weight:800;
+}
+
+/* messages */
+.messages{list-style:none;padding:0;margin:8px 0 14px 0}
+.messages li{
+  background:#e74c3c;color:#fff;padding:10px 12px;border-radius:10px;margin-bottom:10px;
+  font-weight:700;font-size:0.98rem;box-shadow:0 2px 8px rgba(0,0,0,0.06);
+}
+
+/* Form fields (Django's form.as_p output) */
+.form-fields p{ margin:0 0 12px 0; font-size:1.02rem }
+.form-fields label{ display:block; margin-bottom:6px; font-weight:700; color:#34495e }
+.form-fields input, .form-fields select, .form-fields textarea{
+  width:100%;
+  padding:12px 14px;
+  border-radius:10px;
+  border:1.25px solid #e6eef5;
+  background:#fbfdff;
+  font-size:1.02rem;
+  color:#163a57;
+  transition:box-shadow .12s, border-color .12s;
+}
+.form-fields input:focus,
+.form-fields select:focus,
+.form-fields textarea:focus{
+  outline:none;
+  border-color:var(--accent);
+  box-shadow:0 8px 24px rgba(41,128,185,0.08);
+}
+
+/* Button */
+.btn-primary{
+  display:inline-block;
+  width:100%;
+  margin-top:8px;
+  padding:14px 16px;
+  border-radius:10px;
+  border:none;
+  color:#fff;
+  font-weight:800;
+  font-size:1.05rem;
+  background: linear-gradient(90deg,var(--accent) 0%, var(--accent-2) 100%);
+  box-shadow:0 10px 30px rgba(41,128,185,0.14);
+  cursor:pointer;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.btn-primary:hover{ transform: translateY(-3px) }
+
+/* footer of form */
+.form-footer{
+  margin-top:14px;
+  display:flex;
+  gap:12px;
+  align-items:center;
+  justify-content:center;
+  color:var(--muted);
+}
+.form-footer .link{ color:var(--accent); font-weight:700; text-decoration:none; margin-left:6px }
+
+/* Responsive */
+@media (max-width:980px){
+  .split-container{ flex-direction:column-reverse; min-height:initial }
+  .split-image{ height:36vh; min-height:240px }
+  .split-form{ padding:28px 20px }
+  .form-card{ padding:22px }
+  .image-content h2{ font-size:1.6rem }
 }
