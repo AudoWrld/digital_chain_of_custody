@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}View Case{% endblock %}
+
+{% block content %}
+<h1>Case: {{ title }}</h1>
+<p>Category: {{ category }}</p>
+<p>Status: {{ case.case_status }}</p>
+
+<h2>Media</h2>
+{% if media_files %}
+<ul>
+    {% for media in media_files %}
+    <li>
+        {{ media.description }} -
+        <a href="{% url 'view_media' media.id %}">Download</a> |
+        <a href="{% url 'edit_media_description' media.id %}">Edit Description</a> |
+        <a href="{% url 'mark_media_invalid' media.id %}">Mark Invalid</a> |
+        <a href="{% url 'view_media_audit_log' media.id %}">Audit Log</a>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No media uploaded for this case.</p>
+{% endif %}
+
+<h2>Actions</h2>
+{% if case.case_status in 'open under_review' %}
+<a href="{% url 'edit_case' case.id %}">Edit Case</a> |
+<a href="{% url 'withdraw_case' case.id %}">Withdraw Case</a>
+{% endif %}
+{% if case.case_status == 'Closed' %}
+<a href="{% url 'archive_case' case.id %}">Archive Case</a>
+{% endif %}
+{% if request.user.is_staff and case.case_status == 'Closed' and not case.closure_approved %}
+<a href="{% url 'approve_case_closure' case.id %}">Approve Closure</a>
+{% endif %}
+
+<a href="{% url 'case_list' %}">Back to Cases</a>
+{% endblock %}
