@@ -14,6 +14,7 @@ urlpatterns = [
     path("custody/", include("custody.urls")),
     path("evidence/", include("evidence.urls")),
     path("reports", include("evidence.urls")),
+    path("chat/", include("chat.urls")),
 ]
 
 

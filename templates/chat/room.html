@@ -1,0 +1,64 @@
+{% extends 'base.html' %} {% block content %}
+<h2>Conversation {{ conversation.id }}</h2>
+<div
+  id="chat-log"
+  style="border: 1px solid #ccc; padding: 10px; height: 300px; overflow: auto"
+>
+  {% for msg in messages %}
+  <div>
+    <strong>{{ msg.sender.username }}</strong>: {{ msg.content }}
+    <small>{{ msg.timestamp }}</small>
+  </div>
+  {% endfor %}
+</div>
+
+<form id="chat-form">
+  <input id="chat-message-input" type="text" size="100" autocomplete="off" />
+  <input id="chat-message-submit" type="submit" value="Send" />
+</form>
+
+<script>
+  (function () {
+    const conversationId = "{{ conversation.id }}";
+    const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+    const chatSocket = new WebSocket(
+      protocol +
+        "://" +
+        window.location.host +
+        "/ws/chat/" +
+        conversationId +
+        "/"
+    );
+
+    chatSocket.onmessage = function (e) {
+      const data = JSON.parse(e.data);
+      const log = document.getElementById("chat-log");
+      const el = document.createElement("div");
+      el.innerHTML =
+        "<strong>" +
+        data.sender +
+        "</strong>: " +
+        data.message +
+        " <small>" +
+        data.timestamp +
+        "</small>";
+      log.appendChild(el);
+      log.scrollTop = log.scrollHeight;
+    };
+
+    chatSocket.onclose = function (e) {
+      console.error("Chat socket closed unexpectedly");
+    };
+
+    document.getElementById("chat-form").onsubmit = function (e) {
+      e.preventDefault();
+      const input = document.getElementById("chat-message-input");
+      const message = input.value;
+      if (message.trim().length === 0) return;
+      chatSocket.send(JSON.stringify({ message: message }));
+      input.value = "";
+    };
+  })();
+</script>
+
+{% endblock %}

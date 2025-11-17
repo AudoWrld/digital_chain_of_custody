@@ -30,6 +30,9 @@ INSTALLED_APPS = [
     "evidence",
     "reports",
     "dashboard",
+    # Real-time chat app
+    "channels",
+    "chat",
 ]
 
 MIDDLEWARE = [
@@ -60,6 +63,16 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "digital_chain_of_custody.wsgi.application"
+
+# Use Channels' ASGI application for WebSocket support
+ASGI_APPLICATION = "digital_chain_of_custody.asgi.application"
+
+# Channels channel layers - in-memory for local/dev use. Replace with Redis in production.
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
 
 
 # Database
