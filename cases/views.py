@@ -2,19 +2,24 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseForbidden, FileResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
-from .models import Case, CaseMedia, EncryptionKey, CaseAuditLog
+from django.db.models import Q
+from django.utils import timezone
+from .models import Case, CaseMedia, EncryptionKey, CaseAuditLog, AssignmentRequest
 from .forms import CaseForm, CaseMediaForm,EditCaseForm
 import csv
 from django.contrib.auth import get_user_model
+import logging
 User = get_user_model()
+logger = logging.getLogger(__name__)
 
 
 # list all cases for logged-in user
 @login_required
 def case_list(request):
-    cases = Case.objects.filter(created_by=request.user)
+    cases = Case.objects.filter(
+        Q(created_by=request.user) | Q(assigned_investigators=request.user)
+    ).select_related('encryption_key')
     return render(request, 'cases/case_list.html', {'cases': cases})
-
 
 
 @login_required
@@ -22,32 +27,25 @@ def create_case(request):
     if request.method == 'POST':
         form = CaseForm(request.POST)
         if form.is_valid():
-            title = request.POST.get('title')
-            description = request.POST.get('description')
-            category = request.POST.get('category')
-            
-            case = Case(created_by=request.user)
-            cipher = Fernet(Fernet.generate_key())
-            case.case_title = cipher.encrypt(title.encode())
-            case.case_description = cipher.encrypt(description.encode())
-            case.case_category = cipher.encrypt(category.encode())
+            case = form.save(commit=False)
+            case.created_by = request.user
             case.save()
-            
-            CaseAuditLog.log_action(user=request.user, case=case, action='Created case')
-            
-            
-            EncryptionKey.objects.create(case=case)
-            
-            return redirect('view_case', case_id=case.id)
-    return render(request, 'cases/create_case.html')
 
+            # Log creation in audit trail
+            CaseAuditLog.log_action(user=request.user, case=case, action='Created case')
+
+            return redirect('view_case', case_id=case.id)
+    else:
+        form = CaseForm()
+
+    return render(request, 'cases/create_case.html', {'form': form})
 
 @login_required
 def view_case(request, case_id):
-    case = get_object_or_404(Case, id=case_id)
+    case = get_object_or_404(Case, id=case_id, created_by=request.user)
     
-    if request.user != case.created_by and not request.user.is_staff:
-        return HttpResponseForbidden("Your are not allowed to view this case!")
+    if request.user != case.created_by and request.user not in case.assigned_investigators.all() and not request.user.is_staff:
+        return HttpResponseForbidden("You are not allowed to view this case!")
     
     case_title = case.get_title()
     case_description = case.get_description()
@@ -55,7 +53,7 @@ def view_case(request, case_id):
     
     media_files = case.evidence.all()
     
-    CaseAuditLog.log_action(user=request.user, case=case, action=f"Viewed case {case.case_title}")
+    CaseAuditLog.log_action(user=request.user, case=case, action=f"Viewed case {case.get_title()}")
 
     return render(request, 'cases/view_case.html', {
         'case': case,
@@ -75,16 +73,16 @@ def edit_case(request, case_id):
         return HttpResponseForbidden("Not authorized.")
 
     # Only allow editing if case is open or under review
-    if case.case_status not in ['open', 'under_review']:
+    if case.case_status not in ['Open', 'Under Review']:
         return HttpResponseForbidden("Case cannot be edited in its current status.")
 
     old_data = {
-        'title': case.case_title,
-        'description': case.case_description,
-        'category': case.case_category,
+        'case_title': case.get_title(),
+        'case_description': case.get_description(),
+        'case_category': case.get_category(),
         'assigned_investigators': list(case.assigned_investigators.all()),
-        'priority': case.case_priority,
-        'status_notes': case.case_status_notes
+        'case_priority': case.case_priority,
+        'case_status_notes': case.get_status_notes() if hasattr(case, 'get_status_notes') else case.case_status_notes  # assuming status_notes is encrypted
     }
 
     if request.method == 'POST':
@@ -94,9 +92,8 @@ def edit_case(request, case_id):
 
             # Log changes in audit trail
             for field, old_value in old_data.items():
-                new_value = getattr(case, field)
-                # Handle ManyToMany field for assigned_investigators
                 if field == 'assigned_investigators':
+                    new_value = list(case.assigned_investigators.all())
                     new_value_ids = set(user.id for user in new_value)
                     old_value_ids = set(user.id for user in old_value)
                     if new_value_ids != old_value_ids:
@@ -107,6 +104,7 @@ def edit_case(request, case_id):
                             details=f"Old: {', '.join(str(u) for u in old_value)} | New: {', '.join(str(u) for u in new_value)}"
                         )
                 else:
+                    new_value = getattr(case, field)
                     if old_value != new_value:
                         CaseAuditLog.log_action(
                             user=request.user,
@@ -117,7 +115,11 @@ def edit_case(request, case_id):
 
             return redirect('view_case', case_id=case.id)
     else:
-        form = EditCaseForm(instance=case)
+        form = EditCaseForm(instance=case, initial={
+            'case_title': case.get_title(),
+            'case_description': case.get_description(),
+            'case_category': case.get_category()
+        })
 
     return render(request, 'cases/edit_case.html', {'form': form, 'case': case})
 
@@ -128,30 +130,69 @@ def edit_case(request, case_id):
 def assign_investigator(request, case_id):
     case = get_object_or_404(Case, id=case_id)
 
-    # Only staff/admin can assign investigators
-    if not request.user.is_staff:
-        return HttpResponseForbidden("Not allowed.")
-
     if request.method == "POST":
-        investigator_ids = request.POST.getlist("investigators")
-        case.assigned_investigators.set(investigator_ids)
-        case.save()
-
-        CaseAuditLog.log_action(
-            user=request.user,
-            case=case,
-            action="Assigned investigators",
-            details=f"Investigators: {investigator_ids}"
-        )
-
-        return redirect("view_case", case_id=case.id)
+        action = request.POST.get('action')
+        if action == 'propose':
+            # Creator proposes assignment
+            if request.user != case.created_by:
+                return HttpResponseForbidden("Only case creator can propose assignments.")
+            investigator_ids = request.POST.getlist("investigators")
+            notes = request.POST.get('notes', '')
+            request_obj = AssignmentRequest.objects.create(
+                case=case,
+                requested_by=request.user,
+                request_type='assignment',
+                status='pending_admin',
+                notes=notes
+            )
+            request_obj.assigned_users.set(investigator_ids)
+            CaseAuditLog.log_action(
+                user=request.user,
+                case=case,
+                action="Proposed investigator assignment",
+                details=f"Investigators: {investigator_ids}, Notes: {notes}"
+            )
+        elif action == 'approve':
+            # Admin approves
+            if not request.user.is_staff:
+                return HttpResponseForbidden("Only admins can approve.")
+            request_id = request.POST.get('request_id')
+            request_obj = get_object_or_404(AssignmentRequest, id=request_id, case=case)
+            if request_obj.status == 'pending_admin':
+                request_obj.status = 'approved'
+                request_obj.approved_at = timezone.now()
+                request_obj.save()
+                case.assigned_investigators.set(request_obj.assigned_users.all())
+                case.save()
+                CaseAuditLog.log_action(
+                    user=request.user,
+                    case=case,
+                    action="Approved investigator assignment",
+                    details=f"Investigators: {list(request_obj.assigned_users.values_list('username', flat=True))}"
+                )
+        elif action == 'reject':
+            if not request.user.is_staff:
+                return HttpResponseForbidden("Only admins can reject.")
+            request_id = request.POST.get('request_id')
+            request_obj = get_object_or_404(AssignmentRequest, id=request_id, case=case)
+            request_obj.status = 'rejected'
+            request_obj.save()
+            CaseAuditLog.log_action(
+                user=request.user,
+                case=case,
+                action="Rejected investigator assignment",
+                details=f"Request by {request_obj.requested_by.username}"
+            )
+        return redirect("assign_investigators", case_id=case.id)
 
     users = User.objects.all()
+    pending_requests = case.assignment_requests.filter(status__in=['pending_admin'])
 
     return render(request, "cases/assign_investigator.html", {
         "case": case,
         "users": users,
         "assigned": case.assigned_investigators.all(),
+        "pending_requests": pending_requests,
     })
 
 
@@ -267,7 +308,7 @@ def archive_case(request, case_id):
     CaseAuditLog.log_action(
         user=request.user,
         case=case,
-        action=f"Archived case {case.case_title}. Case is now read-only"
+        action=f"Archived case {case.get_title()}. Case is now read-only"
     )
     
     return redirect('view_case', case_id=case.id)
@@ -349,27 +390,25 @@ def upload_media(request, case_id):
     if request.method == 'POST':
         form = CaseMediaForm(request.POST, request.FILES)
         if form.is_valid():
-            media_file = request.FILES.get('media')
-            description = request.POST.get('description')
-            media_type = request.POST.get('media_type')
-            
-            
-            new_media = CaseMedia(
-                case=case,
-                media=media_file,
-                description=description,
-                media_type=media_type
-            )
-            new_media.save()
-            
-            CaseAuditLog.log_action(
-                user=request.user,
-                case=case,
-                action=f'Media: {media_file.name} Type: {media_type}'
-            )
+            media = form.save(commit=False)
+            media.case = case
+            media.save()
+
+            try:
+                CaseAuditLog.log_action(
+                    user=request.user,
+                    case=case,
+                    action='Uploaded media',
+                    details=f'File: {media.media.name}, Type: {media.media_type}, Description: {media.description}'
+                )
+            except Exception as e:
+                logger.error(f"Failed to log media upload for case {case.id}: {e}")
             return redirect('view_case', case_id=case.id)
-        
-        return render(request, 'cases/upload_media.html', {'case':case})
+
+    else:
+        form = CaseMediaForm()
+
+    return render(request, 'cases/upload_media.html', {'form': form, 'case': case})
     
     
 @login_required
@@ -382,7 +421,10 @@ def view_media(request, media_id):
     
     decrypted_file = media.download_decrypted()
     
-    CaseAuditLog.log_action(user=request.user,case=case, action=f'Media: {media.media.name}')
+    try:
+        CaseAuditLog.log_action(user=request.user, case=case, action='Viewed media', details=f'File: {media.media.name}')
+    except Exception as e:
+        logger.error(f"Failed to log media view for case {case.id}: {e}")
     
     response = FileResponse(
         decrypted_file,
@@ -417,8 +459,8 @@ def edit_media_description(request, media_id):
         CaseAuditLog.log_action(
             user=request.user,
             case=case,
-            action="edit media description",
-            details=f'Old: {old_description} | New: {new_description}'
+            action="Edited media description",
+            details=f'File: {media.media.name}, Old: {old_description} | New: {new_description}'
         )
         return redirect('view_case', case_id=case.id)
     return render(request, 'cases/edit_media.html', {'media': media})
@@ -447,7 +489,7 @@ def mark_media_invalid(request, media_id):
         user=request.user,
         case=case,
         action='Marked media invalid',
-        details=f'Media: {media.media.name}'
+        details=f'File: {media.media.name}'
     )
 
     return redirect('view_case', case_id=case.id)
@@ -461,7 +503,9 @@ def view_case_audit_log(request, case_id):
     if request.user != case.created_by and not request.user.is_staff:
         return HttpResponseForbidden("Not authorized to view this audit log.")
 
-    audit_logs = case.audit_logs.all().order_by('-timestamp')
+    # Exclude media-related actions from case audit log
+    media_actions = ['Uploaded media', 'Viewed media', 'Edited media description', 'Marked media invalid']
+    audit_logs = case.audit_logs.exclude(action__in=media_actions).order_by('-timestamp')
 
     return render(request, 'cases/case_audit_log.html', {
         'case': case,
@@ -486,8 +530,9 @@ def download_case_audit_log(request, case_id):
     writer = csv.writer(response)
     writer.writerow(['Timestamp', 'User', 'Action', 'Details'])
 
-    # Fetch all audit logs ordered by timestamp
-    audit_logs = case.audit_logs.all().order_by('timestamp')
+    # Fetch all audit logs ordered by timestamp, exclude media actions
+    media_actions = ['Uploaded media', 'Viewed media', 'Edited media description', 'Marked media invalid']
+    audit_logs = case.audit_logs.exclude(action__in=media_actions).order_by('timestamp')
     for log in audit_logs:
         writer.writerow([
             log.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
@@ -509,7 +554,9 @@ def view_media_audit_log(request, media_id):
         return HttpResponseForbidden("Not authorized to view this media audit log.")
 
     # Fetch all audit logs for this case that relate to this media
-    audit_logs = case.audit_logs.filter(details__icontains=media.media.name).order_by('-timestamp')
+    audit_logs = case.audit_logs.filter(
+        Q(action__icontains=media.media.name) | Q(details__icontains=media.media.name)
+    ).order_by('-timestamp')
 
     return render(request, 'cases/media_audit_log.html', {
         'media': media,
@@ -536,7 +583,9 @@ def download_media_audit_log(request, media_id):
     writer.writerow(['Timestamp', 'User', 'Action', 'Details'])
 
     # Filter audit logs related to this media
-    audit_logs = case.audit_logs.filter(details__icontains=media.media.name).order_by('timestamp')
+    audit_logs = case.audit_logs.filter(
+        Q(action__icontains=media.media.name) | Q(details__icontains=media.media.name)
+    ).order_by('timestamp')
 
     for log in audit_logs:
         writer.writerow([
