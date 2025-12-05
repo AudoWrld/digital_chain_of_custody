@@ -1,14 +1,40 @@
 {% extends 'base.html' %}
+
 {% block title %}Create Case{% endblock %}
 
 {% block content %}
-<h1>Create Case</h1>
+<div class="container py-5">
+    <h2>Create New Case</h2>
+    
+    <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        
+        <div class="form-group mb-3">
+            <label for="id_case_title">Title</label>
+            {{ form.case_title.errors }}
+            {{ form.case_title }}
+        </div>
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Create Case</button>
-</form>
+        <div class="form-group mb-3">
+            <label for="id_case_description">Description</label>
+            {{ form.case_description.errors }}
+            {{ form.case_description }}
+        </div>
 
-<a href="{% url 'case_list' %}">Back to Cases</a>
+        <div class="form-group mb-3">
+            <label for="id_case_category">Category</label>
+            {{ form.case_category.errors }}
+            {{ form.case_category }}
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="id_case_priority">Priority</label>
+            {{ form.case_priority.errors }}
+            {{ form.case_priority }}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Create Case</button>
+    </form>
+</div>
 {% endblock %}

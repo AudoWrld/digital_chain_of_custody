@@ -24,7 +24,7 @@
             <td>{{ case.get_category }}</td>
             <td>
                 <a href="{% url 'view_case' case.id %}">View</a>
-                {% if case.case_status in 'open under_review' %}
+                {% if case.case_status in 'Open,Under Review' %}
                     | <a href="{% url 'edit_case' case.id %}">Edit</a>
                 {% endif %}
             </td>
