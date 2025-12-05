@@ -33,7 +33,7 @@ from datetime import datetime
 User = get_user_model()
 
 
-# Registar
+# Register
 def register(request):
     if request.method == "POST":
         form = RegisterForm(request.POST)
@@ -260,9 +260,11 @@ def verify_recovery_code(request):
 
     return render(request, "accounts/verify_recovery_code.html")
 
+
 # Proceed or setup new 2fa
 def proceed_to_dashboard(request):
-    return render(request, 'accounts/proceed_to_dashboard.html')
+    return render(request, "accounts/proceed_to_dashboard.html")
+
 
 def setup_new_2fa(request):
     user = request.user
@@ -270,9 +272,7 @@ def setup_new_2fa(request):
     user.recovery_codes_downloaded = False
     user.recovery_codes = ""
     user.save()
-    return redirect('second_authentication')
-    
-    
+    return redirect("second_authentication")
 
 # Download recovery codes
 @login_required
