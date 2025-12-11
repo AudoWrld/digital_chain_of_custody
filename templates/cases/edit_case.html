@@ -6,7 +6,6 @@
 
 <form method="post">
     {% csrf_token %}
-    {% if case.case_status == 'Open' %}
     <div>
         <label for="{{ form.case_title.id_for_label }}">Title:</label>
         {{ form.case_title }}
@@ -22,16 +21,10 @@
         {{ form.case_category }}
         {{ form.case_category.errors }}
     </div>
-    {% endif %}
     <div>
         <label for="{{ form.case_priority.id_for_label }}">Priority:</label>
         {{ form.case_priority }}
         {{ form.case_priority.errors }}
-    </div>
-    <div>
-        <label for="{{ form.assigned_investigators.id_for_label }}">Assigned Investigators:</label>
-        {{ form.assigned_investigators }}
-        {{ form.assigned_investigators.errors }}
     </div>
     <button type="submit">Save Changes</button>
 </form>
