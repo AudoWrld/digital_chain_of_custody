@@ -3,8 +3,27 @@
 
 {% block content %}
 <h1>Case: {{ title }}</h1>
-<p>Category: {{ category }}</p>
-<p>Status: {{ case.case_status }}</p>
+<p><strong>Description:</strong> {{ case.get_description }}</p>
+<p><strong>Category:</strong> {{ category }}</p>
+<p><strong>Status:</strong> {{ case.case_status }}</p>
+<p><strong>Priority:</strong> {{ case.case_priority }}</p>
+<p><strong>Created By:</strong> {{ case.created_by.get_full_name }}</p>
+<p><strong>Created At:</strong> {{ case.created_at }}</p>
+<p><strong>Assigned Investigators:</strong>
+    {% for inv in case.assigned_investigators.all %}
+        {{ inv.get_full_name }}{% if not forloop.last %}, {% endif %}
+    {% empty %}
+        None
+    {% endfor %}
+</p>
+{% if case.close_reason %}
+<p><strong>Close Reason:</strong> {{ case.close_reason }}</p>
+{% endif %}
+{% if case.closure_requested %}
+<p><strong>Closure Requested:</strong> Yes</p>
+<p><strong>Creator Approved:</strong> {{ case.closure_creator_approved|yesno:"Yes,No" }}</p>
+<p><strong>Admin Approved:</strong> {{ case.closure_approved|yesno:"Yes,No" }}</p>
+{% endif %}
 
 <h2>Media</h2>
 {% if media_files %}
@@ -42,8 +61,49 @@
 {% if case.case_status == 'Closed' %}
 <a href="{% url 'archive_case' case.id %}">Archive Case</a> |
 {% endif %}
-{% if request.user.is_staff and case.case_status == 'Closed' and not case.closure_approved %}
-<a href="{% url 'admin_approve_case_closure' case.id %}">Approve Closure</a> |
+{% if case.case_status == 'Pending Admin Approval' and request.user.is_staff %}
+  <h3>Pending Investigator Assignment</h3>
+  {% for req in case.assignment_requests.all %}
+    {% if req.status == 'pending_admin' %}
+      <p>Proposed by: {{ req.requested_by.get_full_name }}</p>
+      <p>Proposed Investigators: {% for u in req.assigned_users.all %}{{ u.get_full_name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+      <p>Notes: {{ req.notes }}</p>
+      <form method="post" style="display:inline;">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="approve">
+        <input type="hidden" name="request_id" value="{{ req.id }}">
+        <button type="submit">Approve Assignment</button>
+      </form>
+      <form method="post" style="display:inline;">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="reject">
+        <input type="hidden" name="request_id" value="{{ req.id }}">
+        <button type="submit">Reject Assignment</button>
+      </form>
+    {% endif %}
+  {% endfor %}
+  <hr>
+  <h4>Assign New Investigators</h4>
+  <form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="assign_direct">
+    <label for="direct_investigators">Select Investigators:</label><br>
+    <select name="direct_investigators" id="direct_investigators" multiple>
+      {% for user_obj in investigators %}
+      <option value="{{ user_obj.id }}">{{ user_obj.get_full_name }}</option>
+      {% endfor %}
+    </select><br>
+    <button type="submit">Assign Directly</button>
+  </form>
+{% endif %}
+
+{% if case.closure_requested %}
+  {% if request.user == case.created_by and not case.closure_creator_approved %}
+    <a href="{% url 'admin_approve_case_closure' case.id %}">Approve Closure (Creator)</a> |
+  {% endif %}
+  {% if request.user.is_staff and not case.closure_approved %}
+    <a href="{% url 'admin_approve_case_closure' case.id %}">Approve Closure (Admin)</a> |
+  {% endif %}
 {% endif %}
 <a href="{% url 'view_case_audit_log' case.id %}">Case Audit Log</a> |
 <a href="{% url 'case_list' %}">Back to Cases</a>
