@@ -52,7 +52,7 @@
 
         <form method="post" class="verify-form" novalidate>
           {% csrf_token %}
-          <label for="token" class="label">Enter 6‑digit code or recovery code</label>
+          <label for="token" class="label">Enter 6‑digit code</label>
           <input id="token" name="token" inputmode="numeric" pattern="\d{6}" maxlength="16" placeholder="123456" required />
 
           <button type="submit" class="btn-primary">Verify</button>
