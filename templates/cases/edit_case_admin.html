@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Edit Case{% endblock %}
+
+{% block content %}
+<h1>Edit Case: {{ case.get_title }}</h1>
+
+<form method="post">
+    {% csrf_token %}
+    <div>
+        <label for="{{ form.case_title.id_for_label }}">Title:</label>
+        {{ form.case_title }}
+        {{ form.case_title.errors }}
+    </div>
+    <div>
+        <label for="{{ form.case_description.id_for_label }}">Description:</label>
+        {{ form.case_description }}
+        {{ form.case_description.errors }}
+    </div>
+    <div>
+        <label for="{{ form.case_category.id_for_label }}">Category:</label>
+        {{ form.case_category }}
+        {{ form.case_category.errors }}
+    </div>
+    <div>
+        <label for="{{ form.case_priority.id_for_label }}">Priority:</label>
+        {{ form.case_priority }}
+        {{ form.case_priority.errors }}
+    </div>
+    <div>
+        <label for="{{ form.assigned_investigators.id_for_label }}">Assigned Investigators:</label>
+        {{ form.assigned_investigators }}
+        {{ form.assigned_investigators.errors }}
+    </div>
+    <div>
+        <label for="{{ form.case_status.id_for_label }}">Case Status:</label>
+        {{ form.case_status }}
+        {{ form.case_status.errors }}
+    </div>
+    <div>
+        <label for="{{ form.case_status_notes.id_for_label }}">Status Notes:</label>
+        {{ form.case_status_notes }}
+        {{ form.case_status_notes.errors }}
+    </div>
+    <button type="submit">Save Changes</button>
+</form>
+
+<a href="{% url 'view_case' case.id %}">Back to Case</a>
+{% endblock %}
