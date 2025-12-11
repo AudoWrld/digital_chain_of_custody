@@ -1,16 +1,19 @@
 {% extends 'base.html' %}
-{% block title %}My Cases{% endblock %}
+{% block title %}{% if is_superuser %}All Cases{% else %}My Cases{% endif %}{% endblock %}
 
 {% block content %}
-<h1>My Cases</h1>
+<h1>{% if is_superuser %}All Cases{% else %}My Cases{% endif %}</h1>
 
+{% if not is_superuser %}
 <a href="{% url 'create_case' %}" class="btn btn-primary">Create New Case</a>
+{% endif %}
 
 {% if cases %}
 <table>
     <thead>
         <tr>
             <th>Title</th>
+            {% if is_superuser %}<th>Created By</th>{% endif %}
             <th>Status</th>
             <th>Category</th>
             <th>Actions</th>
@@ -20,6 +23,7 @@
         {% for case in cases %}
         <tr>
             <td>{{ case.get_title }}</td>
+            {% if is_superuser %}<td>{{ case.created_by.get_full_name }}</td>{% endif %}
             <td>{{ case.case_status }}</td>
             <td>{{ case.get_category }}</td>
             <td>
