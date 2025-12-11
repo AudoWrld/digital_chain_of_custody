@@ -33,11 +33,12 @@ class EncryptionKey(models.Model):
 # -----------------------------
 class Case(models.Model):
     STATUS_CHOICES = [
-    ('Open', 'Open'),                  
-    ('Under Review', 'Under Review'),  
-    ('Closed', 'Closed'),              
-    ('Archived', 'Archived'),          
-    ('Invalid', 'Invalid'),  
+    ('Open', 'Open'),
+    ('Pending Admin Approval', 'Pending Admin Approval'),
+    ('Under Review', 'Under Review'),
+    ('Closed', 'Closed'),
+    ('Archived', 'Archived'),
+    ('Invalid', 'Invalid'),
     ('Withdrawn','Withdrawn'),
     ]
 
@@ -60,7 +61,7 @@ class Case(models.Model):
     case_description = models.TextField()
     case_category = models.CharField(max_length=20, choices=CASE_CATEGORIES)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='cases')
-    case_status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Open')
+    case_status = models.CharField(max_length=200, choices=STATUS_CHOICES, default='Open')
     case_status_notes = models.TextField()
     date_created = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)
@@ -68,6 +69,7 @@ class Case(models.Model):
     withdraw_reason = models.TextField(blank=True, null=True)
     close_reason = models.TextField(blank=True, null=True)
     closure_approved = models.BooleanField(default=False)
+    closure_creator_approved = models.BooleanField(default=False)
     case_priority = models.CharField(max_length=10,choices=PRIORITY_CHOICES,default='medium')
     assigned_investigators = models.ManyToManyField(settings.AUTH_USER_MODEL,related_name='assigned_cases',blank=True)
     closure_requested = models.BooleanField(default=False)

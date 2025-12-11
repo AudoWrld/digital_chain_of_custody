@@ -52,7 +52,7 @@ class CaseForm(forms.ModelForm):
 class EditCaseForm(forms.ModelForm):
 
     assigned_investigators = forms.ModelMultipleChoiceField(
-        queryset=User.objects.all(),
+        queryset=User.objects.filter(role="investigator", is_active=True, verified=True),
         widget=forms.SelectMultiple(attrs={'class': 'form-select'}),
         required=False,
         label="Assign Investigators"
@@ -66,6 +66,8 @@ class EditCaseForm(forms.ModelForm):
             'case_category',
             'case_priority',
             'assigned_investigators',
+            'case_status',
+            'case_status_notes',
         ]
 
         widgets = {
@@ -73,7 +75,18 @@ class EditCaseForm(forms.ModelForm):
             'case_description': forms.Textarea(attrs={'class': 'form-control'}),
             'case_category': forms.Select(attrs={'class': 'form-select'}),
             'case_priority': forms.Select(attrs={'class': 'form-select'}),
+            'case_status': forms.Select(attrs={'class': 'form-select'}),
+            'case_status_notes': forms.Textarea(attrs={'class': 'form-control'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        if user and not user.is_staff:
+            # Remove fields not allowed for non-admins
+            fields_to_remove = ['assigned_investigators', 'case_status', 'case_status_notes']
+            for field in fields_to_remove:
+                self.fields.pop(field, None)
 
 
 # ------------------------------
@@ -107,4 +120,4 @@ class AssignInvestigatorForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         from django.contrib.auth.models import User
-        self.fields["assigned_investigators"].queryset = User.objects.all()
+        self.fields["assigned_investigators"].queryset = User.objects.filter(role="investigator", is_active=True, verified=True)

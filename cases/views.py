@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseForbidden, FileResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.core.files.base import ContentFile
 from django.db.models import Q
 from django.utils import timezone
@@ -16,10 +17,15 @@ logger = logging.getLogger(__name__)
 # list all cases for logged-in user
 @login_required
 def case_list(request):
-    cases = Case.objects.filter(
-        Q(created_by=request.user) | Q(assigned_investigators=request.user)
-    ).select_related('encryption_key')
-    return render(request, 'cases/case_list.html', {'cases': cases})
+    if request.user.is_superuser:
+        cases = Case.objects.all().select_related('encryption_key')
+        is_superuser = True
+    else:
+        cases = Case.objects.filter(
+            Q(created_by=request.user) | Q(assigned_investigators=request.user)
+        ).select_related('encryption_key')
+        is_superuser = False
+    return render(request, 'cases/case_list.html', {'cases': cases, 'is_superuser': is_superuser})
 
 
 @login_required
@@ -42,17 +48,62 @@ def create_case(request):
 
 @login_required
 def view_case(request, case_id):
-    case = get_object_or_404(Case, id=case_id, created_by=request.user)
-    
+    case = get_object_or_404(Case, id=case_id)
+
     if request.user != case.created_by and request.user not in case.assigned_investigators.all() and not request.user.is_staff:
         return HttpResponseForbidden("You are not allowed to view this case!")
-    
+
+    if request.method == 'POST' and request.user.is_staff:
+        action = request.POST.get('action')
+        if action == 'approve':
+            request_id = request.POST.get('request_id')
+            request_obj = get_object_or_404(AssignmentRequest, id=request_id, case=case)
+            if request_obj.status == 'pending_admin':
+                request_obj.status = 'approved'
+                request_obj.approved_at = timezone.now()
+                request_obj.save()
+                case.assigned_investigators.set(request_obj.assigned_users.all())
+                case.case_status = 'Under Review'
+                case.save()
+                CaseAuditLog.log_action(
+                    user=request.user,
+                    case=case,
+                    action="Approved investigator assignment",
+                    details=f"Investigators: {list(request_obj.assigned_users.values_list('username', flat=True))}"
+                )
+        elif action == 'reject':
+            request_id = request.POST.get('request_id')
+            request_obj = get_object_or_404(AssignmentRequest, id=request_id, case=case)
+            request_obj.status = 'rejected'
+            request_obj.save()
+            case.case_status = 'Open'
+            case.save()
+            CaseAuditLog.log_action(
+                user=request.user,
+                case=case,
+                action="Rejected investigator assignment",
+                details=f"Request by {request_obj.requested_by.username}"
+            )
+        elif action == 'assign_direct':
+            investigators = request.POST.getlist("direct_investigators")
+            case.assigned_investigators.set(investigators)
+            case.case_status = 'Under Review'
+            case.save()
+            CaseAuditLog.log_action(
+                user=request.user,
+                case=case,
+                action="Directly assigned investigators",
+                details=f"Investigators: {[u.username for u in case.assigned_investigators.all()]}"
+            )
+
     case_title = case.get_title()
     case_description = case.get_description()
-    case_category = case.get_category() 
-    
+    case_category = case.get_category()
+
     media_files = case.evidence.all()
-    
+
+    investigators = User.objects.filter(role='investigator', is_active=True, verified=True)
+
     CaseAuditLog.log_action(user=request.user, case=case, action=f"Viewed case {case.get_title()}")
 
     return render(request, 'cases/view_case.html', {
@@ -60,6 +111,7 @@ def view_case(request, case_id):
         'title': case_title,
         'category': case_category,
         'media_files': media_files,
+        'investigators': investigators,
     })
     
 
@@ -68,13 +120,9 @@ def view_case(request, case_id):
 def edit_case(request, case_id):
     case = get_object_or_404(Case, id=case_id)
 
-    # Permission check: only creator or admin can edit
-    if request.user != case.created_by and not request.user.is_superuser:
+    # Permission check: superuser can edit any, creator before assignment, assigned investigators can edit
+    if not (request.user.is_superuser or (request.user == case.created_by and not case.assigned_investigators.exists()) or request.user in case.assigned_investigators.all()):
         return HttpResponseForbidden("Not authorized.")
-
-    # Only allow editing if case is open or under review
-    if case.case_status not in ['Open', 'Under Review']:
-        return HttpResponseForbidden("Case cannot be edited in its current status.")
 
     old_data = {
         'case_title': case.get_title(),
@@ -82,13 +130,15 @@ def edit_case(request, case_id):
         'case_category': case.get_category(),
         'assigned_investigators': list(case.assigned_investigators.all()),
         'case_priority': case.case_priority,
-        'case_status_notes': case.get_status_notes() if hasattr(case, 'get_status_notes') else case.case_status_notes  # assuming status_notes is encrypted
+        'case_status': case.case_status,
+        'case_status_notes': case.get_status_notes(),
     }
 
     if request.method == 'POST':
-        form = EditCaseForm(request.POST, instance=case)
+        form = EditCaseForm(request.POST, user=request.user, instance=case)
         if form.is_valid():
             form.save()
+            messages.success(request, "Case updated successfully.")
 
             # Log changes in audit trail
             for field, old_value in old_data.items():
@@ -103,6 +153,23 @@ def edit_case(request, case_id):
                             action=f"Edited {field}",
                             details=f"Old: {', '.join(str(u) for u in old_value)} | New: {', '.join(str(u) for u in new_value)}"
                         )
+                elif field in ['case_title', 'case_description', 'case_category', 'case_status_notes']:
+                    # For encrypted fields, get decrypted new value
+                    if field == 'case_title':
+                        new_value = case.get_title()
+                    elif field == 'case_description':
+                        new_value = case.get_description()
+                    elif field == 'case_category':
+                        new_value = case.get_category()
+                    elif field == 'case_status_notes':
+                        new_value = case.get_status_notes()
+                    if old_value != new_value:
+                        CaseAuditLog.log_action(
+                            user=request.user,
+                            case=case,
+                            action=f"Edited {field}",
+                            details=f"Old: {old_value} | New: {new_value}"
+                        )
                 else:
                     new_value = getattr(case, field)
                     if old_value != new_value:
@@ -115,13 +182,15 @@ def edit_case(request, case_id):
 
             return redirect('view_case', case_id=case.id)
     else:
-        form = EditCaseForm(instance=case, initial={
+        form = EditCaseForm(user=request.user, instance=case, initial={
             'case_title': case.get_title(),
             'case_description': case.get_description(),
-            'case_category': case.get_category()
+            'case_category': case.get_category(),
+            'case_status_notes': case.get_status_notes()
         })
 
-    return render(request, 'cases/edit_case.html', {'form': form, 'case': case})
+    template = 'cases/edit_case_admin.html' if request.user.is_staff else 'cases/edit_case.html'
+    return render(request, template, {'form': form, 'case': case})
 
 
 
@@ -146,6 +215,8 @@ def assign_investigator(request, case_id):
                 notes=notes
             )
             request_obj.assigned_users.set(investigator_ids)
+            case.case_status = 'Pending Admin Approval'
+            case.save()
             CaseAuditLog.log_action(
                 user=request.user,
                 case=case,
@@ -163,6 +234,7 @@ def assign_investigator(request, case_id):
                 request_obj.approved_at = timezone.now()
                 request_obj.save()
                 case.assigned_investigators.set(request_obj.assigned_users.all())
+                case.case_status = 'Under Review'
                 case.save()
                 CaseAuditLog.log_action(
                     user=request.user,
@@ -177,15 +249,29 @@ def assign_investigator(request, case_id):
             request_obj = get_object_or_404(AssignmentRequest, id=request_id, case=case)
             request_obj.status = 'rejected'
             request_obj.save()
+            case.case_status = 'Open'
+            case.save()
             CaseAuditLog.log_action(
                 user=request.user,
                 case=case,
                 action="Rejected investigator assignment",
                 details=f"Request by {request_obj.requested_by.username}"
             )
+        elif action == 'assign_direct':
+            if not request.user.is_staff:
+                return HttpResponseForbidden("Only admins can assign.")
+            investigators = request.POST.getlist("direct_investigators")
+            case.assigned_investigators.set(investigators)
+            case.save()
+            CaseAuditLog.log_action(
+                user=request.user,
+                case=case,
+                action="Directly assigned investigators",
+                details=f"Investigators: {[u.username for u in case.assigned_investigators.all()]}"
+            )
         return redirect("assign_investigators", case_id=case.id)
 
-    users = User.objects.all()
+    users = User.objects.filter(role="investigator", is_active=True, verified=True)
     pending_requests = case.assignment_requests.filter(status__in=['pending_admin'])
 
     return render(request, "cases/assign_investigator.html", {
@@ -255,8 +341,9 @@ def close_case(request, case_id):
 def approve_case_closure(request, case_id):
     case = get_object_or_404(Case, id=case_id)
 
-    if not request.user.is_staff:
-        return HttpResponseForbidden("Only admins can approve closures.")
+    # Allow creator or admin to approve
+    if request.user != case.created_by and not request.user.is_staff:
+        return HttpResponseForbidden("Only the case creator or admins can approve closures.")
 
     if not case.closure_requested:
         return HttpResponse("No closure request pending.")
@@ -265,23 +352,41 @@ def approve_case_closure(request, case_id):
         action = request.POST.get("action")
 
         if action == "approve":
-            case.case_status = "Closed"
-            case.closure_approved = True
+            if request.user == case.created_by:
+                case.closure_creator_approved = True
+                CaseAuditLog.log_action(
+                    user=request.user,
+                    case=case,
+                    action="Creator approved case closure"
+                )
+            elif request.user.is_staff:
+                case.closure_approved = True
+                CaseAuditLog.log_action(
+                    user=request.user,
+                    case=case,
+                    action="Admin approved case closure"
+                )
 
-            CaseAuditLog.log_action(
-                user=request.user,
-                case=case,
-                action="Approved case closure"
-            )
+            # Check if both have approved
+            if case.closure_creator_approved and case.closure_approved:
+                case.case_status = "Closed"
+                CaseAuditLog.log_action(
+                    user=request.user,
+                    case=case,
+                    action="Case closed after both approvals"
+                )
 
         elif action == "reject":
+            # Reset all on rejection
             case.closure_requested = False
-            case.case_status = "In Progress"
+            case.closure_creator_approved = False
+            case.closure_approved = False
+            case.case_status = "Under Review"  # or keep as is, but perhaps revert
 
             CaseAuditLog.log_action(
                 user=request.user,
                 case=case,
-                action="Rejected case closure"
+                action="Rejected case closure - reset to pending"
             )
 
         case.save()
@@ -380,8 +485,8 @@ def mark_invalid_case(request, case_id):
 
 @login_required
 def upload_media(request, case_id):
-    case = get_object_or_404(Case, id=case_id, created_by=request.user)
-    if request.user != case.created_by:
+    case = get_object_or_404(Case, id=case_id)
+    if request.user != case.created_by or case.assigned_investigators.exists():
         return HttpResponseForbidden("You are not allowed to upload evidence in this case")
     
     if case.case_status in ['Closed', 'Archived','Invalid']:
