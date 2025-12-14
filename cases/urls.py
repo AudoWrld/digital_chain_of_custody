@@ -11,10 +11,11 @@ urlpatterns = [
     
     # case actions
     
-path('<int:case_id>/archive/', views.archive_case, name='archive_case'),
-path('<int:case_id>/request-close/', views.request_case_closure, name='request_case_closure'),
-path('<int:case_id>/withdraw/', views.withdraw_case, name='withdraw_case'),
-path('<int:case_id>/invalidate/', views.mark_invalid_case, name='invalidate_case'),
+    path('<int:case_id>/close/', views.close_case, name='close_case'),
+    path('<int:case_id>/archive/', views.archive_case, name='archive_case'),
+    path('<int:case_id>/request-close/', views.request_case_closure, name='request_case_closure'),
+    path('<int:case_id>/withdraw/', views.withdraw_case, name='withdraw_case'),
+    path('<int:case_id>/invalidate/', views.mark_invalid_case, name='invalidate_case'),
 
 
 # admin approval action

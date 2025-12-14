@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Approve Case Closure{% endblock %}
+
+{% block content %}
+<h2>Approve Closure for Case: {{ case.get_title }}</h2>
+
+<p><strong>Description:</strong> {{ case.get_description }}</p>
+<p><strong>Close Reason:</strong> {{ case.close_reason }}</p>
+<p><strong>Creator Approved:</strong> {% if case.closure_creator_approved %}Yes{% else %}No{% endif %}</p>
+<p><strong>Admin Approved:</strong> {% if case.closure_approved %}Yes{% else %}No{% endif %}</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" name="action" value="approve">Approve</button>
+    <button type="submit" name="action" value="reject">Reject</button>
+</form>
+
+<a href="{% url 'view_case' case.id %}">Back to Case</a>
+{% endblock %}

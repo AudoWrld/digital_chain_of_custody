@@ -18,7 +18,7 @@
         {% for log in audit_logs %}
         <tr>
             <td>{{ log.timestamp }}</td>
-            <td>{{ log.user.username if log.user else "System" }}</td>
+            <td>{% if log.user %}{{ log.user.username|default:log.user.email|default:"System" }}{% else %}System{% endif %}</td>
             <td>{{ log.action }}</td>
             <td>{{ log.details|default:"-" }}</td>
         </tr>

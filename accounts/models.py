@@ -11,6 +11,7 @@ class UserProfileManager(BaseUserManager):
     use_in_migrations = True
 
     def create_user(self, email, first_name, last_name, password=None, **extra_fields):
+        extra_fields.setdefault("is_active", False)
         if not email:
             raise ValueError("The Email must be set")
         email = self.normalize_email(email)
@@ -85,4 +86,4 @@ class User(AbstractUser, PermissionsMixin):
 
 
     def __str__(self):
-        return self.email
+        return f"{self.first_name} {self.last_name}"
