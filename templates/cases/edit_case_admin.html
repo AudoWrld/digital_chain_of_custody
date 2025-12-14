@@ -26,6 +26,21 @@
         {{ form.case_priority }}
         {{ form.case_priority.errors }}
     </div>
+    <div>
+        <label for="{{ form.assigned_investigators.id_for_label }}">Assigned Investigators:</label>
+        {{ form.assigned_investigators }}
+        {{ form.assigned_investigators.errors }}
+    </div>
+    <div>
+        <label for="{{ form.case_status.id_for_label }}">Case Status:</label>
+        {{ form.case_status }}
+        {{ form.case_status.errors }}
+    </div>
+    <div>
+        <label for="{{ form.case_status_notes.id_for_label }}">Status Notes:</label>
+        {{ form.case_status_notes }}
+        {{ form.case_status_notes.errors }}
+    </div>
     <button type="submit">Save Changes</button>
 </form>
 

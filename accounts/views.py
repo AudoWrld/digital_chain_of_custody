@@ -33,7 +33,7 @@ from datetime import datetime
 User = get_user_model()
 
 
-# Registar
+# Register
 def register(request):
     if request.method == "POST":
         form = RegisterForm(request.POST)
@@ -87,6 +87,36 @@ def register(request):
 
 
 def verification_sent(request):
+    if request.user.is_authenticated and not request.user.verified:
+        if not request.session.get("verification_email_sent"):
+            current_site = get_current_site(request)
+            subject = "Verify your email"
+
+            uid = urlsafe_base64_encode(force_bytes(request.user.pk))
+            token = account_activation_token.make_token(request.user)
+
+            protocol = "https" if request.is_secure() else "http"
+
+            message = render_to_string(
+                "emails/verification_email.html",
+                {
+                    "user": request.user,
+                    "domain": current_site.domain,
+                    "protocol": protocol,
+                    "uid": uid,
+                    "token": token,
+                },
+            )
+
+            send_mail(
+                subject,
+                message,
+                settings.EMAIL_HOST_USER,
+                [request.user.email],
+                fail_silently=False,
+            )
+            request.session["verification_email_sent"] = True
+
     email = request.session.get("pending_verification_email")
     return render(request, "accounts/verification_sent.html", {"email": email})
 
@@ -212,7 +242,10 @@ def second_authentication(request):
                 messages.success(
                     request, "Two-factor authentication verified! Login successful."
                 )
-                return redirect("dashboard")
+                if request.user.is_superuser:
+                    return redirect("/admin/")
+                else:
+                    return redirect("dashboard")
             else:
                 messages.error(request, "Invalid code. Please try again.")
 
@@ -253,16 +286,18 @@ def verify_recovery_code(request):
             user.recovery_codes = json.dumps(recovery_codes)
             user.save()
 
-            messages.success(request, "Recovery code verified! You are now logged in.")
-            return redirect("proceed_to_dashboard")
+            messages.success(request, "Recovery code verified! Please set up new 2FA.")
+            return redirect("setup_new_2fa")
         else:
             messages.error(request, "Invalid recovery code. Please try again.")
 
     return render(request, "accounts/verify_recovery_code.html")
 
+
 # Proceed or setup new 2fa
 def proceed_to_dashboard(request):
-    return render(request, 'accounts/proceed_to_dashboard.html')
+    return render(request, "accounts/proceed_to_dashboard.html")
+
 
 def setup_new_2fa(request):
     user = request.user
@@ -270,9 +305,8 @@ def setup_new_2fa(request):
     user.recovery_codes_downloaded = False
     user.recovery_codes = ""
     user.save()
-    return redirect('second_authentication')
-    
-    
+    return redirect("second_authentication")
+
 
 # Download recovery codes
 @login_required
@@ -444,6 +478,36 @@ def login_view(request):
             messages.error(request, "No account found with this email.")
             return redirect("login")
         if not user.verified:
+            # Send verification email if not already sent
+            if not request.session.get("verification_email_sent"):
+                current_site = get_current_site(request)
+                subject = "Verify your email"
+
+                uid = urlsafe_base64_encode(force_bytes(user.pk))
+                token = account_activation_token.make_token(user)
+
+                protocol = "https" if request.is_secure() else "http"
+
+                message = render_to_string(
+                    "emails/verification_email.html",
+                    {
+                        "user": user,
+                        "domain": current_site.domain,
+                        "protocol": protocol,
+                        "uid": uid,
+                        "token": token,
+                    },
+                )
+
+                send_mail(
+                    subject,
+                    message,
+                    settings.EMAIL_HOST_USER,
+                    [user.email],
+                    fail_silently=False,
+                )
+                request.session["verification_email_sent"] = True
+
             request.session["pending_verification_email"] = user.email
             messages.warning(
                 request,

@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block title %}Assign Investigators{% endblock %}
+
+{% block content %}
+<h2>Assign Investigators to Case: {{ case.get_title }}</h2>
+
+<div>
+    <p><strong>Description:</strong> {{ case.get_description }}</p>
+    <p><strong>Status:</strong> {{ case.case_status }}</p>
+    <p><strong>Priority:</strong> {{ case.case_priority }}</p>
+    <p><strong>Current Investigators:</strong>
+        {% for inv in assigned %}
+            {{ inv }}{% if not forloop.last %}, {% endif %}
+        {% empty %}
+            None
+        {% endfor %}
+    </p>
+</div>
+
+<hr>
+
+{% if user == case.created_by or user.is_staff %}
+<form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="propose">
+    <label for="investigators">Select Investigators:</label><br>
+    <select name="investigators" multiple>
+        {% for user_obj in users %}
+        <option value="{{ user_obj.id }}">{{ user_obj }}</option>
+        {% endfor %}
+    </select><br>
+    <label for="notes">Notes:</label><br>
+    <textarea name="notes"></textarea><br>
+    <button type="submit">Propose Assignment</button>
+</form>
+{% endif %}
+
+<hr>
+
+<h3>Pending Assignments</h3>
+{% if pending_requests %}
+<ul>
+    {% for req in pending_requests %}
+    <li>
+        <strong>Case:</strong> {{ req.case.get_title }}<br>
+        <strong>Requested by:</strong> {{ req.requested_by.username|default:req.requested_by.email|default:"Unknown" }}<br>
+        <strong>Investigators:</strong> {% for u in req.assigned_users.all %}{{ u }}{% if not forloop.last %}, {% endif %}{% endfor %}<br>
+        <strong>Notes:</strong> {{ req.notes }}<br>
+        <strong>Status:</strong> {{ req.get_status_display }}<br>
+        {% if user.is_staff and req.status == 'pending_admin' %}
+        <form method="post" style="display:inline;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="approve">
+            <input type="hidden" name="request_id" value="{{ req.id }}">
+            <button type="submit">Approve</button>
+        </form>
+        <form method="post" style="display:inline;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="reject">
+            <input type="hidden" name="request_id" value="{{ req.id }}">
+            <button type="submit">Reject</button>
+        </form>
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No pending assignments.</p>
+{% endif %}
+
+{% if user.is_staff %}
+<hr>
+<h3>Direct Assign Investigators</h3>
+<form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="assign_direct">
+    <label for="direct_investigators">Select Investigators:</label><br>
+    <select name="direct_investigators" id="direct_investigators" multiple>
+        {% for user_obj in users %}
+        <option value="{{ user_obj.id }}">{{ user_obj }}</option>
+        {% endfor %}
+    </select><br>
+    <button type="submit">Assign Directly</button>
+</form>
+{% endif %}
+
+<a href="{% url 'view_case' case.id %}">Back to Case</a>
+{% endblock %}

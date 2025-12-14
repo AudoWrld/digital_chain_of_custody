@@ -23,8 +23,9 @@ class CaseForm(forms.ModelForm):
         widget=forms.Textarea(attrs={'class': 'form-control'}),
         label="Description"
     )
-    case_category = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control'}),
+    case_category = forms.ChoiceField(
+        choices=Case.CASE_CATEGORIES,
+        widget=forms.Select(attrs={'class': 'form-select'}),
         label="Case Category"
     )
     case_priority = forms.ChoiceField(
@@ -51,7 +52,7 @@ class CaseForm(forms.ModelForm):
 class EditCaseForm(forms.ModelForm):
 
     assigned_investigators = forms.ModelMultipleChoiceField(
-        queryset=User.objects.all(),
+        queryset=User.objects.filter(role="investigator", is_active=True, verified=True),
         widget=forms.SelectMultiple(attrs={'class': 'form-select'}),
         required=False,
         label="Assign Investigators"
@@ -60,6 +61,9 @@ class EditCaseForm(forms.ModelForm):
     class Meta:
         model = Case
         fields = [
+            'case_title',
+            'case_description',
+            'case_category',
             'case_priority',
             'assigned_investigators',
             'case_status',
@@ -67,12 +71,22 @@ class EditCaseForm(forms.ModelForm):
         ]
 
         widgets = {
+            'case_title': forms.TextInput(attrs={'class': 'form-control'}),
+            'case_description': forms.Textarea(attrs={'class': 'form-control'}),
+            'case_category': forms.Select(attrs={'class': 'form-select'}),
             'case_priority': forms.Select(attrs={'class': 'form-select'}),
             'case_status': forms.Select(attrs={'class': 'form-select'}),
             'case_status_notes': forms.Textarea(attrs={'class': 'form-control'}),
         }
 
-    # Notes and status are encrypted BinaryFields — your model automatically encrypts them.
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        if user and not user.is_staff:
+            # Remove fields not allowed for non-admins
+            fields_to_remove = ['assigned_investigators', 'case_status', 'case_status_notes']
+            for field in fields_to_remove:
+                self.fields.pop(field, None)
 
 
 # ------------------------------
@@ -106,4 +120,4 @@ class AssignInvestigatorForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         from django.contrib.auth.models import User
-        self.fields["assigned_investigators"].queryset = User.objects.all()
+        self.fields["assigned_investigators"].queryset = User.objects.filter(role="investigator", is_active=True, verified=True)
