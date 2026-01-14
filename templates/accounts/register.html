@@ -4,60 +4,41 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Register — Chain of Custody</title>
+    <title>Register</title>
     <link rel="stylesheet" href="{% static 'css/register.css' %}" />
   </head>
   <body>
-    <nav class="brand-nav" role="navigation" aria-label="Main">
-      <div class="brand-left">
-        <img src="{% static 'images/logo.png' %}" alt="Chain of Custody logo" class="nav-logo" />
-        <span class="brand-title">Chain of Custody</span>
+    <div class="register-wrapper">
+      <div class="form-card">
+        <div class="login-brand">
+          <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo" />
+          <div class="title">Chain of Custody</div>
+        </div>
+
+        <h1>Create your account</h1>
+
+        {% if messages %}
+          <ul class="messages">
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+
+        <form method="post" action="{% url 'register' %}">
+          {% csrf_token %}
+          <div class="form-fields">
+            {{ form.as_p }}
+          </div>
+
+          <button type="submit" class="btn-primary">Register</button>
+
+          <div class="form-footer">
+            Already have an account?
+            <a href="{% url 'login' %}" class="link">Login</a>
+          </div>
+        </form>
       </div>
-
-      <ul class="nav-right" role="menubar">
-        <li role="none"><a role="menuitem" href="{% url 'dashboard' %}">Dashboard</a></li>
-        <li role="none"><a role="menuitem" href="{% url 'login' %}">Login</a></li>
-        <li role="none" class="active"><a role="menuitem" href="{% url 'register' %}">Register</a></li>
-      </ul>
-    </nav>
-
-    <main class="split-container" role="main">
-      <section class="split-image" aria-hidden="true">
-        <div class="image-overlay"></div>
-        <img src="{% static 'images/investigation.jpeg' %}" alt="Investigation" />
-        <div class="image-content">
-          <h2>Secure. Verifiable. Reliable.</h2>
-          <p>Track evidence and custody with confidence.</p>
-        </div>
-      </section>
-
-      <section class="split-form" aria-labelledby="register-heading">
-        <div class="form-card">
-          <h1 id="register-heading">Create your account</h1>
-
-          {% if messages %}
-            <ul class="messages">
-              {% for message in messages %}
-                <li>{{ message }}</li>
-              {% endfor %}
-            </ul>
-          {% endif %}
-
-          <form method="POST" action="{% url 'register' %}" novalidate>
-            {% csrf_token %}
-            <div class="form-fields">
-              {{ form.as_p }}
-            </div>
-
-            <button type="submit" class="btn-primary">Register</button>
-
-            <div class="form-footer">
-              <span>Already have an account?</span>
-              <a href="{% url 'login' %}" class="link">Login</a>
-            </div>
-          </form>
-        </div>
-      </section>
-    </main>
+    </div>
   </body>
 </html>
