@@ -1,16 +1,236 @@
-{% extends 'base.html' %}
-{% block title %}ChainProof - Homepage{% endblock %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ChainProof - Secure Evidence Management</title>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}" />
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="nav-brand">
+          <img src="{% static 'images/logo.png' %}" alt="Logo" class="nav-logo" />
+          <span class="brand-name">ChainProof</span>
+        </div>
+        <div class="nav-links">
+          {% if user.is_authenticated %}
+            <a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a>
+            <a href="{% url 'logout' %}" class="nav-link nav-btn">Logout</a>
+          {% else %}
+            <a href="{% url 'login' %}" class="nav-link">Login</a>
+            <a href="{% url 'register' %}" class="nav-link nav-btn">Get Started</a>
+          {% endif %}
+        </div>
+      </div>
+    </nav>
 
-{% block content %}
-<h1>Welcome to ChainProof</h1>
+    <section class="hero">
+      <div class="hero-content">
+        <h1 class="hero-title">Secure Evidence Management</h1>
+        <p class="hero-subtitle">End-to-end encrypted platform for evidence reporting, analysis, and chain of custody tracking</p>
+        {% if not user.is_authenticated %}
+          <div class="hero-actions">
+            <a href="{% url 'register' %}" class="btn-primary">Create Account</a>
+            <a href="{% url 'login' %}" class="btn-secondary">Sign In</a>
+          </div>
+        {% else %}
+          <div class="hero-actions">
+            <a href="{% url 'dashboard' %}" class="btn-primary">Go to Dashboard</a>
+          </div>
+        {% endif %}
+      </div>
+      <div class="hero-image">
+        <img src="https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800&h=600&fit=crop" alt="Security and Evidence" />
+      </div>
+    </section>
 
-{% if user.is_authenticated %}
-  <p>Hello, {{ user.first_name }}!</p>
-  <a href="{% url 'logout' %}">Logout</a>
-  <a href="{% url 'dashboard' %}">Dashboard</a>
-{% else %}
-  <a href="{% url 'login' %}">Login</a>
-  <a href="{% url 'register' %}">Register</a>
-{% endif %}
+    <section class="features">
+      <div class="features-container">
+        <div class="feature-card">
+          <i class='bx bxs-lock-alt feature-icon'></i>
+          <h3>Encrypted Storage</h3>
+          <p>All evidence files are encrypted end-to-end, ensuring maximum security and confidentiality</p>
+        </div>
+        <div class="feature-card">
+          <i class='bx bxs-key feature-icon'></i>
+          <h3>Unique Access Keys</h3>
+          <p>Each case is protected with a unique key, granting controlled access to authorized personnel only</p>
+        </div>
+        <div class="feature-card">
+          <i class='bx bxs-group feature-icon'></i>
+          <h3>Role-Based System</h3>
+          <p>Multiple user roles including Reporters, Investigators, Custodians, Analysts, and Auditors</p>
+        </div>
+        <div class="feature-card">
+          <i class='bx bxs-file-doc feature-icon'></i>
+          <h3>Chain of Custody</h3>
+          <p>Complete audit trail tracking every interaction with evidence from submission to resolution</p>
+        </div>
+      </div>
+    </section>
 
-{% endblock %}
+    <section class="workflow">
+      <div class="workflow-container">
+        <h2 class="section-title">How It Works</h2>
+        <div class="workflow-steps">
+          <div class="workflow-step">
+            <div class="step-content">
+              <div class="step-number">1</div>
+              <h4>Report Evidence</h4>
+              <p>Users securely upload images, videos, and documents related to their case. All files are automatically encrypted during upload.</p>
+            </div>
+            <div class="step-image">
+              <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=500&h=400&fit=crop" alt="Report Evidence" />
+            </div>
+          </div>
+          
+          <div class="workflow-step reverse">
+            <div class="step-content">
+              <div class="step-number">2</div>
+              <h4>Encrypted Processing</h4>
+              <p>Evidence is encrypted and assigned to an investigator with a unique case key. Only authorized personnel can access the case.</p>
+            </div>
+            <div class="step-image">
+              <img src="https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=500&h=400&fit=crop" alt="Encryption Process" />
+            </div>
+          </div>
+
+          <div class="workflow-step">
+            <div class="step-content">
+              <div class="step-number">3</div>
+              <h4>Analysis & Review</h4>
+              <p>Analysts and custodians examine evidence while maintaining full chain of custody. Every action is logged and timestamped.</p>
+            </div>
+            <div class="step-image">
+              <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500&h=400&fit=crop" alt="Analysis" />
+            </div>
+          </div>
+
+          <div class="workflow-step reverse">
+            <div class="step-content">
+              <div class="step-number">4</div>
+              <h4>Audit Trail</h4>
+              <p>Auditors verify integrity and compliance throughout the entire evidence lifecycle. Complete transparency guaranteed.</p>
+            </div>
+            <div class="step-image">
+              <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=500&h=400&fit=crop" alt="Audit" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="roles-section">
+      <div class="roles-container">
+        <h2 class="section-title">User Roles & Responsibilities</h2>
+        <div class="roles-grid">
+          <div class="role-card">
+            <i class='bx bxs-user-detail role-icon'></i>
+            <h3>Reporter</h3>
+            <p>Submit evidence securely and track case progress in real-time</p>
+          </div>
+          <div class="role-card">
+            <i class='bx bxs-search-alt role-icon'></i>
+            <h3>Investigator</h3>
+            <p>Review and analyze submitted evidence with secure access controls</p>
+          </div>
+          <div class="role-card">
+            <i class='bx bxs-shield role-icon'></i>
+            <h3>Custodian</h3>
+            <p>Maintain evidence integrity and manage chain of custody documentation</p>
+          </div>
+          <div class="role-card">
+            <i class='bx bxs-bar-chart-alt-2 role-icon'></i>
+            <h3>Analyst</h3>
+            <p>Perform detailed forensic analysis and generate comprehensive reports</p>
+          </div>
+          <div class="role-card">
+            <i class='bx bxs-check-shield role-icon'></i>
+            <h3>Auditor</h3>
+            <p>Verify compliance and validate evidence handling procedures</p>
+          </div>
+          <div class="role-card">
+            <i class='bx bxs-user-circle role-icon'></i>
+            <h3>Administrator</h3>
+            <p>Manage system settings, users, and oversee all operations</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="security-section">
+      <div class="security-container">
+        <div class="security-content">
+          <h2>Military-Grade Security</h2>
+          <p>Your evidence is protected with the highest level of encryption standards. We employ AES-256 encryption, secure key management, and multi-factor authentication to ensure your data remains confidential and tamper-proof.</p>
+          <ul class="security-features">
+            <li><i class='bx bxs-check-circle'></i> End-to-end encryption</li>
+            <li><i class='bx bxs-check-circle'></i> Multi-factor authentication</li>
+            <li><i class='bx bxs-check-circle'></i> Blockchain verification</li>
+            <li><i class='bx bxs-check-circle'></i> Tamper-proof audit logs</li>
+            <li><i class='bx bxs-check-circle'></i> Secure cloud storage</li>
+            <li><i class='bx bxs-check-circle'></i> Regular security audits</li>
+          </ul>
+        </div>
+        <div class="security-image">
+          <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&h=500&fit=crop" alt="Security" />
+        </div>
+      </div>
+    </section>
+
+    <section class="stats-section">
+      <div class="stats-container">
+        <div class="stat-item">
+          <i class='bx bxs-file stat-icon'></i>
+          <h3>10,000+</h3>
+          <p>Cases Processed</p>
+        </div>
+        <div class="stat-item">
+          <i class='bx bxs-user-check stat-icon'></i>
+          <h3>5,000+</h3>
+          <p>Active Users</p>
+        </div>
+        <div class="stat-item">
+          <i class='bx bxs-shield-alt-2 stat-icon'></i>
+          <h3>99.9%</h3>
+          <p>Security Rate</p>
+        </div>
+        <div class="stat-item">
+          <i class='bx bxs-time stat-icon'></i>
+          <h3>24/7</h3>
+          <p>System Availability</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-section">
+      <div class="cta-container">
+        <h2>Ready to Secure Your Evidence?</h2>
+        <p>Join thousands of users who trust ChainProof for their evidence management needs</p>
+        {% if not user.is_authenticated %}
+          <a href="{% url 'register' %}" class="btn-primary">Get Started Today</a>
+        {% else %}
+          <a href="{% url 'dashboard' %}" class="btn-primary">Go to Dashboard</a>
+        {% endif %}
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="footer-container">
+        <div class="footer-brand">
+          <img src="{% static 'images/logo.png' %}" alt="Logo" class="footer-logo" />
+          <span class="footer-name">ChainProof</span>
+        </div>
+        <p class="footer-text">Secure evidence management with complete chain of custody</p>
+        <div class="footer-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+          <a href="#">Contact Us</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
