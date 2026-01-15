@@ -5,12 +5,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ChainProof - Secure Evidence Management</title>
-    <link rel="stylesheet" href="{% static 'css/main/home.css' %}" />
+    <link
+      rel="stylesheet"
+      href="{% static 'css/main/home.css' %}?v={{ STATIC_VERSION }}"
+    />
     <link
       href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
       rel="stylesheet"
     />
-        <link
+    <link
       rel="icon"
       type="image/png"
       href="{% static 'images/favicon.png' %}?v={{ STATIC_VERSION }}"
@@ -45,7 +48,7 @@
   <body>
     <nav class="navbar">
       <div class="nav-container">
-        <a href="/" style="text-decoration: none;"
+        <a href="/" style="text-decoration: none"
           ><div class="nav-brand">
             <img
               src="{% static 'images/logo.png' %}"
