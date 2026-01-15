@@ -1,0 +1,227 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Privacy Policy - ChainProof</title>
+    <link rel="stylesheet" href="{% static 'css/main/privacy.css' %}" />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="nav-container">
+        <a href="{% url 'homepage' %}" style="text-decoration: none">
+          <div class="nav-brand">
+            <img
+              src="{% static 'images/logo.png' %}"
+              alt="Logo"
+              class="nav-logo"
+            />
+            <span class="brand-name">ChainProof</span>
+          </div>
+        </a>
+        <div class="nav-links">
+          {% if user.is_authenticated %}
+          <a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a>
+          <a href="{% url 'logout' %}" class="nav-link nav-btn">Logout</a>
+          {% else %}
+          <a href="{% url 'login' %}" class="nav-link">Login</a>
+          <a href="{% url 'register' %}" class="nav-link nav-btn"
+            >Get Started</a
+          >
+          {% endif %}
+        </div>
+      </div>
+    </nav>
+
+    <section class="page-hero">
+      <div class="page-hero-content">
+        <h1>Privacy Policy</h1>
+        <p>Last updated: January 15, 2026</p>
+      </div>
+    </section>
+
+    <section class="content-section">
+      <div class="content-container">
+        <div class="content-sidebar">
+          <h3>Quick Navigation</h3>
+          <ul>
+            <li><a href="#introduction">Introduction</a></li>
+            <li><a href="#information-collect">Information We Collect</a></li>
+            <li><a href="#how-we-use">How We Use Your Information</a></li>
+            <li><a href="#information-sharing">Information Sharing</a></li>
+            <li><a href="#data-security">Data Security</a></li>
+            <li><a href="#your-rights">Your Rights</a></li>
+            <li><a href="#cookies">Cookies and Tracking</a></li>
+            <li><a href="#changes">Changes to Policy</a></li>
+            <li><a href="#contact">Contact Us</a></li>
+          </ul>
+        </div>
+
+        <div class="content-main">
+          <div class="content-block" id="introduction">
+            <h2>1. Introduction</h2>
+            <p>
+              At ChainProof, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our secure evidence management platform.
+            </p>
+            <p>
+              By using ChainProof, you agree to the collection and use of information in accordance with this policy. We will not use or share your information except as described in this Privacy Policy.
+            </p>
+          </div>
+
+          <div class="content-block" id="information-collect">
+            <h2>2. Information We Collect</h2>
+            <p>We collect information you provide directly to us and information we obtain automatically:</p>
+            <ul>
+              <li>
+                <strong>Personal Information:</strong> Name, email address, phone number, and other contact details provided during registration
+              </li>
+              <li>
+                <strong>Account Information:</strong> Username, password, and role assignments within the platform
+              </li>
+              <li>
+                <strong>Evidence Data:</strong> Digital files, documents, images, and videos uploaded to cases
+              </li>
+              <li>
+                <strong>Usage Data:</strong> Information about how you interact with our platform, including access logs and audit trails
+              </li>
+              <li>
+                <strong>Device Information:</strong> IP address, browser type, operating system, and device identifiers
+              </li>
+            </ul>
+          </div>
+
+          <div class="content-block" id="how-we-use">
+            <h2>3. How We Use Your Information</h2>
+            <p>We use the collected information for the following purposes:</p>
+            <ul>
+              <li>Provide and maintain our evidence management services</li>
+              <li>Authenticate users and manage access controls</li>
+              <li>Maintain complete chain of custody records</li>
+              <li>Ensure platform security and prevent unauthorized access</li>
+              <li>Comply with legal obligations and regulatory requirements</li>
+              <li>Communicate with you about your account and our services</li>
+              <li>Improve our platform through analytics and user feedback</li>
+              <li>Detect and prevent fraud or security incidents</li>
+            </ul>
+          </div>
+
+          <div class="content-block" id="information-sharing">
+            <h2>4. Information Sharing</h2>
+            <p>We do not sell, trade, or otherwise transfer your personal information to third parties except in the following circumstances:</p>
+            <ul>
+              <li>With your explicit consent</li>
+              <li>To authorized personnel within your organization for case management</li>
+              <li>When required by law or to comply with legal processes</li>
+              <li>To protect our rights, property, or safety, or that of our users</li>
+              <li>In connection with a business transfer, merger, or acquisition</li>
+              <li>With service providers who assist us in operating our platform (under strict confidentiality agreements)</li>
+            </ul>
+            <p>All evidence data remains encrypted and accessible only to authorized users with proper case keys.</p>
+          </div>
+
+          <div class="content-block" id="data-security">
+            <h2>5. Data Security</h2>
+            <p>We implement comprehensive security measures to protect your information:</p>
+            <ul>
+              <li>AES-256 encryption for all stored data</li>
+              <li>End-to-end encryption for data transmission</li>
+              <li>Multi-factor authentication requirements</li>
+              <li>Regular security audits and penetration testing</li>
+              <li>Blockchain verification for evidence integrity</li>
+              <li>Secure cloud infrastructure with redundant backups</li>
+              <li>Access controls and role-based permissions</li>
+              <li>Continuous monitoring and threat detection</li>
+            </ul>
+            <p>While we strive to protect your information, no method of transmission over the internet is 100% secure. We cannot guarantee absolute security.</p>
+          </div>
+
+          <div class="content-block" id="your-rights">
+            <h2>6. Your Rights</h2>
+            <p>You have the following rights regarding your personal information:</p>
+            <ul>
+              <li><strong>Access:</strong> Request a copy of the personal information we hold about you</li>
+              <li><strong>Correction:</strong> Request correction of inaccurate or incomplete information</li>
+              <li><strong>Deletion:</strong> Request deletion of your personal information (subject to legal requirements)</li>
+              <li><strong>Portability:</strong> Request transfer of your data in a structured format</li>
+              <li><strong>Restriction:</strong> Request limitation of processing in certain circumstances</li>
+              <li><strong>Objection:</strong> Object to processing based on legitimate interests</li>
+              <li><strong>Withdrawal:</strong> Withdraw consent where processing is based on consent</li>
+            </ul>
+            <p>To exercise these rights, please contact us using the information provided below.</p>
+          </div>
+
+          <div class="content-block" id="cookies">
+            <h2>7. Cookies and Tracking</h2>
+            <p>We use cookies and similar technologies to enhance your experience:</p>
+            <ul>
+              <li><strong>Essential Cookies:</strong> Required for platform functionality and security</li>
+              <li><strong>Analytics Cookies:</strong> Help us understand how users interact with our platform</li>
+              <li><strong>Preference Cookies:</strong> Remember your settings and preferences</li>
+            </ul>
+            <p>You can control cookie settings through your browser, though disabling certain cookies may affect platform functionality.</p>
+          </div>
+
+          <div class="content-block" id="changes">
+            <h2>8. Changes to This Policy</h2>
+            <p>
+              We may update this Privacy Policy from time to time. We will notify you of any changes by:
+            </p>
+            <ul>
+              <li>Posting the new Privacy Policy on this page</li>
+              <li>Sending you an email notification</li>
+              <li>Displaying a notice within the platform</li>
+            </ul>
+            <p>
+              Your continued use of ChainProof after changes constitutes acceptance of the updated policy. We encourage you to review this policy periodically.
+            </p>
+          </div>
+
+          <div class="content-block" id="contact">
+            <h2>9. Contact Us</h2>
+            <p>
+              If you have questions about this Privacy Policy or our data practices, please contact us:
+            </p>
+            <ul>
+              <li>Email: privacy@chainproof.com</li>
+              <li>Phone: +254 700 000 000</li>
+              <li>Address: Nairobi, Kenya</li>
+            </ul>
+          </div>
+
+          <div class="acceptance-box">
+            <i class="bx bxs-shield-check"></i>
+            <p>
+              Your privacy is our priority. We are committed to protecting your personal information and maintaining the highest standards of data security.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="footer-container">
+        <div class="footer-brand">
+          <img
+            src="{% static 'images/logo.png' %}"
+            alt="Logo"
+            class="footer-logo"
+          />
+          <span class="footer-name">ChainProof</span>
+        </div>
+        <p class="footer-text">
+          Secure evidence management with complete chain of custody
+        </p>
+        <div class="footer-links">
+          <a href="{% url 'privacy' %}">Privacy Policy</a>
+          <a href="{% url 'terms' %}">Terms of Service</a>
+          <a href="{% url 'contact' %}">Contact Us</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,162 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contact Us - ChainProof</title>
+    <link rel="stylesheet" href="{% static 'css/main/contact.css' %}" />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="nav-container">
+        <a href="{% url 'homepage' %}">
+          <div class="nav-brand">
+            <img
+              src="{% static 'images/logo.png' %}"
+              alt="Logo"
+              class="nav-logo"
+            />
+            <span class="brand-name">ChainProof</span>
+          </div>
+        </a>
+        <div class="nav-links">
+          {% if user.is_authenticated %}
+          <a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a>
+          <a href="{% url 'logout' %}" class="nav-link nav-btn">Logout</a>
+          {% else %}
+          <a href="{% url 'login' %}" class="nav-link">Login</a>
+          <a href="{% url 'register' %}" class="nav-link nav-btn"
+            >Get Started</a
+          >
+          {% endif %}
+        </div>
+      </div>
+    </nav>
+
+    <section class="contact-hero">
+      <div class="contact-hero-content">
+        <h1>Get In Touch</h1>
+        <p>Have questions? We're here to help you secure your evidence</p>
+      </div>
+    </section>
+
+    <section class="contact-section">
+      <div class="contact-container">
+        <div class="contact-info">
+          <h2>Contact Information</h2>
+          <p>Reach out to us through any of these channels</p>
+
+          <div class="info-items">
+            <div class="info-item">
+              <i class="bx bxs-phone"></i>
+              <div>
+                <h4>Phone</h4>
+                <p>+254 700 000 000</p>
+                <p>+254 711 111 111</p>
+              </div>
+            </div>
+
+            <div class="info-item">
+              <i class="bx bxs-envelope"></i>
+              <div>
+                <h4>Email</h4>
+                <p>support@chainproof.com</p>
+                <p>info@chainproof.com</p>
+              </div>
+            </div>
+
+            <div class="info-item">
+              <i class="bx bxs-map"></i>
+              <div>
+                <h4>Address</h4>
+                <p>Nairobi, Kenya</p>
+                <p>Westlands, Nairobi County</p>
+              </div>
+            </div>
+
+            <div class="info-item">
+              <i class="bx bxs-time"></i>
+              <div>
+                <h4>Business Hours</h4>
+                <p>Monday - Friday: 8:00 AM - 6:00 PM</p>
+                <p>Saturday: 9:00 AM - 2:00 PM</p>
+                <p>Sunday: Closed</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="contact-form-wrapper">
+          <h2>Send Us A Message</h2>
+          <form method="post" class="contact-form">
+            {% csrf_token %} {% if messages %}
+            <ul class="messages">
+              {% for message in messages %}
+              <li>{{ message }}</li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+
+            <div class="form-group">
+              <label for="name">Full Name</label>
+              <input type="text" id="name" name="name" required />
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input type="email" id="email" name="email" required />
+            </div>
+
+            <div class="form-group">
+              <label for="phone">Phone Number</label>
+              <input type="tel" id="phhomeone" name="phone" />
+            </div>
+
+            <div class="form-group">
+              <label for="subject">Subject</label>
+              <input type="text" id="subject" name="subject" required />
+            </div>
+
+            <div class="form-group">
+              <label for="message">Message</label>
+              <textarea
+                id="message"
+                name="message"
+                rows="6"
+                required
+              ></textarea>
+            </div>
+
+            <button type="submit" class="btn-submit">Send Message</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="footer-container">
+        <div class="footer-brand">
+          <img
+            src="{% static 'images/logo.png' %}"
+            alt="Logo"
+            class="footer-logo"
+          />
+          <span class="footer-name">ChainProof</span>
+        </div>
+        <p class="footer-text">
+          Secure evidence management with complete chain of custody
+        </p>
+        <div class="footer-links">
+          <a href="{% url 'privacy' %}">Privacy Policy</a>
+          <a href="{% url 'terms' %}">Terms of Service</a>
+          <a href="{% url 'contact' %}">Contact Us</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
