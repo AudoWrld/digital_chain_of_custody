@@ -2,60 +2,104 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Verify Recovery Code — Chain of Custody</title>
-    <link rel="stylesheet" href="{% static 'css/accounts/verify_recovery_code.css' %}" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verify Recovery Code</title>
+    <link rel="stylesheet" href="{% static 'css/accounts/verify_recovery_code.css' %}?v={{ STATIC_VERSION }}" />
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const toasts = document.querySelectorAll('.toast');
+        toasts.forEach(toast => {
+          setTimeout(() => {
+            toast.style.animation = 'slideOut 0.3s ease-out forwards';
+            setTimeout(() => {
+              toast.remove();
+            }, 300);
+          }, 5000);
+        });
+      });
+    </script>
   </head>
   <body>
-    <nav class="brand-nav" role="navigation" aria-label="Main">
-      <div class="brand-left">
-        <img src="{% static 'images/logo.png' %}" alt="Chain of Custody logo" class="nav-logo" />
-        <span class="brand-title">Chain of Custody</span>
+    {% if messages %}
+      <div class="toast-container">
+        {% for message in messages %}
+          <div class="toast {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
       </div>
-      <ul class="nav-right">
-        <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-        <li><a href="{% url 'login' %}">Login</a></li>
-      </ul>
-    </nav>
+    {% endif %}
+    
+    <div class="login-wrapper">
+      <div class="login-card">
+        <div class="login-brand">
+          <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo" />
+          <div class="title">Chain of Custody</div>
+        </div>
 
-    <main class="verify-wrapper">
-      <section class="verify-card" aria-labelledby="verify-heading">
-        <h1 id="verify-heading">Verify Recovery Code</h1>
-        <p class="lead">Enter one of your unused recovery codes. Each code can be used only once.</p>
+        <h2>Verify Recovery Code</h2>
+        <p class="muted">Enter one of your unused recovery codes. Each code can be used only once.</p>
 
-        {% if messages %}
-          <ul class="messages" role="status" aria-live="polite">
-            {% for message in messages %}
-              <li>{{ message }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-
-        <form method="POST" class="verify-form" novalidate>
+        <form method="post" novalidate>
           {% csrf_token %}
-          <label for="recovery_code" class="label">Recovery code</label>
+          <label for="recovery_code">Recovery code</label>
           <input
+            type="text"
             id="recovery_code"
             name="recovery_code"
-            type="text"
             inputmode="numeric"
             autocomplete="one-time-code"
-            placeholder="XXXX-XXXX-XXXX"
-            maxlength="32"
+            placeholder="XXXX-XXXX"
+            maxlength="8"
             required
           />
 
-          <div class="form-row">
-            <button type="submit" class="btn-primary">Verify</button>
-            <a href="{% url 'login' %}" class="btn-ghost">Back to Login</a>
-          </div>
+          <button type="submit">Verify</button>
         </form>
 
-        <p class="note">
+        <div class="login-links">
+          <a href="{% url 'login' %}">Back to Login</a>
+        </div>
+
+        <p class="muted small" style="margin-top:12px;">
           Lost your recovery codes? Contact support or generate new codes from your account settings after signing in.
         </p>
-      </section>
-    </main>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const recoveryCodeInput = document.getElementById('recovery_code');
+        
+        if (recoveryCodeInput) {
+          recoveryCodeInput.addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^a-zA-Z0-9-]/g, '');
+          });
+          
+          recoveryCodeInput.addEventListener('keypress', function(e) {
+            if ([8, 9, 27, 13, 189].indexOf(e.keyCode) !== -1 ||
+                (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                (e.keyCode >= 35 && e.keyCode <= 40)) {
+              return;
+            }
+            
+            if (!((e.keyCode >= 48 && e.keyCode <= 57) ||
+                  (e.keyCode >= 65 && e.keyCode <= 90) ||
+                  (e.keyCode >= 97 && e.keyCode <= 122))) {
+              e.preventDefault();
+            }
+          });
+          
+          recoveryCodeInput.addEventListener('paste', function(e) {
+            const pastedData = (e.clipboardData || window.clipboardData).getData('text');
+            const filteredData = pastedData.replace(/[^a-zA-Z0-9-]/g, '');
+            
+            if (pastedData !== filteredData) {
+              e.preventDefault();
+              document.execCommand('insertText', false, filteredData);
+            }
+          });
+        }
+      });
+    </script>
   </body>
 </html>

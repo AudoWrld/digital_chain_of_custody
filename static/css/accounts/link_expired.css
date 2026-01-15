@@ -2,6 +2,7 @@
   --accent: #2980b9;
   --accent-2: #6dd5fa;
   --muted: #7f8c8d;
+  --bg: #f4f6f8;
   --card: #ffffff;
   --danger: #e74c3c;
   --success: #27ae60;
@@ -24,7 +25,7 @@ body {
 }
 body {
   font-family: var(--font-sans);
-  background: linear-gradient(180deg, #edf2f7 0%, #f4f6f8 100%);
+  background: linear-gradient(180deg, #edf2f7 0%, var(--bg) 100%);
   color: #22303b;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -67,15 +68,10 @@ body {
   letter-spacing: 0.2px;
 }
 
-h2 {
+.login-card h2 {
   margin: 6px 0 18px;
   font-size: 1.6rem;
   color: #163a57;
-}
-.login-note {
-  margin: 0 0 14px;
-  color: var(--muted);
-  font-size: 0.98rem;
 }
 
 .toast-container {
@@ -143,67 +139,60 @@ h2 {
 .messages {
   list-style: none;
   padding: 0;
-  margin: 8px 0 12px 0;
+  margin: 0 0 16px 0;
 }
 .messages li {
-  background: #e74c3c;
+  background: var(--danger);
   color: #fff;
   padding: 10px 12px;
-  border-radius: 10px;
+  border-radius: 8px;
   margin-bottom: 10px;
   font-weight: 600;
   font-size: 0.98rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  font-size: 1rem;
+.form-group {
+  margin-bottom: 20px;
 }
-label {
+.form-group label {
   display: block;
+  margin-bottom: 8px;
   font-weight: 600;
   color: #34495e;
-  margin-bottom: 6px;
-  font-size: 0.98rem;
 }
-
-input[type="email"] {
+.form-group input {
   width: 100%;
-  padding: 12px 14px;
-  border-radius: 10px;
-  border: 1.25px solid #e6eef5;
-  background: #fbfdff;
+  padding: 12px 16px;
+  border: 2px solid #e1e8ed;
+  border-radius: 8px;
   font-size: 1rem;
-  color: #1f2d38;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
-input::placeholder {
-  color: var(--muted);
-  opacity: 0.9;
-}
-input:focus {
+.form-group input:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 8px 24px rgba(41, 128, 185, 0.08);
+  box-shadow: 0 0 0 3px rgba(41, 128, 185, 0.1);
 }
 
-button[type="submit"] {
-  margin-top: 4px;
-  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 100%);
+.btn {
+  width: 100%;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
   color: #fff;
-  padding: 12px 14px;
-  border-radius: 10px;
   border: none;
-  font-weight: 700;
-  font-size: 1.05rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 6px 18px rgba(41, 128, 185, 0.14);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-
-button[type="submit"]:hover {
-  box-shadow: 0 8px 20px rgba(41, 128, 185, 0.18);
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(41, 128, 185, 0.3);
+}
+.btn:active {
+  transform: translateY(0);
 }
 
 .login-links {
@@ -213,6 +202,10 @@ button[type="submit"]:hover {
   gap: 6px;
   font-size: 0.95rem;
 }
+.login-links .login-note {
+  font-size: 0.95rem;
+  color: var(--muted);
+}
 .login-links a {
   color: var(--accent);
   text-decoration: none;
@@ -220,6 +213,26 @@ button[type="submit"]:hover {
 }
 .login-links a:hover {
   text-decoration: underline;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.muted p {
+  margin-bottom: 12px;
+}
+
+.muted p:last-child {
+  margin-bottom: 0;
+}
+
+.muted strong {
+  color: #34495e;
+  font-weight: 600;
 }
 
 @media (max-width: 520px) {
@@ -231,13 +244,9 @@ button[type="submit"]:hover {
   .login-brand .title {
     font-size: 1.1rem;
   }
-  h2 {
+  .login-card h2 {
     font-size: 1.25rem;
     margin-bottom: 12px;
-  }
-  button[type="submit"] {
-    font-size: 1rem;
-    padding: 11px;
   }
   
   .toast-container {
@@ -250,5 +259,11 @@ button[type="submit"]:hover {
   .toast {
     font-size: 0.9rem;
     padding: 10px 12px;
+  }
+
+  .login-links {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
 }

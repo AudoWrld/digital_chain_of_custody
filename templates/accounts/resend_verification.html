@@ -1,55 +1,66 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Resend Verification — Chain of Custody</title>
-    <link rel="stylesheet" href="{% static 'css/accounts/resend_verification.css' %}" />
-  </head>
-  <body>
-    <nav class="brand-nav" role="navigation" aria-label="Main">
-      <div class="brand-left">
-        <img src="{% static 'images/logo.png' %}" alt="Chain of Custody logo" class="nav-logo" />
-        <span class="brand-title">Chain of Custody</span>
-      </div>
-      <ul class="nav-right">
-        <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-        <li><a href="{% url 'login' %}">Login</a></li>
-      </ul>
-    </nav>
+{% block title %}Resend Verification Email{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/accounts/resend_verification.css' %}?v={{ STATIC_VERSION }}">
+{% endblock %}
+{% block content %}
+<div class="login-wrapper">
+  <div class="login-card">
+    <div class="login-brand">
+      <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo">
+      <div class="title">Chain of Custody</div>
+    </div>
+    <h2>Resend Verification Email</h2>
+    
+    <div class="toast-container">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="toast {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    </div>
 
-    <main class="resend-wrapper">
-      <div class="resend-card" role="region" aria-labelledby="resend-heading">
-        <h1 id="resend-heading">Resend Verification Email</h1>
-
-        {% if messages %}
-          <ul class="messages" role="status" aria-live="polite">
-            {% for message in messages %}
-              <li>{{ message }}</li>
-            {% endfor %}
-          </ul>
+    <div class="muted">
+      <p>
+        {% if email %}
+          We'll resend a verification link to <strong>{{ email }}</strong>.
+        {% else %}
+          We'll resend a verification link to your email address.
         {% endif %}
+      </p>
+    </div>
 
-        <p class="lead">
-          {% if email %}
-            We'll resend a verification link to <strong>{{ email }}</strong>.
-          {% else %}
-            We'll resend a verification link to your email address.
-          {% endif %}
-        </p>
-
-        <form method="post" class="resend-form">
-          {% csrf_token %}
-          <input type="hidden" name="email" value="{{ email }}" />
-          <div class="form-row">
-            <button type="submit" class="btn-primary">Resend</button>
-            <a class="btn-ghost" href="{% url 'login' %}">Back to Login</a>
-          </div>
-        </form>
-
-        <p class="note">Didn't receive it? Check your spam folder or try again in a few minutes.</p>
+    <form method="post" class="resend-form">
+      {% csrf_token %}
+      <input type="hidden" name="email" value="{{ email }}" />
+      <div class="form-row">
+        <button type="submit" class="btn btn-primary">Resend</button>
+        <a class="btn btn-ghost" href="{% url 'login' %}">Back to Login</a>
       </div>
-    </main>
-  </body>
-</html>
+    </form>
+
+    <div class="note">
+      <p>Didn't receive it? Check your spam folder or try again in a few minutes.</p>
+    </div>
+
+    <div class="login-links">
+      <span class="login-note">Already verified?</span>
+      <a href="{% url 'login' %}">Back to Login</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const toasts = document.querySelectorAll('.toast');
+  toasts.forEach(toast => {
+    setTimeout(() => {
+      toast.style.animation = 'slideOut 0.3s ease-in forwards';
+      setTimeout(() => toast.remove(), 300);
+    }, 5000);
+  });
+});
+</script>
+{% endblock %}

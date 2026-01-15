@@ -2,34 +2,41 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Two‑Factor Authentication — Chain of Custody</title>
-    <link rel="stylesheet" href="{% static 'css/accounts/second_auth.css' %}" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Two-Factor Authentication</title>
+    <link rel="stylesheet" href="{% static 'css/accounts/second_auth.css' %}?v={{ STATIC_VERSION }}" />
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const toasts = document.querySelectorAll('.toast');
+        toasts.forEach(toast => {
+          setTimeout(() => {
+            toast.style.animation = 'slideOut 0.3s ease-out forwards';
+            setTimeout(() => {
+              toast.remove();
+            }, 300);
+          }, 5000);
+        });
+      });
+    </script>
   </head>
   <body>
-    <nav class="brand-nav" role="navigation" aria-label="Main">
-      <div class="brand-left">
-        <img src="{% static 'images/logo.png' %}" alt="Chain of Custody logo" class="nav-logo" />
-        <span class="brand-title">Chain of Custody</span>
+    {% if messages %}
+      <div class="toast-container">
+        {% for message in messages %}
+          <div class="toast {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
       </div>
-      <ul class="nav-right">
-        <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
-        <li><a href="{% url 'logout' %}">Logout</a></li>
-      </ul>
-    </nav>
+    {% endif %}
+    
+    <div class="login-wrapper">
+      <div class="login-card">
+        <div class="login-brand">
+          <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo" />
+          <div class="title">Chain of Custody</div>
+        </div>
 
-    <main class="auth-wrapper">
-      <section class="auth-card" aria-labelledby="auth-heading">
-        <h1 id="auth-heading">Two‑Factor Authentication</h1>
-
-        {% if messages %}
-          <ul class="messages" role="status" aria-live="polite">
-            {% for message in messages %}
-              <li>{{ message }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
+        <h2>Two-Factor Authentication</h2>
 
         {% if qr_code %}
           <p class="muted">Scan the QR code with your authenticator (Google Authenticator, Authy, etc.)</p>
@@ -50,12 +57,12 @@
           </div>
         {% endif %}
 
-        <form method="post" class="verify-form" novalidate>
+        <form method="post" novalidate>
           {% csrf_token %}
-          <label for="token" class="label">Enter 6‑digit code</label>
-          <input id="token" name="token" inputmode="numeric" pattern="\d{6}" maxlength="16" placeholder="123456" required />
+          <label for="token">Enter 6-digit code</label>
+          <input type="text" id="token" name="token" inputmode="numeric" pattern="\d{6}" maxlength="6" placeholder="123456" required />
 
-          <button type="submit" class="btn-primary">Verify</button>
+          <button type="submit">Verify</button>
         </form>
 
         {% if user.two_factor_enabled %}
@@ -64,8 +71,8 @@
             <a href="{% url 'verify_recovery_code' %}" class="link">Verify using a recovery code</a>
           </p>
         {% endif %}
-      </section>
-    </main>
+      </div>
+    </div>
 
     <script>
       document.addEventListener('click', function (e) {
@@ -81,7 +88,47 @@
           alert('Copy failed — select and copy manually.');
         });
       });
+
+      document.addEventListener('DOMContentLoaded', function() {
+        const tokenInput = document.getElementById('token');
+        
+        if (tokenInput) {
+          // Prevent non-numeric input
+          tokenInput.addEventListener('input', function(e) {
+            // Remove any non-numeric characters
+            this.value = this.value.replace(/[^0-9]/g, '');
+          });
+          
+          // Prevent non-numeric keypresses
+          tokenInput.addEventListener('keypress', function(e) {
+            // Allow: backspace, delete, tab, escape, enter
+            if ([8, 9, 27, 13].indexOf(e.keyCode) !== -1 ||
+                // Allow: Ctrl+A, Command+A
+                (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                // Allow: home, end, left, right, down, up
+                (e.keyCode >= 35 && e.keyCode <= 40)) {
+              return;
+            }
+            
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+              e.preventDefault();
+            }
+          });
+          
+          // Prevent paste of non-numeric content
+          tokenInput.addEventListener('paste', function(e) {
+            const pastedData = (e.clipboardData || window.clipboardData).getData('text');
+            const numericData = pastedData.replace(/[^0-9]/g, '');
+            
+            if (pastedData !== numericData) {
+              e.preventDefault();
+              // Only paste the numeric characters
+              document.execCommand('insertText', false, numericData);
+            }
+          });
+        }
+      });
     </script>
   </body>
 </html>
-// ...existing code...

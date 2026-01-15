@@ -4,34 +4,41 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Email Verification Sent — Chain of Custody</title>
-    <link rel="stylesheet" href="{% static 'css/accounts/verification_sent.css' %}" />
+    <title>Email Verification Sent</title>
+    <link rel="stylesheet" href="{% static 'css/accounts/verification_sent.css' %}?v={{ STATIC_VERSION }}" />
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const toasts = document.querySelectorAll('.toast');
+        toasts.forEach(toast => {
+          setTimeout(() => {
+            toast.style.animation = 'slideOut 0.3s ease-out forwards';
+            setTimeout(() => {
+              toast.remove();
+            }, 300);
+          }, 5000);
+        });
+      });
+    </script>
   </head>
   <body>
-    <nav class="brand-nav" role="navigation" aria-label="Main">
-      <div class="brand-left">
-        <img src="{% static 'images/logo.png' %}" alt="Chain of Custody logo" class="nav-logo" />
-        <span class="brand-title">Chain of Custody</span>
+    {% if messages %}
+      <div class="toast-container">
+        {% for message in messages %}
+          <div class="toast {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
       </div>
-      <ul class="nav-right" role="menubar">
-        <li role="none"><a role="menuitem" href="{% url 'dashboard' %}">Dashboard</a></li>
-        <li role="none"><a role="menuitem" href="{% url 'login' %}">Login</a></li>
-      </ul>
-    </nav>
+    {% endif %}
+    
+    <div class="login-wrapper">
+      <div class="login-card">
+        <div class="login-brand">
+          <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo" />
+          <div class="title">Chain of Custody</div>
+        </div>
 
-    <main class="vs-wrapper" role="main">
-      <div class="vs-card" role="region" aria-labelledby="vs-heading">
-        <h1 id="vs-heading">Verification Email Sent</h1>
+        <h2>Verification Email Sent</h2>
 
-        {% if messages %}
-          <ul class="messages" role="status" aria-live="polite">
-            {% for message in messages %}
-              <li>{{ message }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-
-        <div class="vs-info">
+        <div class="muted">
           {% if email %}
             <p>We've sent a verification email to <strong>{{ email }}</strong>.</p>
           {% else %}
@@ -40,15 +47,16 @@
           <p>Please open the message and click the verification link to activate your account. If you don't see it, check your spam folder.</p>
         </div>
 
-        <div class="vs-actions">
+        <div class="login-links">
           {% if email %}
-            <a class="btn btn-secondary" href="{% url 'resend_verification' %}?email={{ email|urlencode }}">Resend verification email</a>
+            <a href="{% url 'resend_verification' %}?email={{ email|urlencode }}">Resend verification email</a>
           {% else %}
-            <a class="btn btn-secondary" href="{% url 'resend_verification' %}">Resend verification email</a>
+            <a href="{% url 'resend_verification' %}">Resend verification email</a>
           {% endif %}
-          <a class="btn btn-primary" href="{% url 'login' %}">Back to login</a>
+          <span class="login-note">•</span>
+          <a href="{% url 'login' %}">Back to login</a>
         </div>
       </div>
-    </main>
+    </div>
   </body>
 </html>
