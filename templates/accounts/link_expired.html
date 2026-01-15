@@ -1,35 +1,64 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Verification Link Expired</title>
-  </head>
-  <body>
-    {% if messages %}
-    <ul class="messages">
-      {% for message in messages %}
-      <li>{{ message }}</li>
-      {% endfor %}
-    </ul>
-    {% endif %}
-
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Verification Link Expired{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/accounts/link_expired.css' %}?v={{ STATIC_VERSION }}">
+{% endblock %}
+{% block content %}
+<div class="login-wrapper">
+  <div class="login-card">
+    <div class="login-brand">
+      <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo">
+      <div class="title">Chain of Custody</div>
+    </div>
     <h2>Verification Link Expired</h2>
-    <p>Sorry, your verification link is invalid or has expired.</p>
+    
+    <div class="toast-container">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="toast {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    </div>
 
-    {% if email %}
-    <p>You registered with <strong>{{ email }}</strong>.</p>
-    {% endif %}
-
-    <p>Click below to request a new verification link:</p>
+    <div class="muted">
+      <p>Sorry, your verification link is invalid or has expired.</p>
+      {% if email %}
+        <p>You registered with <strong>{{ email }}</strong>.</p>
+      {% endif %}
+      <p>Click below to request a new verification link:</p>
+    </div>
 
     <form method="POST" action="{% url 'resend_verification' %}">
-      {% csrf_token %} {% if email %}
-      <input type="hidden" name="email" value="{{ email }}" />
+      {% csrf_token %}
+      {% if email %}
+        <input type="hidden" name="email" value="{{ email }}" />
       {% else %}
-      <label for="email">Enter your email:</label>
-      <input type="email" name="email" id="email" required />
+        <div class="form-group">
+          <label for="email">Enter your email:</label>
+          <input type="email" name="email" id="email" required />
+        </div>
       {% endif %}
-      <button type="submit">Resend Verification Email</button>
+      <button type="submit" class="btn">Resend Verification Email</button>
     </form>
-  </body>
-</html>
+
+    <div class="login-links">
+      <span class="login-note">Remember your password?</span>
+      <a href="{% url 'login' %}">Back to Login</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const toasts = document.querySelectorAll('.toast');
+  toasts.forEach(toast => {
+    setTimeout(() => {
+      toast.style.animation = 'slideOut 0.3s ease-in forwards';
+      setTimeout(() => toast.remove(), 300);
+    }, 5000);
+  });
+});
+</script>
+{% endblock %}
