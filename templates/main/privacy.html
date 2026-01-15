@@ -5,10 +5,44 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Privacy Policy - ChainProof</title>
-    <link rel="stylesheet" href="{% static 'css/main/privacy.css' %}" />
+    <link
+      rel="stylesheet"
+      href="{% static 'css/main/privacy.css' %}?v={{ STATIC_VERSION }}"
+    />
     <link
       href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
       rel="stylesheet"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href="{% static 'images/favicon.png' %}?v={{ STATIC_VERSION }}"
+      sizes="64x64"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href="{% static 'images/favicon.png' %}?v={{ STATIC_VERSION }}"
+      sizes="128x128"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href="{% static 'images/favicon-96x96.png' %}?v={{ STATIC_VERSION }}"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href="{% static 'images/favicon.ico' %}?v={{ STATIC_VERSION }}"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="{% static 'images/apple-touch-icon.png' %}?v={{ STATIC_VERSION }}"
+    />
+    <link
+      rel="manifest"
+      href="{% static 'site.json' %}?v={{ STATIC_VERSION }}"
     />
   </head>
   <body>
@@ -66,31 +100,45 @@
           <div class="content-block" id="introduction">
             <h2>1. Introduction</h2>
             <p>
-              At ChainProof, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our secure evidence management platform.
+              At ChainProof, we are committed to protecting your privacy and
+              ensuring the security of your personal information. This Privacy
+              Policy explains how we collect, use, disclose, and safeguard your
+              information when you use our secure evidence management platform.
             </p>
             <p>
-              By using ChainProof, you agree to the collection and use of information in accordance with this policy. We will not use or share your information except as described in this Privacy Policy.
+              By using ChainProof, you agree to the collection and use of
+              information in accordance with this policy. We will not use or
+              share your information except as described in this Privacy Policy.
             </p>
           </div>
 
           <div class="content-block" id="information-collect">
             <h2>2. Information We Collect</h2>
-            <p>We collect information you provide directly to us and information we obtain automatically:</p>
+            <p>
+              We collect information you provide directly to us and information
+              we obtain automatically:
+            </p>
             <ul>
               <li>
-                <strong>Personal Information:</strong> Name, email address, phone number, and other contact details provided during registration
+                <strong>Personal Information:</strong> Name, email address,
+                phone number, and other contact details provided during
+                registration
               </li>
               <li>
-                <strong>Account Information:</strong> Username, password, and role assignments within the platform
+                <strong>Account Information:</strong> Username, password, and
+                role assignments within the platform
               </li>
               <li>
-                <strong>Evidence Data:</strong> Digital files, documents, images, and videos uploaded to cases
+                <strong>Evidence Data:</strong> Digital files, documents,
+                images, and videos uploaded to cases
               </li>
               <li>
-                <strong>Usage Data:</strong> Information about how you interact with our platform, including access logs and audit trails
+                <strong>Usage Data:</strong> Information about how you interact
+                with our platform, including access logs and audit trails
               </li>
               <li>
-                <strong>Device Information:</strong> IP address, browser type, operating system, and device identifiers
+                <strong>Device Information:</strong> IP address, browser type,
+                operating system, and device identifiers
               </li>
             </ul>
           </div>
@@ -112,21 +160,41 @@
 
           <div class="content-block" id="information-sharing">
             <h2>4. Information Sharing</h2>
-            <p>We do not sell, trade, or otherwise transfer your personal information to third parties except in the following circumstances:</p>
+            <p>
+              We do not sell, trade, or otherwise transfer your personal
+              information to third parties except in the following
+              circumstances:
+            </p>
             <ul>
               <li>With your explicit consent</li>
-              <li>To authorized personnel within your organization for case management</li>
+              <li>
+                To authorized personnel within your organization for case
+                management
+              </li>
               <li>When required by law or to comply with legal processes</li>
-              <li>To protect our rights, property, or safety, or that of our users</li>
-              <li>In connection with a business transfer, merger, or acquisition</li>
-              <li>With service providers who assist us in operating our platform (under strict confidentiality agreements)</li>
+              <li>
+                To protect our rights, property, or safety, or that of our users
+              </li>
+              <li>
+                In connection with a business transfer, merger, or acquisition
+              </li>
+              <li>
+                With service providers who assist us in operating our platform
+                (under strict confidentiality agreements)
+              </li>
             </ul>
-            <p>All evidence data remains encrypted and accessible only to authorized users with proper case keys.</p>
+            <p>
+              All evidence data remains encrypted and accessible only to
+              authorized users with proper case keys.
+            </p>
           </div>
 
           <div class="content-block" id="data-security">
             <h2>5. Data Security</h2>
-            <p>We implement comprehensive security measures to protect your information:</p>
+            <p>
+              We implement comprehensive security measures to protect your
+              information:
+            </p>
             <ul>
               <li>AES-256 encryption for all stored data</li>
               <li>End-to-end encryption for data transmission</li>
@@ -137,39 +205,85 @@
               <li>Access controls and role-based permissions</li>
               <li>Continuous monitoring and threat detection</li>
             </ul>
-            <p>While we strive to protect your information, no method of transmission over the internet is 100% secure. We cannot guarantee absolute security.</p>
+            <p>
+              While we strive to protect your information, no method of
+              transmission over the internet is 100% secure. We cannot guarantee
+              absolute security.
+            </p>
           </div>
 
           <div class="content-block" id="your-rights">
             <h2>6. Your Rights</h2>
-            <p>You have the following rights regarding your personal information:</p>
+            <p>
+              You have the following rights regarding your personal information:
+            </p>
             <ul>
-              <li><strong>Access:</strong> Request a copy of the personal information we hold about you</li>
-              <li><strong>Correction:</strong> Request correction of inaccurate or incomplete information</li>
-              <li><strong>Deletion:</strong> Request deletion of your personal information (subject to legal requirements)</li>
-              <li><strong>Portability:</strong> Request transfer of your data in a structured format</li>
-              <li><strong>Restriction:</strong> Request limitation of processing in certain circumstances</li>
-              <li><strong>Objection:</strong> Object to processing based on legitimate interests</li>
-              <li><strong>Withdrawal:</strong> Withdraw consent where processing is based on consent</li>
+              <li>
+                <strong>Access:</strong> Request a copy of the personal
+                information we hold about you
+              </li>
+              <li>
+                <strong>Correction:</strong> Request correction of inaccurate or
+                incomplete information
+              </li>
+              <li>
+                <strong>Deletion:</strong> Request deletion of your personal
+                information (subject to legal requirements)
+              </li>
+              <li>
+                <strong>Portability:</strong> Request transfer of your data in a
+                structured format
+              </li>
+              <li>
+                <strong>Restriction:</strong> Request limitation of processing
+                in certain circumstances
+              </li>
+              <li>
+                <strong>Objection:</strong> Object to processing based on
+                legitimate interests
+              </li>
+              <li>
+                <strong>Withdrawal:</strong> Withdraw consent where processing
+                is based on consent
+              </li>
             </ul>
-            <p>To exercise these rights, please contact us using the information provided below.</p>
+            <p>
+              To exercise these rights, please contact us using the information
+              provided below.
+            </p>
           </div>
 
           <div class="content-block" id="cookies">
             <h2>7. Cookies and Tracking</h2>
-            <p>We use cookies and similar technologies to enhance your experience:</p>
+            <p>
+              We use cookies and similar technologies to enhance your
+              experience:
+            </p>
             <ul>
-              <li><strong>Essential Cookies:</strong> Required for platform functionality and security</li>
-              <li><strong>Analytics Cookies:</strong> Help us understand how users interact with our platform</li>
-              <li><strong>Preference Cookies:</strong> Remember your settings and preferences</li>
+              <li>
+                <strong>Essential Cookies:</strong> Required for platform
+                functionality and security
+              </li>
+              <li>
+                <strong>Analytics Cookies:</strong> Help us understand how users
+                interact with our platform
+              </li>
+              <li>
+                <strong>Preference Cookies:</strong> Remember your settings and
+                preferences
+              </li>
             </ul>
-            <p>You can control cookie settings through your browser, though disabling certain cookies may affect platform functionality.</p>
+            <p>
+              You can control cookie settings through your browser, though
+              disabling certain cookies may affect platform functionality.
+            </p>
           </div>
 
           <div class="content-block" id="changes">
             <h2>8. Changes to This Policy</h2>
             <p>
-              We may update this Privacy Policy from time to time. We will notify you of any changes by:
+              We may update this Privacy Policy from time to time. We will
+              notify you of any changes by:
             </p>
             <ul>
               <li>Posting the new Privacy Policy on this page</li>
@@ -177,14 +291,17 @@
               <li>Displaying a notice within the platform</li>
             </ul>
             <p>
-              Your continued use of ChainProof after changes constitutes acceptance of the updated policy. We encourage you to review this policy periodically.
+              Your continued use of ChainProof after changes constitutes
+              acceptance of the updated policy. We encourage you to review this
+              policy periodically.
             </p>
           </div>
 
           <div class="content-block" id="contact">
             <h2>9. Contact Us</h2>
             <p>
-              If you have questions about this Privacy Policy or our data practices, please contact us:
+              If you have questions about this Privacy Policy or our data
+              practices, please contact us:
             </p>
             <ul>
               <li>Email: privacy@chainproof.com</li>
@@ -194,9 +311,11 @@
           </div>
 
           <div class="acceptance-box">
-            <i class='bx bx-shield' ></i>
+            <i class="bx bx-shield"></i>
             <p>
-              Your privacy is our priority. We are committed to protecting your personal information and maintaining the highest standards of data security.
+              Your privacy is our priority. We are committed to protecting your
+              personal information and maintaining the highest standards of data
+              security.
             </p>
           </div>
         </div>
