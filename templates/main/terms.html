@@ -1,0 +1,327 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Terms and Conditions - ChainProof</title>
+    <link rel="stylesheet" href="{% static 'css/main/terms.css' %}" />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="nav-container">
+        <a href="{% url 'homepage' %}" style="text-decoration: none">
+          <div class="nav-brand">
+            <img
+              src="{% static 'images/logo.png' %}"
+              alt="Logo"
+              class="nav-logo"
+            />
+            <span class="brand-name">ChainProof</span>
+          </div>
+        </a>
+        <div class="nav-links">
+          {% if user.is_authenticated %}
+          <a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a>
+          <a href="{% url 'logout' %}" class="nav-link nav-btn">Logout</a>
+          {% else %}
+          <a href="{% url 'login' %}" class="nav-link">Login</a>
+          <a href="{% url 'register' %}" class="nav-link nav-btn"
+            >Get Started</a
+          >
+          {% endif %}
+        </div>
+      </div>
+    </nav>
+
+    <section class="page-hero">
+      <div class="page-hero-content">
+        <h1>Terms and Conditions</h1>
+        <p>Last updated: January 15, 2026</p>
+      </div>
+    </section>
+
+    <section class="content-section">
+      <div class="content-container">
+        <div class="content-sidebar">
+          <h3>Quick Navigation</h3>
+          <ul>
+            <li><a href="#acceptance">Acceptance of Terms</a></li>
+            <li><a href="#definitions">Definitions</a></li>
+            <li><a href="#account">Account Registration</a></li>
+            <li><a href="#use">Use of Service</a></li>
+            <li><a href="#evidence">Evidence Submission</a></li>
+            <li><a href="#security">Security & Privacy</a></li>
+            <li><a href="#responsibilities">User Responsibilities</a></li>
+            <li><a href="#prohibited">Prohibited Activities</a></li>
+            <li><a href="#termination">Termination</a></li>
+            <li><a href="#limitation">Limitation of Liability</a></li>
+            <li><a href="#changes">Changes to Terms</a></li>
+            <li><a href="#contact">Contact Information</a></li>
+          </ul>
+        </div>
+
+        <div class="content-main">
+          <div class="content-block" id="acceptance">
+            <h2>1. Acceptance of Terms</h2>
+            <p>
+              By accessing and using ChainProof, you accept and agree to be
+              bound by the terms and provision of this agreement. If you do not
+              agree to abide by the above, please do not use this service.
+            </p>
+            <p>
+              These Terms and Conditions constitute a legally binding agreement
+              made between you and ChainProof concerning your access to and use
+              of the platform.
+            </p>
+          </div>
+
+          <div class="content-block" id="definitions">
+            <h2>2. Definitions</h2>
+            <p>For the purposes of these Terms and Conditions:</p>
+            <ul>
+              <li>
+                <strong>Platform</strong> refers to the ChainProof evidence
+                management system
+              </li>
+              <li>
+                <strong>User</strong> means any individual or entity using the
+                service
+              </li>
+              <li>
+                <strong>Evidence</strong> refers to any digital files,
+                documents, images, or videos uploaded to the platform
+              </li>
+              <li>
+                <strong>Case</strong> means a collection of evidence items
+                related to a specific investigation
+              </li>
+              <li>
+                <strong>Authorized Personnel</strong> includes Reporters,
+                Investigators, Custodians, Analysts, and Auditors
+              </li>
+            </ul>
+          </div>
+
+          <div class="content-block" id="account">
+            <h2>3. Account Registration</h2>
+            <p>
+              To use ChainProof, you must register for an account by providing
+              accurate and complete information. You are responsible for:
+            </p>
+            <ul>
+              <li>
+                Maintaining the confidentiality of your account credentials
+              </li>
+              <li>All activities that occur under your account</li>
+              <li>Notifying us immediately of any unauthorized access</li>
+              <li>Ensuring your contact information is current and accurate</li>
+            </ul>
+            <p>
+              You must be at least 18 years old to create an account.
+              Organizations may register on behalf of their employees or
+              authorized representatives.
+            </p>
+          </div>
+
+          <div class="content-block" id="use">
+            <h2>4. Use of Service</h2>
+            <p>
+              ChainProof provides a secure platform for evidence management with
+              the following features:
+            </p>
+            <ul>
+              <li>End-to-end encrypted storage of digital evidence</li>
+              <li>Role-based access control system</li>
+              <li>Complete chain of custody tracking</li>
+              <li>Audit trail for all evidence interactions</li>
+              <li>Secure case management and assignment</li>
+            </ul>
+            <p>
+              You agree to use the service only for lawful purposes and in
+              accordance with these Terms.
+            </p>
+          </div>
+
+          <div class="content-block" id="evidence">
+            <h2>5. Evidence Submission</h2>
+            <p>When submitting evidence to ChainProof:</p>
+            <ul>
+              <li>
+                You warrant that you have the legal right to submit the evidence
+              </li>
+              <li>All evidence is automatically encrypted upon upload</li>
+              <li>
+                You understand that evidence becomes part of a permanent audit
+                trail
+              </li>
+              <li>You agree to provide accurate metadata and descriptions</li>
+              <li>
+                You acknowledge that tampering with evidence is prohibited and
+                may result in legal consequences
+              </li>
+            </ul>
+            <p>
+              ChainProof reserves the right to refuse or remove any evidence
+              that violates these terms or applicable laws.
+            </p>
+          </div>
+
+          <div class="content-block" id="security">
+            <h2>6. Security & Privacy</h2>
+            <p>We implement industry-standard security measures including:</p>
+            <ul>
+              <li>AES-256 encryption for all stored evidence</li>
+              <li>End-to-end encryption for data transmission</li>
+              <li>Multi-factor authentication options</li>
+              <li>Regular security audits and updates</li>
+              <li>Blockchain verification for evidence integrity</li>
+            </ul>
+            <p>
+              Your privacy is important to us. Please review our Privacy Policy
+              to understand how we collect, use, and protect your information.
+            </p>
+          </div>
+
+          <div class="content-block" id="responsibilities">
+            <h2>7. User Responsibilities</h2>
+            <p>As a user of ChainProof, you agree to:</p>
+            <ul>
+              <li>Comply with all applicable laws and regulations</li>
+              <li>Maintain the confidentiality of case access keys</li>
+              <li>Use your assigned role appropriately and ethically</li>
+              <li>
+                Report any security vulnerabilities or suspicious activity
+              </li>
+              <li>Keep your account information up to date</li>
+              <li>Respect the privacy and rights of others</li>
+              <li>Follow proper chain of custody procedures</li>
+            </ul>
+          </div>
+
+          <div class="content-block" id="prohibited">
+            <h2>8. Prohibited Activities</h2>
+            <p>You may not:</p>
+            <ul>
+              <li>Upload false, fraudulent, or misleading evidence</li>
+              <li>Attempt to access cases or evidence without authorization</li>
+              <li>Tamper with or alter evidence or audit trails</li>
+              <li>Share access keys with unauthorized individuals</li>
+              <li>Use the platform for illegal activities</li>
+              <li>Attempt to bypass security measures</li>
+              <li>Reverse engineer or decompile the platform</li>
+              <li>Upload malicious code or viruses</li>
+              <li>Harass or threaten other users</li>
+              <li>Misrepresent your identity or role</li>
+            </ul>
+          </div>
+
+          <div class="content-block" id="termination">
+            <h2>9. Termination</h2>
+            <p>We reserve the right to suspend or terminate your account if:</p>
+            <ul>
+              <li>You violate these Terms and Conditions</li>
+              <li>Your account is inactive for an extended period</li>
+              <li>We suspect fraudulent or illegal activity</li>
+              <li>You fail to pay applicable fees (if any)</li>
+              <li>We discontinue the service</li>
+            </ul>
+            <p>
+              Upon termination, your access to the platform will be revoked.
+              Evidence stored in active cases will be retained according to
+              legal and regulatory requirements.
+            </p>
+          </div>
+
+          <div class="content-block" id="limitation">
+            <h2>10. Limitation of Liability</h2>
+            <p>
+              ChainProof is provided "as is" without warranties of any kind. To
+              the maximum extent permitted by law:
+            </p>
+            <ul>
+              <li>
+                We are not liable for any indirect, incidental, or consequential
+                damages
+              </li>
+              <li>We do not guarantee uninterrupted or error-free service</li>
+              <li>
+                We are not responsible for unauthorized access resulting from
+                user negligence
+              </li>
+              <li>
+                Our total liability shall not exceed the amount paid by you (if
+                any) for the service
+              </li>
+            </ul>
+            <p>
+              This limitation applies to all claims, whether based on warranty,
+              contract, tort, or any other legal theory.
+            </p>
+          </div>
+
+          <div class="content-block" id="changes">
+            <h2>11. Changes to Terms</h2>
+            <p>
+              We reserve the right to modify these Terms and Conditions at any
+              time. Changes will be effective immediately upon posting to the
+              platform. Your continued use of ChainProof after changes
+              constitutes acceptance of the modified terms.
+            </p>
+            <p>
+              We will notify users of significant changes via email or platform
+              notification. It is your responsibility to review these terms
+              periodically.
+            </p>
+          </div>
+
+          <div class="content-block" id="contact">
+            <h2>12. Contact Information</h2>
+            <p>
+              If you have questions about these Terms and Conditions, please
+              contact us:
+            </p>
+            <ul>
+              <li>Email: legal@chainproof.com</li>
+              <li>Phone: +254 700 000 000</li>
+              <li>Address: Nairobi, Kenya</li>
+            </ul>
+          </div>
+
+          <div class="acceptance-box">
+            <i class="bx bxs-check-circle"></i>
+            <p>
+              By using ChainProof, you acknowledge that you have read,
+              understood, and agree to be bound by these Terms and Conditions.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="footer-container">
+        <div class="footer-brand">
+          <img
+            src="{% static 'images/logo.png' %}"
+            alt="Logo"
+            class="footer-logo"
+          />
+          <span class="footer-name">ChainProof</span>
+        </div>
+        <p class="footer-text">
+          Secure evidence management with complete chain of custody
+        </p>
+        <div class="footer-links">
+          <a href="{% url 'privacy' %}">Privacy Policy</a>
+          <a href="{% url 'terms' %}">Terms of Service</a>
+          <a href="{% url 'contact' %}">Contact Us</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
