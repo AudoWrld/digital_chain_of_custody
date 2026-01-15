@@ -284,7 +284,7 @@ body {
     gap: 30px;
   }
   .content-sidebar {
-    position: static;
+    display: none;
   }
   .content-main {
     padding: 30px 24px;
