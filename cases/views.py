@@ -40,7 +40,7 @@ def create_case(request):
             # Log creation in audit trail
             CaseAuditLog.log_action(user=request.user, case=case, action='Created case')
 
-            return redirect('view_case', case_id=case.id)
+            return redirect('cases:view_case', case_id=case.id)
     else:
         form = CaseForm()
 
@@ -180,7 +180,7 @@ def edit_case(request, case_id):
                             details=f"Old: {old_value} | New: {new_value}"
                         )
 
-            return redirect('view_case', case_id=case.id)
+            return redirect('cases:view_case', case_id=case.id)
     else:
         form = EditCaseForm(user=request.user, instance=case, initial={
             'case_title': case.get_title(),
@@ -269,7 +269,7 @@ def assign_investigator(request, case_id):
                 action="Directly assigned investigators",
                 details=f"Investigators: {[u.username for u in case.assigned_investigators.all()]}"
             )
-        return redirect("assign_investigators", case_id=case.id)
+        return redirect("cases:assign_investigators", case_id=case.id)
 
     users = User.objects.filter(role="investigator", is_active=True, verified=True)
     pending_requests = case.assignment_requests.filter(status__in=['pending_admin'])
@@ -333,7 +333,7 @@ def close_case(request, case_id):
         action='Closed case -metadata and content are now read only'
     )
     
-    return redirect('view_case', case_id=case.id)
+    return redirect('cases:view_case', case_id=case.id)
 
 
 
@@ -416,7 +416,7 @@ def archive_case(request, case_id):
         action=f"Archived case {case.get_title()}. Case is now read-only"
     )
     
-    return redirect('view_case', case_id=case.id)
+    return redirect('cases:view_case', case_id=case.id)
 
 
 
@@ -444,7 +444,7 @@ def withdraw_case(request, case_id):
         action="Withdrawn case - case is now read-only"
     )
 
-    return redirect('view_case', case_id=case.id)
+    return redirect('cases:view_case', case_id=case.id)
 
 
 
@@ -480,7 +480,7 @@ def mark_invalid_case(request, case_id):
             action="Marked case invalid"
         )
 
-    return redirect('view_case', case_id=case.id)
+    return redirect('cases:view_case', case_id=case.id)
 
 
 @login_required
@@ -508,7 +508,7 @@ def upload_media(request, case_id):
                 )
             except Exception as e:
                 logger.error(f"Failed to log media upload for case {case.id}: {e}")
-            return redirect('view_case', case_id=case.id)
+            return redirect('cases:view_case', case_id=case.id)
 
     else:
         form = CaseMediaForm()
@@ -567,7 +567,7 @@ def edit_media_description(request, media_id):
             action="Edited media description",
             details=f'File: {media.media.name}, Old: {old_description} | New: {new_description}'
         )
-        return redirect('view_case', case_id=case.id)
+        return redirect('cases:view_case', case_id=case.id)
     return render(request, 'cases/edit_media.html', {'media': media})
 
 
@@ -597,7 +597,7 @@ def mark_media_invalid(request, media_id):
         details=f'File: {media.media.name}'
     )
 
-    return redirect('view_case', case_id=case.id)
+    return redirect('cases:view_case', case_id=case.id)
 
 
 

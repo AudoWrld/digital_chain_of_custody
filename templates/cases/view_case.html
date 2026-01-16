@@ -31,35 +31,35 @@
     {% for media in media_files %}
     <li>
         {{ media.description }} -
-        <a href="{% url 'view_media' media.id %}">Download</a> |
+        <a href="{% url 'cases:view_media' media.id %}">Download</a> |
         {% if case.case_status not in 'Closed,Archived,Withdrawn,Invalid' %}
-        <a href="{% url 'edit_media_description' media.id %}">Edit Description</a> |
-        <a href="{% url 'mark_media_invalid' media.id %}">Mark Invalid</a> |
+        <a href="{% url 'cases:edit_media_description' media.id %}">Edit Description</a> |
+        <a href="{% url 'cases:mark_media_invalid' media.id %}">Mark Invalid</a> |
         {% endif %}
-        <a href="{% url 'view_media_audit_log' media.id %}">Audit Log</a>
+        <a href="{% url 'cases:view_media_audit_log' media.id %}">Audit Log</a>
     </li>
     {% endfor %}
 </ul>
 {% else %}
-<p>No media uploaded for this case. {% if case.case_status not in 'Closed,Archived,Withdrawn,Invalid' %}<a href="{% url 'upload_media' case.id %}">Upload Media</a>{% endif %}</p>
+<p>No media uploaded for this case. {% if case.case_status not in 'Closed,Archived,Withdrawn,Invalid' %}<a href="{% url 'cases:upload_media' case.id %}">Upload Media</a>{% endif %}</p>
 {% endif %}
 
 <h2>Actions</h2>
 {% if case.case_status not in 'Closed,Archived,Withdrawn,Invalid' %}
-<a href="{% url 'upload_media' case.id %}">Upload Media</a> |
+<a href="{% url 'cases:upload_media' case.id %}">Upload Media</a> |
 {% endif %}
 {% if case.case_status == 'Open' or case.case_status == 'Under Review' %}
-<a href="{% url 'edit_case' case.id %}">Edit Case</a> |
-<a href="{% url 'assign_investigators' case.id %}">Assign Investigators</a> |
+<a href="{% url 'cases:edit_case' case.id %}">Edit Case</a> |
+<a href="{% url 'cases:assign_investigators' case.id %}">Assign Investigators</a> |
 {% if not case.closure_requested %}
-<a href="{% url 'request_case_closure' case.id %}">Request Closure</a> |
+<a href="{% url 'cases:request_case_closure' case.id %}">Request Closure</a> |
 {% endif %}
-<a href="{% url 'close_case' case.id %}">Close Case</a> |
-<a href="{% url 'withdraw_case' case.id %}">Withdraw Case</a> |
-<a href="{% url 'invalidate_case' case.id %}">Mark Invalid</a> |
+<a href="{% url 'cases:close_case' case.id %}">Close Case</a> |
+<a href="{% url 'cases:withdraw_case' case.id %}">Withdraw Case</a> |
+<a href="{% url 'cases:invalidate_case' case.id %}">Mark Invalid</a> |
 {% endif %}
 {% if case.case_status == 'Closed' %}
-<a href="{% url 'archive_case' case.id %}">Archive Case</a> |
+<a href="{% url 'cases:archive_case' case.id %}">Archive Case</a> |
 {% endif %}
 {% if case.case_status == 'Pending Admin Approval' and request.user.is_staff %}
   <h3>Pending Investigator Assignment</h3>
@@ -99,12 +99,12 @@
 
 {% if case.closure_requested %}
   {% if request.user == case.created_by and not case.closure_creator_approved %}
-    <a href="{% url 'admin_approve_case_closure' case.id %}">Approve Closure (Creator)</a> |
+    <a href="{% url 'cases:admin_approve_case_closure' case.id %}">Approve Closure (Creator)</a> |
   {% endif %}
   {% if request.user.is_staff and not case.closure_approved %}
-    <a href="{% url 'admin_approve_case_closure' case.id %}">Approve Closure (Admin)</a> |
+    <a href="{% url 'cases:admin_approve_case_closure' case.id %}">Approve Closure (Admin)</a> |
   {% endif %}
 {% endif %}
-<a href="{% url 'view_case_audit_log' case.id %}">Case Audit Log</a> |
-<a href="{% url 'case_list' %}">Back to Cases</a>
+<a href="{% url 'cases:view_case_audit_log' case.id %}">Case Audit Log</a> |
+<a href="{% url 'cases:case_list' %}">Back to Cases</a>
 {% endblock %}
