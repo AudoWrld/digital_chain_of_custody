@@ -1,8 +1,23 @@
-{% extends "base.html" %}
+{% extends "accounts/base.html" %}
 {% load static %}
 {% block title %}Resend Verification Email{% endblock %}
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/accounts/resend_verification.css' %}?v={{ STATIC_VERSION }}">
+{% endblock %}
+{% block extra_head %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const toasts = document.querySelectorAll('.toast');
+    toasts.forEach(toast => {
+      setTimeout(() => {
+        toast.style.animation = 'slideOut 0.3s ease-out forwards';
+        setTimeout(() => {
+          toast.remove();
+        }, 300);
+      }, 5000);
+    });
+  });
+</script>
 {% endblock %}
 {% block content %}
 <div class="login-wrapper">
@@ -12,14 +27,6 @@
       <div class="title">Chain of Custody</div>
     </div>
     <h2>Resend Verification Email</h2>
-    
-    <div class="toast-container">
-      {% if messages %}
-        {% for message in messages %}
-          <div class="toast {{ message.tags }}">{{ message }}</div>
-        {% endfor %}
-      {% endif %}
-    </div>
 
     <div class="muted">
       <p>
@@ -50,17 +57,4 @@
     </div>
   </div>
 </div>
-{% endblock %}
-{% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const toasts = document.querySelectorAll('.toast');
-  toasts.forEach(toast => {
-    setTimeout(() => {
-      toast.style.animation = 'slideOut 0.3s ease-in forwards';
-      setTimeout(() => toast.remove(), 300);
-    }, 5000);
-  });
-});
-</script>
 {% endblock %}

@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}ChainProof{% endblock %}</title>
+    {% block extra_css %}{% endblock %}
+    <link
+      rel="icon"
+      type="image/png"
+      href="{% static 'images/favicon.png' %}?v={{ STATIC_VERSION }}"
+      sizes="64x64"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href="{% static 'images/favicon.png' %}?v={{ STATIC_VERSION }}"
+      sizes="128x128"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href="{% static 'images/favicon-96x96.png' %}?v={{ STATIC_VERSION }}"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href="{% static 'images/favicon.ico' %}?v={{ STATIC_VERSION }}"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="{% static 'images/apple-touch-icon.png' %}?v={{ STATIC_VERSION }}"
+    />
+    <link
+      rel="manifest"
+      href="{% static 'site.json' %}?v={{ STATIC_VERSION }}"
+    />
+    {% block extra_head %}{% endblock %}
+  </head>
+  <body>
+    {% if messages %}
+      <div class="toast-container">
+        {% for message in messages %}
+          <div class="toast {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+    {% block extra_js %}{% endblock %}
+  </body>
+</html>

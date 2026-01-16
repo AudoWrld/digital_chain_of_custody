@@ -1,26 +1,10 @@
+{% extends 'accounts/base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Two-Factor Authentication</title>
-    <link rel="stylesheet" href="{% static 'css/accounts/second_auth.css' %}?v={{ STATIC_VERSION }}" />
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const toasts = document.querySelectorAll('.toast');
-        toasts.forEach(toast => {
-          setTimeout(() => {
-            toast.style.animation = 'slideOut 0.3s ease-out forwards';
-            setTimeout(() => {
-              toast.remove();
-            }, 300);
-          }, 5000);
-        });
-      });
-    </script>
-  </head>
-  <body>
+{% block title %}Two-Factor Authentication{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/accounts/second_auth.css' %}?v={{ STATIC_VERSION }}" />
+{% endblock %}
+{% block content %}
     {% if messages %}
       <div class="toast-container">
         {% for message in messages %}
@@ -73,7 +57,8 @@
         {% endif %}
       </div>
     </div>
-
+{% endblock %}
+{% block extra_js %}
     <script>
       document.addEventListener('click', function (e) {
         if (!e.target.matches('#copy-secret')) return;
@@ -130,5 +115,4 @@
         }
       });
     </script>
-  </body>
-</html>
+{% endblock %}
