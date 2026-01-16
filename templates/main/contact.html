@@ -10,9 +10,26 @@
       href="{% static 'css/main/contact.css' %}?v={{ STATIC_VERSION }}"
     />
     <link
+      rel="stylesheet"
+      href="{% static 'css/accounts/login.css' %}?v={{ STATIC_VERSION }}"
+    />
+    <link
       href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
       rel="stylesheet"
     />
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const toasts = document.querySelectorAll('.toast');
+        toasts.forEach(toast => {
+          setTimeout(() => {
+            toast.style.animation = 'slideOut 0.3s ease-out forwards';
+            setTimeout(() => {
+              toast.remove();
+            }, 300);
+          }, 5000);
+        });
+      });
+    </script>
     <link
       rel="icon"
       type="image/png"
@@ -46,6 +63,14 @@
     />
   </head>
   <body>
+    {% if messages %}
+      <div class="toast-container">
+        {% for message in messages %}
+          <div class="toast {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    
     <nav class="navbar">
       <div class="nav-container">
         <a href="{% url 'homepage' %}" style="text-decoration: none;">
@@ -128,42 +153,74 @@
         <div class="contact-form-wrapper">
           <h2>Send Us A Message</h2>
           <form method="post" class="contact-form">
-            {% csrf_token %} {% if messages %}
-            <ul class="messages">
-              {% for message in messages %}
-              <li>{{ message }}</li>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+              {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
               {% endfor %}
-            </ul>
+            </div>
             {% endif %}
 
             <div class="form-group">
-              <label for="name">Full Name</label>
-              <input type="text" id="name" name="name" required />
+              <label for="{{ form.name.id_for_label }}">Full Name</label>
+              {{ form.name }}
+              {% if form.name.errors %}
+              <div class="error">
+                {% for error in form.name.errors %}
+                  <span>{{ error }}</span>
+                {% endfor %}
+              </div>
+              {% endif %}
             </div>
 
             <div class="form-group">
-              <label for="email">Email Address</label>
-              <input type="email" id="email" name="email" required />
+              <label for="{{ form.email.id_for_label }}">Email Address</label>
+              {{ form.email }}
+              {% if form.email.errors %}
+              <div class="error">
+                {% for error in form.email.errors %}
+                  <span>{{ error }}</span>
+                {% endfor %}
+              </div>
+              {% endif %}
             </div>
 
             <div class="form-group">
-              <label for="phone">Phone Number</label>
-              <input type="tel" id="phhomeone" name="phone" />
+              <label for="{{ form.phone.id_for_label }}">Phone Number</label>
+              {{ form.phone }}
+              {% if form.phone.errors %}
+              <div class="error">
+                {% for error in form.phone.errors %}
+                  <span>{{ error }}</span>
+                {% endfor %}
+              </div>
+              {% endif %}
             </div>
 
             <div class="form-group">
-              <label for="subject">Subject</label>
-              <input type="text" id="subject" name="subject" required />
+              <label for="{{ form.subject.id_for_label }}">Subject</label>
+              {{ form.subject }}
+              {% if form.subject.errors %}
+              <div class="error">
+                {% for error in form.subject.errors %}
+                  <span>{{ error }}</span>
+                {% endfor %}
+              </div>
+              {% endif %}
             </div>
 
             <div class="form-group">
-              <label for="message">Message</label>
-              <textarea
-                id="message"
-                name="message"
-                rows="6"
-                required
-              ></textarea>
+              <label for="{{ form.message.id_for_label }}">Message</label>
+              {{ form.message }}
+              {% if form.message.errors %}
+              <div class="error">
+                {% for error in form.message.errors %}
+                  <span>{{ error }}</span>
+                {% endfor %}
+              </div>
+              {% endif %}
             </div>
 
             <button type="submit" class="btn-submit">Send Message</button>
