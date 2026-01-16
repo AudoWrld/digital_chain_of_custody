@@ -242,6 +242,12 @@ def second_authentication(request):
                 messages.success(
                     request, "Two-factor authentication verified! Login successful."
                 )
+                if not request.user.recovery_codes_downloaded:
+                    messages.info(
+                        request, "Please download your recovery codes before proceeding to your dashboard."
+                    )
+                    return redirect("recovery_codes_view")
+                
                 if request.user.is_superuser:
                     return redirect("/admin/")
                 else:
@@ -358,15 +364,16 @@ def download_recovery_codes(request):
     x_col1 = 90
     x_col2 = width / 2 + 20
 
+    # Display 5 codes on left, 5 codes on right
     for i, code in enumerate(codes):
-        if i % 2 == 0:
+        if i < 5:  # First 5 codes on left
             p.drawString(x_col1, y, f"{i+1}. {code}")
-        else:
+            y -= 25
+        else:  # Next 5 codes on right
+            if i == 5:  # Reset y position for right column
+                y = height - 260
             p.drawString(x_col2, y, f"{i+1}. {code}")
             y -= 25
-
-    if len(codes) % 2 != 0:
-        y -= 25
 
     # Footer
     p.setFont("Helvetica-Oblique", 9)

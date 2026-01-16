@@ -41,13 +41,27 @@
     </div>
 
     <section class="code-area">
-      <div class="code-grid" aria-live="polite">
-        {% for code in codes %}
-          <div class="code-item">
-            <code class="code-value">{{ code }}</code>
-            <button type="button" class="btn-copy" data-code="{{ code }}" title="Copy code">Copy</button>
-          </div>
-        {% endfor %}
+      <div class="code-columns" aria-live="polite">
+        <div class="code-column">
+          <h3>Codes 1-5</h3>
+          {% for code in codes|slice:":5" %}
+            <div class="code-item">
+              <span class="code-number">{{ forloop.counter }}.</span>
+              <code class="code-value">{{ code }}</code>
+              <button type="button" class="btn-copy" data-code="{{ code }}" title="Copy code">Copy</button>
+            </div>
+          {% endfor %}
+        </div>
+        <div class="code-column">
+          <h3>Codes 6-10</h3>
+          {% for code in codes|slice:"5:" %}
+            <div class="code-item">
+              <span class="code-number">{{ forloop.counter|add:5 }}.</span>
+              <code class="code-value">{{ code }}</code>
+              <button type="button" class="btn-copy" data-code="{{ code }}" title="Copy code">Copy</button>
+            </div>
+          {% endfor %}
+        </div>
       </div>
       <p class="rc-note">Store these somewhere safe. You can download them as a PDF.</p>
     </section>
