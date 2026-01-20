@@ -4,21 +4,6 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/accounts/recovery_codes.css' %}?v={{ STATIC_VERSION }}" />
 {% endblock %}
-{% block extra_head %}
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const toasts = document.querySelectorAll('.toast');
-    toasts.forEach(toast => {
-      setTimeout(() => {
-        toast.style.animation = 'slideOut 0.3s ease-out forwards';
-        setTimeout(() => {
-          toast.remove();
-        }, 300);
-      }, 5000);
-    });
-  });
-</script>
-{% endblock %}
 {% block content %}
 <div class="login-wrapper">
   <div class="login-card">
@@ -83,8 +68,21 @@
     </div>
   </div>
 </div>
-{% endblock %}
-{% block extra_js %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+const toasts = document.querySelectorAll('.toast');
+toasts.forEach(toast => {
+  setTimeout(() => {
+    toast.style.animation = 'slideOut 0.3s ease-out forwards';
+    setTimeout(() => {
+      toast.remove();
+    }, 300);
+  }, 5000);
+});
+});
+</script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   document.addEventListener('click', function (e) {
