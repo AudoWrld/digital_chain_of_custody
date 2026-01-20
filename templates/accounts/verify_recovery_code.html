@@ -49,8 +49,21 @@
         </p>
       </div>
     </div>
-{% endblock %}
-{% block extra_js %}
+
+<script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toasts = document.querySelectorAll('.toast');
+            toasts.forEach(toast => {
+                setTimeout(() => {
+                    toast.style.animation = 'slideOut 0.3s ease-out forwards';
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 300);
+                }, 5000);
+            });
+        });
+    </script>
+
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         const recoveryCodeInput = document.getElementById('recovery_code');
