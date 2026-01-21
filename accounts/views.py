@@ -251,7 +251,7 @@ def second_authentication(request):
                 if request.user.is_superuser:
                     return redirect("/admin/")
                 else:
-                    return redirect("dashboard")
+                    return redirect("dashboard:dashboard")
             else:
                 messages.error(request, "Invalid code. Please try again.")
 
@@ -263,7 +263,7 @@ def recovery_codes_view(request):
     user = request.user
     if not user.recovery_codes:
         messages.error(request, "No recovery codes found.")
-        return redirect("dashboard")
+        return redirect("dashboard:dashboard")
 
     codes = json.loads(user.recovery_codes)
     return render(request, "accounts/recovery_codes.html", {"codes": codes})
@@ -321,7 +321,7 @@ def download_recovery_codes(request):
 
     if not user.recovery_codes:
         messages.error(request, "No recovery codes found.")
-        return redirect("dashboard")
+        return redirect("dashboard:dashboard")
 
     codes = json.loads(user.recovery_codes)
 
