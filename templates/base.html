@@ -62,10 +62,10 @@
         <div class="user-avatar">
           {{ user.first_name.0 }}{{ user.last_name.0 }}
         </div>
-        <button class="logout-btn">
+        <a href="{% url 'logout' %}" class="logout-btn">
           <i class='bx bx-log-out'></i>
           <span>Logout</span>
-        </button>
+        </a>
       </div>
     </header>
 
@@ -78,7 +78,7 @@
             <i class='bx bx-home'></i>
             <span>Dashboard</span>
           </a>
-          <a href="#" class="sidebar-link">
+          <a href="{% url 'cases:case_list' %}" class="sidebar-link">
             <i class='bx bx-briefcase'></i>
             <span>All Cases</span>
           </a>
@@ -86,7 +86,7 @@
             <i class='bx bx-archive'></i>
             <span>All Evidence</span>
           </a>
-          <a href="#" class="sidebar-link">
+          <a href="{% url 'cases:create_case' %}" class="sidebar-link">
             <i class='bx bx-plus-circle'></i>
             <span>Create Case</span>
           </a>
@@ -110,7 +110,7 @@
             <i class='bx bx-help-circle'></i>
             <span>Help</span>
           </a>
-          <a href="#" class="sidebar-link">
+          <a href="{% url 'logout' %}" class="sidebar-link">
             <i class='bx bx-log-out'></i>
             <span>Logout</span>
           </a>
@@ -122,11 +122,11 @@
             <i class='bx bx-home'></i>
             <span>Dashboard</span>
           </a>
-          <a href="#" class="sidebar-link">
+          <a href="{% url 'cases:create_case' %}" class="sidebar-link">
             <i class='bx bx-plus-circle'></i>
             <span>Create Case</span>
           </a>
-          <a href="#" class="sidebar-link">
+          <a href="{% url 'cases:case_list' %}" class="sidebar-link">
             <i class='bx bx-briefcase'></i>
             <span>My Cases</span>
           </a>
@@ -142,7 +142,7 @@
             <i class='bx bx-help-circle'></i>
             <span>Help</span>
           </a>
-          <a href="#" class="sidebar-link">
+          <a href="{% url 'logout' %}" class="sidebar-link">
             <i class='bx bx-log-out'></i>
             <span>Logout</span>
           </a>
@@ -154,11 +154,11 @@
             <i class='bx bx-home'></i>
             <span>Dashboard</span>
           </a>
-          <a href="#" class="sidebar-link">
+          <a href="{% url 'cases:create_case' %}" class="sidebar-link">
             <i class='bx bx-plus-circle'></i>
             <span>Create Case</span>
           </a>
-          <a href="#" class="sidebar-link">
+          <a href="{% url 'cases:case_list' %}" class="sidebar-link">
             <i class='bx bx-briefcase'></i>
             <span>My Cases</span>
           </a>
@@ -178,7 +178,7 @@
             <i class='bx bx-help-circle'></i>
             <span>Help</span>
           </a>
-          <a href="#" class="sidebar-link">
+          <a href="{% url 'logout' %}" class="sidebar-link">
             <i class='bx bx-log-out'></i>
             <span>Logout</span>
           </a>
@@ -210,7 +210,7 @@
             <i class='bx bx-help-circle'></i>
             <span>Help</span>
           </a>
-          <a href="#" class="sidebar-link">
+          <a href="{% url 'logout' %}" class="sidebar-link">
             <i class='bx bx-log-out'></i>
             <span>Logout</span>
           </a>
@@ -242,7 +242,7 @@
             <i class='bx bx-help-circle'></i>
             <span>Help</span>
           </a>
-          <a href="#" class="sidebar-link">
+          <a href="{% url 'logout' %}" class="sidebar-link">
             <i class='bx bx-log-out'></i>
             <span>Logout</span>
           </a>
@@ -254,7 +254,7 @@
             <i class='bx bx-home'></i>
             <span>Dashboard</span>
           </a>
-          <a href="#" class="sidebar-link">
+          <a href="{% url 'cases:case_list' %}" class="sidebar-link">
             <i class='bx bx-briefcase'></i>
             <span>All Cases</span>
           </a>
@@ -274,7 +274,7 @@
             <i class='bx bx-help-circle'></i>
             <span>Help</span>
           </a>
-          <a href="#" class="sidebar-link">
+          <a href="{% url 'logout' %}" class="sidebar-link">
             <i class='bx bx-log-out'></i>
             <span>Logout</span>
           </a>
