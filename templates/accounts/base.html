@@ -37,7 +37,7 @@
       rel="manifest"
       href="{% static 'site.json' %}?v={{ STATIC_VERSION }}"
     />
-    {% block extra_head %}{% endblock %}
+    
   </head>
   <body>
     {% if messages %}
@@ -48,6 +48,6 @@
       </div>
     {% endif %}
     {% block content %}{% endblock %}
-    {% block extra_js %}{% endblock %}
+    
   </body>
 </html>
