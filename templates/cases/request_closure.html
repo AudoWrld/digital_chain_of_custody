@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Request Case Closure{% endblock %}
+
+{% block content %}
+<h2>Request Closure for Case: {{ case.get_title }}</h2>
+
+<p><strong>Description:</strong> {{ case.get_description }}</p>
+<p><strong>Status:</strong> {{ case.case_status }}</p>
+<p><strong>Priority:</strong> {{ case.case_priority }}</p>
+
+<form method="post">
+    {% csrf_token %}
+    <label for="close_reason">Reason for Closure:</label><br>
+    <textarea name="close_reason" id="close_reason" rows="4" cols="50" required></textarea><br><br>
+    <button type="submit">Submit Closure Request</button>
+</form>
+
+<a href="{% url 'cases:view_case' case.id %}">Back to Case</a>
+{% endblock %}
