@@ -74,7 +74,7 @@
         <div>
         {% if user.is_superuser %}
         <nav class="sidebar-section">
-          <a href="#" class="sidebar-link active">
+          <a href="{% url 'dashboard:dashboard' %}" class="sidebar-link active">
             <i class='bx bx-home'></i>
             <span>Dashboard</span>
           </a>
@@ -118,7 +118,7 @@
         
         {% elif user.role == 'regular_user' %}
         <nav class="sidebar-section">
-          <a href="#" class="sidebar-link active">
+          <a href="{% url 'dashboard:dashboard' %}" class="sidebar-link active">
             <i class='bx bx-home'></i>
             <span>Dashboard</span>
           </a>
@@ -150,7 +150,7 @@
         
         {% elif user.role == 'investigator' %}
         <nav class="sidebar-section">
-          <a href="#" class="sidebar-link active">
+          <a href="{% url 'dashboard:dashboard' %}" class="sidebar-link active">
             <i class='bx bx-home'></i>
             <span>Dashboard</span>
           </a>
@@ -186,7 +186,7 @@
         
         {% elif user.role == 'analyst' %}
         <nav class="sidebar-section">
-          <a href="#" class="sidebar-link active">
+          <a href="{% url 'dashboard:dashboard' %}" class="sidebar-link active">
             <i class='bx bx-home'></i>
             <span>Dashboard</span>
           </a>
@@ -218,7 +218,7 @@
         
         {% elif user.role == 'custodian' %}
         <nav class="sidebar-section">
-          <a href="#" class="sidebar-link active">
+          <a href="{% url 'dashboard:dashboard' %}" class="sidebar-link active">
             <i class='bx bx-home'></i>
             <span>Dashboard</span>
           </a>
@@ -250,7 +250,7 @@
         
         {% elif user.role == 'auditor' %}
         <nav class="sidebar-section">
-          <a href="#" class="sidebar-link active">
+          <a href="{% url 'dashboard:dashboard' %}" class="sidebar-link active">
             <i class='bx bx-home'></i>
             <span>Dashboard</span>
           </a>
