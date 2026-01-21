@@ -58,13 +58,13 @@
       </form>
 
       {% if user.recovery_codes_downloaded %}
-        <a href="{% url 'dashboard' %}" class="btn btn-ghost">Proceed to Dashboard</a>
+        <a href="{% url 'dashboard:dashboard' %}" class="btn btn-ghost">Proceed to Dashboard</a>
       {% endif %}
     </footer>
 
     <div class="login-links">
       <span class="login-note">Done with recovery codes?</span>
-      <a href="{% url 'dashboard' %}">Go to Dashboard</a>
+      <a href="{% url 'dashboard:dashboard' %}">Go to Dashboard</a>
     </div>
   </div>
 </div>
