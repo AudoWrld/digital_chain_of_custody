@@ -38,17 +38,19 @@
     </div>
   </div>
 </div>
-{% endblock %}
-{% block extra_js %}
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  const toasts = document.querySelectorAll('.toast');
-  toasts.forEach(toast => {
+const toasts = document.querySelectorAll('.toast');
+toasts.forEach(toast => {
+  setTimeout(() => {
+    toast.style.animation = 'slideOut 0.3s ease-out forwards';
     setTimeout(() => {
-      toast.style.animation = 'slideOut 0.3s ease-in forwards';
-      setTimeout(() => toast.remove(), 300);
-    }, 5000);
-  });
+      toast.remove();
+    }, 300);
+  }, 5000);
+});
 });
 </script>
 {% endblock %}
+
