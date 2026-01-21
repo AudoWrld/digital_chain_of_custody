@@ -5,14 +5,624 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}ChainProof{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link
+      rel="icon"
+      type="image/png"
+      href="{% static 'images/favicon.png' %}?v={{ STATIC_VERSION }}"
+      sizes="64x64"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href="{% static 'images/favicon.png' %}?v={{ STATIC_VERSION }}"
+      sizes="128x128"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href="{% static 'images/favicon-96x96.png' %}?v={{ STATIC_VERSION }}"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href="{% static 'images/favicon.ico' %}?v={{ STATIC_VERSION }}"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="{% static 'images/apple-touch-icon.png' %}?v={{ STATIC_VERSION }}"
+    />
+    <link
+      rel="manifest"
+      href="{% static 'site.json' %}?v={{ STATIC_VERSION }}"
+    />
+    <style>
+      :root {
+        --accent: #2980b9;
+        --accent-2: #6dd5fa;
+        --muted: #7f8c8d;
+        --bg: #f4f6f8;
+        --card: #ffffff;
+        --danger: #e74c3c;
+        --success: #27ae60;
+        --warning: #f39c12;
+        --info: #3498db;
+        --radius: 8px;
+        --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.08);
+        --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        --text-dark: #2c3e50;
+        --text-light: #95a5a6;
+        --border: rgba(0, 0, 0, 0.08);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: var(--font-sans);
+        height: 100dvh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        background: var(--bg);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      .header {
+        height: 64px;
+        background: var(--card);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 24px;
+        z-index: 100;
+        position: relative;
+      }
+
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .logo {
+        height: 32px;
+        width: auto;
+      }
+
+      .brand-name {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--text-dark);
+        letter-spacing: -0.02em;
+      }
+
+      .user-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .user-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      .user-details {
+        text-align: right;
+      }
+
+      .user-name {
+        font-weight: 500;
+        color: var(--text-dark);
+        font-size: 14px;
+        line-height: 1.4;
+      }
+
+      .user-role {
+        font-size: 12px;
+        color: var(--text-light);
+        text-transform: capitalize;
+        line-height: 1.4;
+      }
+
+      .logout-btn {
+        background: var(--card);
+        color: var(--text-dark);
+        border: 1px solid var(--border);
+        padding: 8px 16px;
+        border-radius: var(--radius);
+        cursor: pointer;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 14px;
+        font-family: var(--font-sans);
+      }
+
+      .logout-btn:hover {
+        background: var(--bg);
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      .logout-btn:active {
+        transform: scale(0.98);
+      }
+
+      .main-wrapper {
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+      }
+
+      .sidebar {
+        width: 256px;
+        background: var(--card);
+        border-right: 1px solid var(--border);
+        overflow-y: auto;
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .sidebar-footer {
+        padding: 16px 12px;
+        border-top: 1px solid var(--border);
+        margin-top: auto;
+      }
+
+      .sidebar-footer-text {
+        font-size: 11px;
+        color: var(--text-light);
+        text-align: center;
+        line-height: 1.5;
+      }
+
+      .sidebar-footer-title {
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 4px;
+      }
+
+      .content-area {
+        flex: 1;
+        background: var(--bg);
+        overflow-y: auto;
+        padding: 10px;
+      }
+
+      .sidebar-section {
+        margin-bottom: 4px;
+      }
+
+      .sidebar-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        color: var(--text-dark);
+        text-decoration: none;
+        transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 14px;
+        font-weight: 500;
+        border-radius: var(--radius);
+        position: relative;
+      }
+
+      .sidebar-link:hover {
+        background: var(--bg);
+        color: var(--accent);
+      }
+
+      .sidebar-link.active {
+        background: rgba(41, 128, 185, 0.08);
+        color: var(--accent);
+      }
+
+      .sidebar-link.active::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 3px;
+        height: 20px;
+        background: var(--accent);
+        border-radius: 0 2px 2px 0;
+      }
+
+      .sidebar-link i {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .messages {
+        position: fixed;
+        top: 80px;
+        right: 24px;
+        z-index: 1000;
+        list-style: none;
+        max-width: 400px;
+      }
+
+      .messages li {
+        background: var(--card);
+        padding: 12px 16px;
+        margin-bottom: 8px;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-lg);
+        animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid var(--border);
+        font-size: 14px;
+        color: var(--text-dark);
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      .card {
+        background: var(--card);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 24px;
+        margin-bottom: 16px;
+        border: 1px solid var(--border);
+      }
+
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.15);
+        border-radius: 4px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, 0.25);
+      }
+
+      @media (max-width: 768px) {
+        .sidebar {
+          width: 72px;
+        }
+
+        .sidebar-link span {
+          display: none;
+        }
+
+        .sidebar-link {
+          justify-content: center;
+          padding: 12px;
+        }
+
+        .user-details {
+          display: none;
+        }
+
+        .content-area {
+          padding: 5px;
+        }
+
+        .sidebar-footer {
+          padding: 12px 8px;
+        }
+
+        .sidebar-footer-text {
+          font-size: 9px;
+          writing-mode: vertical-rl;
+          text-orientation: mixed;
+        }
+
+        .header {
+          padding: 0 12px;
+        }
+
+        .brand-name {
+          display: none;
+        }
+      }
+    </style>
   </head>
   <body>
-    {% if messages %}
-    <ul class="messages">
-      {% for message in messages %}
-      <li>{{ message }}</li>
-      {% endfor %}
-    </ul>
-    {% endif %} {% block content %} {% endblock %}
+    <header class="header">
+      <div class="header-left">
+        <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo" />
+        <span class="brand-name">ChainProof</span>
+      </div>
+      <div class="user-info">
+        <div class="user-details">
+          <div class="user-name">{{ user.first_name }} {{ user.last_name }}</div>
+          <div class="user-role">
+            {% if user.is_superuser %}
+            Admin
+            {% else %}
+            {{ user.role }}
+            {% endif %}
+          </div>
+        </div>
+        <div class="user-avatar">
+          {{ user.first_name.0 }}{{ user.last_name.0 }}
+        </div>
+        <button class="logout-btn">
+          <i class='bx bx-log-out'></i>
+          <span>Logout</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="main-wrapper">
+      <aside class="sidebar">
+        <div>
+        {% if user.is_superuser %}
+        <nav class="sidebar-section">
+          <a href="#" class="sidebar-link active">
+            <i class='bx bx-home'></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-briefcase'></i>
+            <span>All Cases</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-archive'></i>
+            <span>All Evidence</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-plus-circle'></i>
+            <span>Create Case</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-group'></i>
+            <span>User Management</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-user-check'></i>
+            <span>Role Assignment</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-cog'></i>
+            <span>System Settings</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-shield'></i>
+            <span>Admin Panel</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-help-circle'></i>
+            <span>Help</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-log-out'></i>
+            <span>Logout</span>
+          </a>
+        </nav>
+        
+        {% elif user.role == 'regular_user' %}
+        <nav class="sidebar-section">
+          <a href="#" class="sidebar-link active">
+            <i class='bx bx-home'></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-plus-circle'></i>
+            <span>Create Case</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-briefcase'></i>
+            <span>My Cases</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-archive'></i>
+            <span>My Evidence</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-file-blank'></i>
+            <span>Case Reports</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-help-circle'></i>
+            <span>Help</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-log-out'></i>
+            <span>Logout</span>
+          </a>
+        </nav>
+        
+        {% elif user.role == 'investigator' %}
+        <nav class="sidebar-section">
+          <a href="#" class="sidebar-link active">
+            <i class='bx bx-home'></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-plus-circle'></i>
+            <span>Create Case</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-briefcase'></i>
+            <span>My Cases</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-add-to-queue'></i>
+            <span>Register Evidence</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-transfer'></i>
+            <span>Transfer Custody</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-history'></i>
+            <span>My Activity Log</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-help-circle'></i>
+            <span>Help</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-log-out'></i>
+            <span>Logout</span>
+          </a>
+        </nav>
+        
+        {% elif user.role == 'analyst' %}
+        <nav class="sidebar-section">
+          <a href="#" class="sidebar-link active">
+            <i class='bx bx-home'></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-briefcase'></i>
+            <span>Assigned Cases</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-analyse'></i>
+            <span>Evidence Analysis</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-check-shield'></i>
+            <span>Integrity Verification</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-file-blank'></i>
+            <span>Analysis Reports</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-help-circle'></i>
+            <span>Help</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-log-out'></i>
+            <span>Logout</span>
+          </a>
+        </nav>
+        
+        {% elif user.role == 'custodian' %}
+        <nav class="sidebar-section">
+          <a href="#" class="sidebar-link active">
+            <i class='bx bx-home'></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-box'></i>
+            <span>Evidence Inventory</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-transfer'></i>
+            <span>Custody Transfers</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-list-ul'></i>
+            <span>Chain of Custody Logs</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-data'></i>
+            <span>Storage Status</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-help-circle'></i>
+            <span>Help</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-log-out'></i>
+            <span>Logout</span>
+          </a>
+        </nav>
+        
+        {% elif user.role == 'auditor' %}
+        <nav class="sidebar-section">
+          <a href="#" class="sidebar-link active">
+            <i class='bx bx-home'></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-briefcase'></i>
+            <span>All Cases</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-list-check'></i>
+            <span>Audit Logs</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-file-blank'></i>
+            <span>Chain of Custody Reports</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-check-shield'></i>
+            <span>Integrity Checks</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-help-circle'></i>
+            <span>Help</span>
+          </a>
+          <a href="#" class="sidebar-link">
+            <i class='bx bx-log-out'></i>
+            <span>Logout</span>
+          </a>
+        </nav>
+        {% endif %}
+        </div>
+
+        <div class="sidebar-footer">
+          <div class="sidebar-footer-text">
+            <div class="sidebar-footer-title">ChainProof</div>
+            Securing Evidence Integrity Since 2026
+          </div>
+        </div>
+      </aside>
+
+      <main class="content-area">
+        {% if messages %}
+        <ul class="messages">
+          {% for message in messages %}
+          <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+        
+        {% block content %}
+        {% endblock %}
+      </main>
+    </div>
   </body>
 </html>
