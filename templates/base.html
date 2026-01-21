@@ -74,11 +74,11 @@
         <div>
         {% if user.is_superuser %}
         <nav class="sidebar-section">
-          <a href="{% url 'dashboard:dashboard' %}" class="sidebar-link active">
+          <a href="{% url 'dashboard:dashboard' %}" class="sidebar-link {% if request.path == '/dashboard/' %}active{% endif %}">
             <i class='bx bx-home'></i>
             <span>Dashboard</span>
           </a>
-          <a href="{% url 'cases:case_list' %}" class="sidebar-link">
+          <a href="{% url 'cases:case_list' %}" class="sidebar-link {% if request.path == '/cases/' %}active{% endif %}">
             <i class='bx bx-briefcase'></i>
             <span>All Cases</span>
           </a>
@@ -86,7 +86,7 @@
             <i class='bx bx-archive'></i>
             <span>All Evidence</span>
           </a>
-          <a href="{% url 'cases:create_case' %}" class="sidebar-link">
+          <a href="{% url 'cases:create_case' %}" class="sidebar-link {% if request.path == '/cases/create/' %}active{% endif %}">
             <i class='bx bx-plus-circle'></i>
             <span>Create Case</span>
           </a>
@@ -118,15 +118,15 @@
         
         {% elif user.role == 'regular_user' %}
         <nav class="sidebar-section">
-          <a href="{% url 'dashboard:dashboard' %}" class="sidebar-link active">
+          <a href="{% url 'dashboard:dashboard' %}" class="sidebar-link {% if request.path == '/dashboard/' %}active{% endif %}">
             <i class='bx bx-home'></i>
             <span>Dashboard</span>
           </a>
-          <a href="{% url 'cases:create_case' %}" class="sidebar-link">
+          <a href="{% url 'cases:create_case' %}" class="sidebar-link {% if request.path == '/cases/create/' %}active{% endif %}">
             <i class='bx bx-plus-circle'></i>
             <span>Create Case</span>
           </a>
-          <a href="{% url 'cases:case_list' %}" class="sidebar-link">
+          <a href="{% url 'cases:case_list' %}" class="sidebar-link {% if request.path == '/cases/' %}active{% endif %}">
             <i class='bx bx-briefcase'></i>
             <span>My Cases</span>
           </a>
@@ -150,15 +150,15 @@
         
         {% elif user.role == 'investigator' %}
         <nav class="sidebar-section">
-          <a href="{% url 'dashboard:dashboard' %}" class="sidebar-link active">
+          <a href="{% url 'dashboard:dashboard' %}" class="sidebar-link {% if request.path == '/dashboard/' %}active{% endif %}">
             <i class='bx bx-home'></i>
             <span>Dashboard</span>
           </a>
-          <a href="{% url 'cases:create_case' %}" class="sidebar-link">
+          <a href="{% url 'cases:create_case' %}" class="sidebar-link {% if request.path == '/cases/create/' %}active{% endif %}">
             <i class='bx bx-plus-circle'></i>
             <span>Create Case</span>
           </a>
-          <a href="{% url 'cases:case_list' %}" class="sidebar-link">
+          <a href="{% url 'cases:case_list' %}" class="sidebar-link {% if request.path == '/cases/' %}active{% endif %}">
             <i class='bx bx-briefcase'></i>
             <span>My Cases</span>
           </a>
@@ -186,7 +186,7 @@
         
         {% elif user.role == 'analyst' %}
         <nav class="sidebar-section">
-          <a href="{% url 'dashboard:dashboard' %}" class="sidebar-link active">
+          <a href="{% url 'dashboard:dashboard' %}" class="sidebar-link {% if request.path == '/dashboard/' %}active{% endif %}">
             <i class='bx bx-home'></i>
             <span>Dashboard</span>
           </a>
@@ -218,7 +218,7 @@
         
         {% elif user.role == 'custodian' %}
         <nav class="sidebar-section">
-          <a href="{% url 'dashboard:dashboard' %}" class="sidebar-link active">
+          <a href="{% url 'dashboard:dashboard' %}" class="sidebar-link {% if request.path == '/dashboard/' %}active{% endif %}">
             <i class='bx bx-home'></i>
             <span>Dashboard</span>
           </a>
@@ -250,11 +250,11 @@
         
         {% elif user.role == 'auditor' %}
         <nav class="sidebar-section">
-          <a href="{% url 'dashboard:dashboard' %}" class="sidebar-link active">
+          <a href="{% url 'dashboard:dashboard' %}" class="sidebar-link {% if request.path == '/dashboard/' %}active{% endif %}">
             <i class='bx bx-home'></i>
             <span>Dashboard</span>
           </a>
-          <a href="{% url 'cases:case_list' %}" class="sidebar-link">
+          <a href="{% url 'cases:case_list' %}" class="sidebar-link {% if request.path == '/cases/' %}active{% endif %}">
             <i class='bx bx-briefcase'></i>
             <span>All Cases</span>
           </a>
