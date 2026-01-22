@@ -5,6 +5,7 @@ app_name = "cases"
 
 urlpatterns = [
     path("", views.case_list, name="case_list"),
+    path("assigned/", views.assigned_cases, name="assigned_cases"),
     path("create/", views.create_case, name="create_case"),
     path("<int:case_id>/", views.view_case, name="view_case"),
     path("<int:case_id>/edit/", views.edit_case, name="edit_case"),

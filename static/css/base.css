@@ -246,11 +246,10 @@ body {
   top: calc(var(--header-height) + 16px);
   right: 24px;
   z-index: 1000;
-  list-style: none;
   max-width: 400px;
 }
 
-.messages li {
+.message {
   background: var(--card);
   padding: 14px 18px;
   margin-bottom: 8px;
@@ -263,21 +262,60 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.messages li::before {
-  content: '✓';
+.message-icon {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 20px;
   height: 20px;
   border-radius: 50%;
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+.message-success .message-icon {
   background: var(--success);
   color: white;
-  font-size: 12px;
-  font-weight: 700;
-  flex-shrink: 0;
+}
+
+.message-error .message-icon {
+  background: var(--danger);
+  color: white;
+}
+
+.message-warning .message-icon {
+  background: var(--warning);
+  color: white;
+}
+
+.message-info .message-icon {
+  background: var(--info);
+  color: white;
+}
+
+.message-content {
+  flex: 1;
+}
+
+.message-close {
+  background: transparent;
+  border: none;
+  color: var(--text-light);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: var(--transition);
+}
+
+.message-close:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text-dark);
 }
 
 @keyframes slideIn {
