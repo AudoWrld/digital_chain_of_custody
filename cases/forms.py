@@ -1,44 +1,51 @@
 from .models import Case, CaseMedia
 from django import forms
 from django.contrib.auth import get_user_model
+
 User = get_user_model()
 
 
-
-
-
-# ------------------------------
-# Case Creation Form
-# ------------------------------
 class CaseForm(forms.ModelForm):
     class Meta:
         model = Case
-        fields = ['case_title', 'case_description', 'case_category', 'case_priority']
+        fields = ["case_title", "case_description", "case_category", "case_priority"]
 
     case_title = forms.CharField(
-        widget=forms.TextInput(attrs={'class': 'form-control'}),
-        label="Case Title"
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "required": "required",
+                "autocomplete": "off",
+            }
+        ),
+        label="Case Title",
+        required=True,
     )
+
     case_description = forms.CharField(
-        widget=forms.Textarea(attrs={'class': 'form-control'}),
-        label="Description"
+        widget=forms.Textarea(attrs={"class": "form-control", "rows": "4"}),
+        label="Description",
+        required=True,
+        min_length=150,
     )
     case_category = forms.ChoiceField(
         choices=Case.CASE_CATEGORIES,
-        widget=forms.Select(attrs={'class': 'form-select'}),
-        label="Case Category"
+        widget=forms.Select(attrs={"class": "form-select"}),
+        label="Case Category",
     )
     case_priority = forms.ChoiceField(
         choices=Case.PRIORITY_CHOICES,
-        widget=forms.Select(attrs={'class': 'form-select'}),
-        label="Priority"
+        widget=forms.Select(attrs={"class": "form-select"}),
+        label="Priority",
     )
 
+    def clean_case_description(self):
+        description = self.cleaned_data.get("case_description")
+        if len(description) < 150:
+            raise forms.ValidationError("Description must be at least 150 characters.")
+        return description
+
     def save(self, commit=True):
-        """
-        Prevent Django from trying to encrypt twice.
-        Your Case model handles encryption in save().
-        """
         case = super().save(commit=False)
 
         if commit:
@@ -46,52 +53,51 @@ class CaseForm(forms.ModelForm):
         return case
 
 
-# ------------------------------
-# Edit Case Form
-# ------------------------------
 class EditCaseForm(forms.ModelForm):
 
     assigned_investigators = forms.ModelMultipleChoiceField(
-        queryset=User.objects.filter(role="investigator", is_active=True, verified=True),
-        widget=forms.SelectMultiple(attrs={'class': 'form-select'}),
+        queryset=User.objects.filter(
+            role="investigator", is_active=True, verified=True
+        ),
+        widget=forms.SelectMultiple(attrs={"class": "form-select"}),
         required=False,
-        label="Assign Investigators"
+        label="Assign Investigators",
     )
 
     class Meta:
         model = Case
         fields = [
-            'case_title',
-            'case_description',
-            'case_category',
-            'case_priority',
-            'assigned_investigators',
-            'case_status',
-            'case_status_notes',
+            "case_title",
+            "case_description",
+            "case_category",
+            "case_priority",
+            "assigned_investigators",
+            "case_status",
+            "case_status_notes",
         ]
 
         widgets = {
-            'case_title': forms.TextInput(attrs={'class': 'form-control'}),
-            'case_description': forms.Textarea(attrs={'class': 'form-control'}),
-            'case_category': forms.Select(attrs={'class': 'form-select'}),
-            'case_priority': forms.Select(attrs={'class': 'form-select'}),
-            'case_status': forms.Select(attrs={'class': 'form-select'}),
-            'case_status_notes': forms.Textarea(attrs={'class': 'form-control'}),
+            "case_title": forms.TextInput(attrs={"class": "form-control"}),
+            "case_description": forms.Textarea(attrs={"class": "form-control"}),
+            "case_category": forms.Select(attrs={"class": "form-select"}),
+            "case_priority": forms.Select(attrs={"class": "form-select"}),
+            "case_status": forms.Select(attrs={"class": "form-select"}),
+            "case_status_notes": forms.Textarea(attrs={"class": "form-control"}),
         }
 
     def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user', None)
+        user = kwargs.pop("user", None)
         super().__init__(*args, **kwargs)
         if user and not user.is_staff:
-            # Remove fields not allowed for non-admins
-            fields_to_remove = ['assigned_investigators', 'case_status', 'case_status_notes']
+            fields_to_remove = [
+                "assigned_investigators",
+                "case_status",
+                "case_status_notes",
+            ]
             for field in fields_to_remove:
                 self.fields.pop(field, None)
 
 
-# ------------------------------
-# Case Media Upload Form
-# ------------------------------
 class CaseMediaForm(forms.ModelForm):
     description_text = forms.CharField(max_length=255)
 
@@ -107,10 +113,10 @@ class CaseMediaForm(forms.ModelForm):
             media.save()
         return media
 
+
 class AssignInvestigatorForm(forms.ModelForm):
     assigned_investigators = forms.ModelMultipleChoiceField(
-        queryset=None,
-        widget=forms.CheckboxSelectMultiple
+        queryset=None, widget=forms.CheckboxSelectMultiple
     )
 
     class Meta:
@@ -120,4 +126,7 @@ class AssignInvestigatorForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         from django.contrib.auth.models import User
-        self.fields["assigned_investigators"].queryset = User.objects.filter(role="investigator", is_active=True, verified=True)
+
+        self.fields["assigned_investigators"].queryset = User.objects.filter(
+            role="investigator", is_active=True, verified=True
+        )
