@@ -4,7 +4,7 @@
 {% block content %}
 <h1>{% if is_superuser %}All Cases{% else %}My Cases{% endif %}</h1>
 
-{% if not is_superuser %}
+{% if user.role == 'regular_user' %}
 <a href="{% url 'cases:create_case' %}" class="btn btn-primary">Create New Case</a>
 {% endif %}
 

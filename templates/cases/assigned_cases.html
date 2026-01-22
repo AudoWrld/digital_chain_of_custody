@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Assigned Cases{% endblock %}
+
+{% block content %}
+<h1>Assigned Cases</h1>
+
+{% if cases %}
+<table>
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Created By</th>
+            <th>Status</th>
+            <th>Category</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for case in cases %}
+        <tr>
+            <td>{{ case.get_title }}</td>
+            <td>{{ case.created_by.get_full_name }}</td>
+            <td>{{ case.case_status }}</td>
+            <td>{{ case.get_category }}</td>
+            <td>
+                <a href="{% url 'cases:view_case' case.id %}">View</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No cases assigned to you.</p>
+{% endif %}
+{% endblock %}
