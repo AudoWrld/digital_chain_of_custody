@@ -53,7 +53,7 @@ def assigned_cases(request):
         return HttpResponseForbidden("Only investigators can view assigned cases.")
 
     return render(
-        request, "cases/case_list.html", {"cases": cases, "is_superuser": is_superuser}
+        request, "cases/assigned_cases.html", {"cases": cases, "is_superuser": is_superuser}
     )
 
 

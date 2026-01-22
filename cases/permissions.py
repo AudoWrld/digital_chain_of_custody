@@ -23,9 +23,6 @@ def regular_user_required(view_func):
     @wraps(view_func)
     @login_required
     def _wrapped_view(request, *args, **kwargs):
-        if request.user.is_superuser:
-            return view_func(request, *args, **kwargs)
-        
         if request.user.role != 'regular_user':
             return HttpResponseForbidden("Only regular users can access this page.")
         
