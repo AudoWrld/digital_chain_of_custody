@@ -1,31 +1,50 @@
 from django.db import models
 from django.conf import settings
-from cryptography.fernet import Fernet, InvalidToken
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.primitives import padding
+from cryptography.hazmat.backends import default_backend
 from django.core.files.base import ContentFile
 from django.core.exceptions import ObjectDoesNotExist
 import base64
+import os
+import hashlib
 
 
 # -----------------------------
 # 1. Encryption Key Model
 # -----------------------------
 class EncryptionKey(models.Model):
+    """
+    AES-256 Encryption Key Model for Case Encryption.
+    
+    Each case gets a unique 256-bit encryption key.
+    The key is stored securely in the database.
+    """
     case = models.OneToOneField('Case', on_delete=models.CASCADE, related_name='encryption_key', unique=True)
     key = models.BinaryField(editable=False)
+    iv = models.BinaryField(null=True, editable=False)  # Initialization Vector for AES
     created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        """Generate a key automatically when a new case is created."""
+        """Generate a unique AES-256 key and IV for each new case."""
         if not self.key:
-            self.key = Fernet.generate_key()
+            # Generate 256-bit (32 bytes) key
+            self.key = os.urandom(32)
+            # Generate 128-bit (16 bytes) IV
+            self.iv = os.urandom(16)
         super().save(*args, **kwargs)
 
     def get_cipher(self):
-        """Return a Fernet cipher object."""
-        return Fernet(self.key)
+        """Return an AES-256 cipher object."""
+        cipher = Cipher(
+            algorithms.AES(self.key),
+            modes.CBC(self.iv),
+            backend=default_backend()
+        )
+        return cipher
 
     def __str__(self):
-        return f"Encryption key for Case ID: {self.case.id}"
+        return f"AES-256 encryption key for Case ID: {self.case.id}"
 
 
 # -----------------------------
@@ -77,34 +96,64 @@ class Case(models.Model):
 
 
     def __str__(self):
-        return f"Case ({self.get_title() or 'Encrypted'}) - {self.case_status}"
+        # Show encrypted data in shell/admin, not decrypted
+        title_preview = self.case_title[:30] + "..." if self.case_title and len(self.case_title) > 30 else self.case_title
+        return f"Case (Encrypted: {title_preview or 'N/A'}) - {self.case_status}"
 
-    # ---------- Encryption ----------
+    # ---------- AES-256 Encryption ----------
+    def _pad_data(self, data):
+        """Apply PKCS7 padding to data."""
+        padder = padding.PKCS7(128).padder()
+        padded_data = padder.update(data) + padder.finalize()
+        return padded_data
+
+    def _unpad_data(self, padded_data):
+        """Remove PKCS7 padding from data."""
+        unpadder = padding.PKCS7(128).unpadder()
+        data = unpadder.update(padded_data) + unpadder.finalize()
+        return data
+
     def encrypt_field(self, value):
-        """Encrypt text data."""
+        """Encrypt text data using AES-256-CBC."""
         if value is None or value == "":
             return None
         cipher = self.encryption_key.get_cipher()
-        encrypted_bytes = cipher.encrypt(value.encode())
+        encryptor = cipher.encryptor()
+        
+        # Convert to bytes, pad, encrypt
+        data = value.encode('utf-8')
+        padded_data = self._pad_data(data)
+        encrypted_bytes = encryptor.update(padded_data) + encryptor.finalize()
+        
         return base64.b64encode(encrypted_bytes).decode()
 
     def encrypt_field_with_cipher(self, value, cipher):
         """Encrypt text data with given cipher."""
         if value is None or value == "":
             return None
-        encrypted_bytes = cipher.encrypt(value.encode())
+        encryptor = cipher.encryptor()
+        
+        data = value.encode('utf-8')
+        padded_data = self._pad_data(data)
+        encrypted_bytes = encryptor.update(padded_data) + encryptor.finalize()
+        
         return base64.b64encode(encrypted_bytes).decode()
 
     def decrypt_field(self, encrypted_value):
-        """Decrypt text data."""
+        """Decrypt text data using AES-256-CBC."""
         if not encrypted_value:
             return ""
         try:
             cipher = self.encryption_key.get_cipher()
+            decryptor = cipher.decryptor()
+            
             encrypted_bytes = base64.b64decode(encrypted_value)
-            return cipher.decrypt(encrypted_bytes).decode()
+            padded_data = decryptor.update(encrypted_bytes) + decryptor.finalize()
+            data = self._unpad_data(padded_data)
+            
+            return data.decode('utf-8')
         except Exception as e:
-            # Handle decryption failure more gracefully
+            # Handle decryption failure gracefully
             import logging
             logger = logging.getLogger(__name__)
             logger.error(f"Decryption failed for Case ID {self.id}: {e}")
@@ -112,21 +161,28 @@ class Case(models.Model):
 
 
     def encrypt_fields(self):
-        """Encrypt all text fields before saving."""
+        """Encrypt all text fields before saving using AES-256."""
         if hasattr(self, 'encryption_key'):
             cipher = self.encryption_key.get_cipher()
         else:
-            # Generate key for new case
-            self._temp_key = Fernet.generate_key()
-            cipher = Fernet(self._temp_key)
+            # Generate key and IV for new case
+            self._temp_key = os.urandom(32)
+            self._temp_iv = os.urandom(16)
+            cipher = Cipher(
+                algorithms.AES(self._temp_key),
+                modes.CBC(self._temp_iv),
+                backend=default_backend()
+            )
 
         for field_name in ['case_title', 'case_description', 'case_category', 'case_status_notes']:
             value = getattr(self, field_name)
             if isinstance(value, str) and value:
-                # Check if already encrypted
+                # Check if already encrypted by attempting to decrypt
                 try:
                     encrypted_bytes = base64.b64decode(value)
-                    cipher.decrypt(encrypted_bytes)
+                    decryptor = cipher.decryptor()
+                    padded_data = decryptor.update(encrypted_bytes) + decryptor.finalize()
+                    self._unpad_data(padded_data)
                     # If no exception, it's already encrypted, skip
                     continue
                 except Exception:
@@ -135,13 +191,14 @@ class Case(models.Model):
                     setattr(self, field_name, encrypted)
 
     def save(self, *args, **kwargs):
-        """Encrypt fields before saving."""
+        """Encrypt fields before saving using AES-256."""
         self.encrypt_fields()
         super().save(*args, **kwargs)
         # Create encryption key for new cases
         if hasattr(self, '_temp_key'):
-            EncryptionKey.objects.create(case=self, key=self._temp_key)
+            EncryptionKey.objects.create(case=self, key=self._temp_key, iv=self._temp_iv)
             delattr(self, '_temp_key')
+            delattr(self, '_temp_iv')
 
     # ---------- Decryption Getters ----------
     def get_title(self):
@@ -161,6 +218,12 @@ class Case(models.Model):
 # 3. Case Media (Evidence)
 # -----------------------------
 class CaseMedia(models.Model):
+    """
+    Case Media (Evidence) Model.
+    
+    Note: Media files are NOT encrypted. Only the Case model uses AES-256 encryption
+    for sensitive metadata. Media files are stored as-is for performance and accessibility.
+    """
     MEDIA_TYPE_CHOICES = [
         ('image', 'Image'),
         ('video', 'Video'),
@@ -180,51 +243,12 @@ class CaseMedia(models.Model):
     description = models.CharField(max_length=255)
     media_type = models.CharField(max_length=50, choices=MEDIA_TYPE_CHOICES)
     date_uploaded = models.DateTimeField(auto_now_add=True)
-    _encrypted = False  # flag to avoid double-encryption in one save cycle
     media_status = models.CharField(max_length=20, choices=MEDIA_STATUS_CHOICES, default='Valid')
     
-    
-
     def __str__(self):
-        return f"Media for Case: {self.case.get_title()}"
-
-    def save(self, *args, **kwargs):
-        """Encrypt media files before saving."""
-        if not self.case.encryption_key:
-            EncryptionKey.objects.create(case=self.case)
-
-        cipher = self.case.encryption_key.get_cipher()
-
-        if self.media and not self._encrypted:
-            self.media.open('rb')
-            file_content = self.media.read()
-            self.media.close()
-
-            encrypted_content = cipher.encrypt(file_content)
-            encrypted_file = ContentFile(encrypted_content)
-            # Ensure path is case_media/filename, extract filename from any existing path
-            filename = self.media.name.split('/')[-1]
-            encrypted_file.name = f'case_media/{filename}'
-
-            self.media.save(encrypted_file.name, encrypted_file, save=False)
-            self._encrypted = True
-
-        super().save(*args, **kwargs)
-
-    def decrypt_media(self):
-        """Return decrypted media content."""
-        cipher = self.case.encryption_key.get_cipher()
-        self.media.open('rb')
-        encrypted_content = self.media.read()
-        self.media.close()
-        decrypted_content = cipher.decrypt(encrypted_content)
-        return decrypted_content
-
-    def download_decrypted(self):
-        """Generate a decrypted version of the file for authorized download."""
-        decrypted_content = self.decrypt_media()
-        file_name = f"decrypted_{self.media.name.split('/')[-1]}"
-        return ContentFile(decrypted_content, name=file_name)
+        # Show encrypted case title, not decrypted
+        title_preview = self.case.case_title[:30] + "..." if self.case.case_title and len(self.case.case_title) > 30 else self.case.case_title
+        return f"Media for Case (Encrypted: {title_preview or 'N/A'})"
 
 
 
@@ -254,7 +278,9 @@ class AssignmentRequest(models.Model):
     approved_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.request_type} for {self.case.get_title()} by {self.requested_by}"
+        # Show encrypted case title, not decrypted
+        title_preview = self.case.case_title[:30] + "..." if self.case.case_title and len(self.case.case_title) > 30 else self.case.case_title
+        return f"{self.request_type} for Case (Encrypted: {title_preview or 'N/A'}) by {self.requested_by}"
 
 # -----------------------------
 # 5. Case Audit Log
