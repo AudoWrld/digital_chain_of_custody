@@ -1,33 +1,91 @@
 {% extends 'base.html' %}
+
 {% block title %}Edit Case{% endblock %}
 
+{% block extra_css %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/cases/create_case.css' %}">
+{% endblock %}
+
 {% block content %}
-<h1>Edit Case: {{ case.get_title }}</h1>
+<div class="create-case-container">
+    <div class="create-case-card">
+        <div class="create-case-header">
+            <h2>Edit Case: {{ case.get_title }}</h2>
+        </div>
 
-<form method="post">
-    {% csrf_token %}
-    <div>
-        <label for="{{ form.case_title.id_for_label }}">Title:</label>
-        {{ form.case_title }}
-        {{ form.case_title.errors }}
-    </div>
-    <div>
-        <label for="{{ form.case_description.id_for_label }}">Description:</label>
-        {{ form.case_description }}
-        {{ form.case_description.errors }}
-    </div>
-    <div>
-        <label for="{{ form.case_category.id_for_label }}">Category:</label>
-        {{ form.case_category }}
-        {{ form.case_category.errors }}
-    </div>
-    <div>
-        <label for="{{ form.case_priority.id_for_label }}">Priority:</label>
-        {{ form.case_priority }}
-        {{ form.case_priority.errors }}
-    </div>
-    <button type="submit">Save Changes</button>
-</form>
+        <form method="post">
+            {% csrf_token %}
 
-<a href="{% url 'cases:view_case' case.id %}">Back to Case</a>
+            {% if form.non_field_errors %}
+            <div class="non-field-errors">
+                {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label for="id_case_title">Case Title <span class="required-asterisk">*</span></label>
+                {{ form.case_title.errors }}
+                {{ form.case_title }}
+            </div>
+
+            <div class="form-group">
+                <label for="id_case_description">Description <span class="required-asterisk">*</span></label>
+                {{ form.case_description.errors }}
+                <div class="description-wrapper">
+                    {{ form.case_description }}
+                    <div class="char-counter" id="desc-counter">0/150</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="id_case_category">Category</label>
+                {{ form.case_category.errors }}
+                {{ form.case_category }}
+            </div>
+
+            <div class="form-group">
+                <label for="id_case_priority">Priority</label>
+                {{ form.case_priority.errors }}
+                {{ form.case_priority }}
+            </div>
+
+            <button type="submit" class="btn-submit">Save Changes</button>
+        </form>
+    </div>
+
+    <div class="evidence-note">
+        <svg class="evidence-note-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <div class="evidence-note-content">
+            <p class="evidence-note-title">Evidence Upload</p>
+            <p class="evidence-note-text">After saving changes, you will be able to upload evidence files (images, videos, documents, etc.) to support your case investigation.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const descTextarea = document.getElementById('id_case_description');
+    const counter = document.getElementById('desc-counter');
+    const minLength = 150;
+
+    function updateCounter() {
+        const currentLength = descTextarea.value.length;
+        counter.textContent = `${currentLength}/${minLength}`;
+
+        if (currentLength < minLength) {
+            counter.classList.add('error');
+            counter.classList.remove('warning');
+        } else {
+            counter.classList.remove('error');
+            counter.classList.remove('warning');
+        }
+    }
+
+    descTextarea.addEventListener('input', updateCounter);
+    updateCounter();
+});
+</script>
 {% endblock %}
