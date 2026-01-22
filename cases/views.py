@@ -163,52 +163,58 @@ def edit_case(request, case_id):
     if request.method == "POST":
         form = EditCaseForm(request.POST, user=request.user, instance=case)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Case updated successfully.")
-            for field, old_value in old_data.items():
-                if field == "assigned_investigators":
-                    new_value = list(case.assigned_investigators.all())
-                    new_value_ids = set(user.id for user in new_value)
-                    old_value_ids = set(user.id for user in old_value)
-                    if new_value_ids != old_value_ids:
-                        CaseAuditLog.log_action(
-                            user=request.user,
-                            case=case,
-                            action=f"Edited {field}",
-                            details=f"Old: {', '.join(str(u) for u in old_value)} | New: {', '.join(str(u) for u in new_value)}",
-                        )
-                elif field in [
-                    "case_title",
-                    "case_description",
-                    "case_category",
-                    "case_status_notes",
-                ]:
-                    if field == "case_title":
-                        new_value = case.get_title()
-                    elif field == "case_description":
-                        new_value = case.get_description()
-                    elif field == "case_category":
-                        new_value = case.get_category()
-                    elif field == "case_status_notes":
-                        new_value = case.get_status_notes()
-                    if old_value != new_value:
-                        CaseAuditLog.log_action(
-                            user=request.user,
-                            case=case,
-                            action=f"Edited {field}",
-                            details=f"Old: {old_value} | New: {new_value}",
-                        )
-                else:
-                    new_value = getattr(case, field)
-                    if old_value != new_value:
-                        CaseAuditLog.log_action(
-                            user=request.user,
-                            case=case,
-                            action=f"Edited {field}",
-                            details=f"Old: {old_value} | New: {new_value}",
-                        )
+            try:
+                form.save()
+                messages.success(request, "Case updated successfully.")
+                for field, old_value in old_data.items():
+                    if field == "assigned_investigators":
+                        new_value = list(case.assigned_investigators.all())
+                        new_value_ids = set(user.id for user in new_value)
+                        old_value_ids = set(user.id for user in old_value)
+                        if new_value_ids != old_value_ids:
+                            CaseAuditLog.log_action(
+                                user=request.user,
+                                case=case,
+                                action=f"Edited {field}",
+                                details=f"Old: {', '.join(str(u) for u in old_value)} | New: {', '.join(str(u) for u in new_value)}",
+                            )
+                    elif field in [
+                        "case_title",
+                        "case_description",
+                        "case_category",
+                        "case_status_notes",
+                    ]:
+                        if field == "case_title":
+                            new_value = case.get_title()
+                        elif field == "case_description":
+                            new_value = case.get_description()
+                        elif field == "case_category":
+                            new_value = case.get_category()
+                        elif field == "case_status_notes":
+                            new_value = case.get_status_notes()
+                        if old_value != new_value:
+                            CaseAuditLog.log_action(
+                                user=request.user,
+                                case=case,
+                                action=f"Edited {field}",
+                                details=f"Old: {old_value} | New: {new_value}",
+                            )
+                    else:
+                        new_value = getattr(case, field)
+                        if old_value != new_value:
+                            CaseAuditLog.log_action(
+                                user=request.user,
+                                case=case,
+                                action=f"Edited {field}",
+                                details=f"Old: {old_value} | New: {new_value}",
+                            )
 
-            return redirect("cases:view_case", case_id=case.id)
+                return redirect("cases:view_case", case_id=case.id)
+            except Exception as e:
+                logger.error(f"Error updating case: {e}")
+                messages.error(request, "Failed to update case. Please try again.")
+        else:
+            messages.error(request, "Please correct the errors below.")
     else:
         form = EditCaseForm(
             user=request.user,
