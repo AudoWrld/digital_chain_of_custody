@@ -155,21 +155,13 @@
             <i class='bx bx-home'></i>
             <span>Dashboard</span>
           </a>
-          <a href="{% url 'cases:create_case' %}" class="sidebar-link {% if request.path == '/cases/create/' %}active{% endif %}">
-            <i class='bx bx-plus-circle'></i>
-            <span>Create Case</span>
-          </a>
-          <a href="{% url 'cases:case_list' %}" class="sidebar-link {% if request.path == '/cases/' %}active{% endif %}">
+          <a href="{% url 'cases:assigned_cases' %}" class="sidebar-link {% if request.path == '/cases/assigned/' %}active{% endif %}">
             <i class='bx bx-briefcase'></i>
-            <span>My Cases</span>
+            <span>Assigned Cases</span>
           </a>
           <a href="#" class="sidebar-link">
             <i class='bx bx-add-to-queue'></i>
             <span>Register Evidence</span>
-          </a>
-          <a href="#" class="sidebar-link">
-            <i class='bx bx-transfer'></i>
-            <span>Transfer Custody</span>
           </a>
           <a href="#" class="sidebar-link">
             <i class='bx bx-history'></i>
@@ -190,10 +182,6 @@
           <a href="{% url 'dashboard:dashboard' %}" class="sidebar-link {% if request.path == '/dashboard/' %}active{% endif %}">
             <i class='bx bx-home'></i>
             <span>Dashboard</span>
-          </a>
-          <a href="#" class="sidebar-link">
-            <i class='bx bx-briefcase'></i>
-            <span>Assigned Cases</span>
           </a>
           <a href="#" class="sidebar-link">
             <i class='bx bx-analyse'></i>
@@ -254,10 +242,6 @@
           <a href="{% url 'dashboard:dashboard' %}" class="sidebar-link {% if request.path == '/dashboard/' %}active{% endif %}">
             <i class='bx bx-home'></i>
             <span>Dashboard</span>
-          </a>
-          <a href="{% url 'cases:case_list' %}" class="sidebar-link {% if request.path == '/cases/' %}active{% endif %}">
-            <i class='bx bx-briefcase'></i>
-            <span>All Cases</span>
           </a>
           <a href="#" class="sidebar-link">
             <i class='bx bx-list-check'></i>
@@ -322,8 +306,8 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-      const errorMessages = document.querySelectorAll('.message-error');
-      errorMessages.forEach(function(message) {
+      const messages = document.querySelectorAll('.message');
+      messages.forEach(function(message) {
         setTimeout(function() {
           message.style.opacity = '0';
           message.style.transform = 'translateX(100%)';
