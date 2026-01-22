@@ -7,6 +7,7 @@ from django.db.models import Q
 from django.utils import timezone
 from .models import Case, CaseMedia, EncryptionKey, CaseAuditLog, AssignmentRequest
 from .forms import CaseForm, CaseMediaForm, EditCaseForm
+from .permissions import regular_user_required, role_required
 import csv
 from django.contrib.auth import get_user_model
 import logging
@@ -20,17 +21,43 @@ def case_list(request):
     if request.user.is_superuser:
         cases = Case.objects.all().select_related("encryption_key")
         is_superuser = True
-    else:
+    elif request.user.role == 'regular_user':
         cases = Case.objects.filter(
-            Q(created_by=request.user) | Q(assigned_investigators=request.user)
+            created_by=request.user
         ).select_related("encryption_key")
         is_superuser = False
+    elif request.user.role == 'investigator':
+        cases = Case.objects.filter(
+            assigned_investigators=request.user
+        ).select_related("encryption_key")
+        is_superuser = False
+    else:
+        return HttpResponseForbidden("You do not have permission to view cases.")
+
     return render(
         request, "cases/case_list.html", {"cases": cases, "is_superuser": is_superuser}
     )
 
 
 @login_required
+def assigned_cases(request):
+    if request.user.is_superuser:
+        cases = Case.objects.all().select_related("encryption_key")
+        is_superuser = True
+    elif request.user.role == 'investigator':
+        cases = Case.objects.filter(
+            assigned_investigators=request.user
+        ).select_related("encryption_key")
+        is_superuser = False
+    else:
+        return HttpResponseForbidden("Only investigators can view assigned cases.")
+
+    return render(
+        request, "cases/assigned_cases.html", {"cases": cases, "is_superuser": is_superuser}
+    )
+
+
+@regular_user_required
 def create_case(request):
     if request.method == "POST":
         form = CaseForm(request.POST)
@@ -141,14 +168,16 @@ def view_case(request, case_id):
 def edit_case(request, case_id):
     case = get_object_or_404(Case, id=case_id)
 
-    if not (
-        request.user.is_superuser
-        or (
-            request.user == case.created_by and not case.assigned_investigators.exists()
-        )
-        or request.user in case.assigned_investigators.all()
-    ):
-        return HttpResponseForbidden("Not authorized.")
+    if request.user.is_superuser:
+        pass
+    elif request.user.role == 'regular_user':
+        if request.user != case.created_by:
+            return HttpResponseForbidden("You can only edit your own cases.")
+    elif request.user.role == 'investigator':
+        if request.user not in case.assigned_investigators.all():
+            return HttpResponseForbidden("You can only edit cases assigned to you.")
+    else:
+        return HttpResponseForbidden("You do not have permission to edit cases.")
 
     old_data = {
         "case_title": case.get_title(),
@@ -163,52 +192,58 @@ def edit_case(request, case_id):
     if request.method == "POST":
         form = EditCaseForm(request.POST, user=request.user, instance=case)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Case updated successfully.")
-            for field, old_value in old_data.items():
-                if field == "assigned_investigators":
-                    new_value = list(case.assigned_investigators.all())
-                    new_value_ids = set(user.id for user in new_value)
-                    old_value_ids = set(user.id for user in old_value)
-                    if new_value_ids != old_value_ids:
-                        CaseAuditLog.log_action(
-                            user=request.user,
-                            case=case,
-                            action=f"Edited {field}",
-                            details=f"Old: {', '.join(str(u) for u in old_value)} | New: {', '.join(str(u) for u in new_value)}",
-                        )
-                elif field in [
-                    "case_title",
-                    "case_description",
-                    "case_category",
-                    "case_status_notes",
-                ]:
-                    if field == "case_title":
-                        new_value = case.get_title()
-                    elif field == "case_description":
-                        new_value = case.get_description()
-                    elif field == "case_category":
-                        new_value = case.get_category()
-                    elif field == "case_status_notes":
-                        new_value = case.get_status_notes()
-                    if old_value != new_value:
-                        CaseAuditLog.log_action(
-                            user=request.user,
-                            case=case,
-                            action=f"Edited {field}",
-                            details=f"Old: {old_value} | New: {new_value}",
-                        )
-                else:
-                    new_value = getattr(case, field)
-                    if old_value != new_value:
-                        CaseAuditLog.log_action(
-                            user=request.user,
-                            case=case,
-                            action=f"Edited {field}",
-                            details=f"Old: {old_value} | New: {new_value}",
-                        )
+            try:
+                form.save()
+                messages.success(request, "Case updated successfully.")
+                for field, old_value in old_data.items():
+                    if field == "assigned_investigators":
+                        new_value = list(case.assigned_investigators.all())
+                        new_value_ids = set(user.id for user in new_value)
+                        old_value_ids = set(user.id for user in old_value)
+                        if new_value_ids != old_value_ids:
+                            CaseAuditLog.log_action(
+                                user=request.user,
+                                case=case,
+                                action=f"Edited {field}",
+                                details=f"Old: {', '.join(str(u) for u in old_value)} | New: {', '.join(str(u) for u in new_value)}",
+                            )
+                    elif field in [
+                        "case_title",
+                        "case_description",
+                        "case_category",
+                        "case_status_notes",
+                    ]:
+                        if field == "case_title":
+                            new_value = case.get_title()
+                        elif field == "case_description":
+                            new_value = case.get_description()
+                        elif field == "case_category":
+                            new_value = case.get_category()
+                        elif field == "case_status_notes":
+                            new_value = case.get_status_notes()
+                        if old_value != new_value:
+                            CaseAuditLog.log_action(
+                                user=request.user,
+                                case=case,
+                                action=f"Edited {field}",
+                                details=f"Old: {old_value} | New: {new_value}",
+                            )
+                    else:
+                        new_value = getattr(case, field)
+                        if old_value != new_value:
+                            CaseAuditLog.log_action(
+                                user=request.user,
+                                case=case,
+                                action=f"Edited {field}",
+                                details=f"Old: {old_value} | New: {new_value}",
+                            )
 
-            return redirect("cases:view_case", case_id=case.id)
+                return redirect("cases:view_case", case_id=case.id)
+            except Exception as e:
+                logger.error(f"Error updating case: {e}")
+                messages.error(request, "Failed to update case. Please try again.")
+        else:
+            messages.error(request, "Please correct the errors below.")
     else:
         form = EditCaseForm(
             user=request.user,

@@ -55,6 +55,37 @@ class CaseForm(forms.ModelForm):
 
 class EditCaseForm(forms.ModelForm):
 
+    case_title = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "required": "required",
+                "autocomplete": "off",
+            }
+        ),
+        label="Case Title",
+        required=True,
+    )
+
+    case_description = forms.CharField(
+        widget=forms.Textarea(attrs={"class": "form-control", "rows": "4"}),
+        label="Description",
+        required=True,
+        min_length=150,
+    )
+
+    case_category = forms.ChoiceField(
+        choices=Case.CASE_CATEGORIES,
+        widget=forms.Select(attrs={"class": "form-select"}),
+        label="Case Category",
+    )
+
+    case_priority = forms.ChoiceField(
+        choices=Case.PRIORITY_CHOICES,
+        widget=forms.Select(attrs={"class": "form-select"}),
+        label="Priority",
+    )
+
     assigned_investigators = forms.ModelMultipleChoiceField(
         queryset=User.objects.filter(
             role="investigator", is_active=True, verified=True
@@ -77,13 +108,15 @@ class EditCaseForm(forms.ModelForm):
         ]
 
         widgets = {
-            "case_title": forms.TextInput(attrs={"class": "form-control"}),
-            "case_description": forms.Textarea(attrs={"class": "form-control"}),
-            "case_category": forms.Select(attrs={"class": "form-select"}),
-            "case_priority": forms.Select(attrs={"class": "form-select"}),
             "case_status": forms.Select(attrs={"class": "form-select"}),
             "case_status_notes": forms.Textarea(attrs={"class": "form-control"}),
         }
+
+    def clean_case_description(self):
+        description = self.cleaned_data.get("case_description")
+        if len(description) < 150:
+            raise forms.ValidationError("Description must be at least 150 characters.")
+        return description
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop("user", None)
