@@ -12,6 +12,7 @@ class UserProfileManager(BaseUserManager):
 
     def create_user(self, email, first_name, last_name, password=None, **extra_fields):
         extra_fields.setdefault("is_active", False)
+        extra_fields.setdefault("role", "regular_user")
         if not email:
             raise ValueError("The Email must be set")
         email = self.normalize_email(email)
@@ -33,6 +34,7 @@ class UserProfileManager(BaseUserManager):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("is_active", True)
+        extra_fields.setdefault("role", "superuser")
 
         if extra_fields.get("is_staff") is not True:
             raise ValueError("Superuser must have is_staff=True.")
@@ -44,6 +46,7 @@ class UserProfileManager(BaseUserManager):
 
 class User(AbstractUser, PermissionsMixin):
     ROLE = [
+        ("superuser", "Superuser"),
         ("regular_user", "Regular User"),
         ("investigator", "Investigator"),
         ("analyst", "Analyst"),
@@ -80,7 +83,7 @@ class User(AbstractUser, PermissionsMixin):
     )
     objects = UserProfileManager()
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["first_name", "last_name", "role"]
+    REQUIRED_FIELDS = ["first_name", "last_name"]
     
  
 
