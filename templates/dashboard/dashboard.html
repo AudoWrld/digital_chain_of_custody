@@ -1,4 +1,254 @@
 {% extends 'base.html' %}
-{% block content %}
+{% block title %}Dashboard{% endblock %}
 
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard/dashboard.css' %}?v={{ STATIC_VERSION }}" />
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1>Welcome back, {{ user.first_name }}!</h1>
+    <p class="dashboard-subtitle">
+      {% if is_superuser %}
+      System Administrator Dashboard
+      {% elif user_role == 'regular_user' %}
+      Your Case Management Dashboard
+      {% elif user_role == 'investigator' %}
+      Investigator Dashboard
+      {% elif user_role == 'analyst' %}
+      Evidence Analyst Dashboard
+      {% elif user_role == 'custodian' %}
+      Evidence Custodian Dashboard
+      {% elif user_role == 'auditor' %}
+      Audit Dashboard
+      {% endif %}
+    </p>
+  </div>
+
+  {% if is_superuser or user_role == 'regular_user' or user_role == 'investigator' or user_role == 'analyst' %}
+  <div class="stats-grid">
+    <div class="stat-card stat-primary">
+      <div class="stat-icon">
+        <i class='bx bx-briefcase'></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ total_cases }}</div>
+        <div class="stat-label">Total Cases</div>
+      </div>
+    </div>
+
+    <div class="stat-card stat-success">
+      <div class="stat-icon">
+        <i class='bx bx-folder-open'></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ open_cases }}</div>
+        <div class="stat-label">Open Cases</div>
+      </div>
+    </div>
+
+    <div class="stat-card stat-warning">
+      <div class="stat-icon">
+        <i class='bx bx-time'></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ under_review_cases }}</div>
+        <div class="stat-label">Under Review</div>
+      </div>
+    </div>
+
+    <div class="stat-card stat-info">
+      <div class="stat-icon">
+        <i class='bx bx-check-circle'></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ closed_cases }}</div>
+        <div class="stat-label">Closed Cases</div>
+      </div>
+    </div>
+
+
+
+    {% if total_users is not None %}
+    <div class="stat-card stat-purple">
+      <div class="stat-icon">
+        <i class='bx bx-group'></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ total_users }}</div>
+        <div class="stat-label">Total Users</div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% if user_role == 'custodian' %}
+  <div class="stats-grid">
+    <div class="stat-card stat-secondary">
+      <div class="stat-icon">
+        <i class='bx bx-briefcase'></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ total_cases }}</div>
+        <div class="stat-label">Total Cases</div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if user_role == 'auditor' %}
+  <div class="stats-grid">
+    <div class="stat-card stat-primary">
+      <div class="stat-icon">
+        <i class='bx bx-briefcase'></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ total_cases }}</div>
+        <div class="stat-label">Total Cases</div>
+      </div>
+    </div>
+
+    <div class="stat-card stat-purple">
+      <div class="stat-icon">
+        <i class='bx bx-list-check'></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ total_audit_logs }}</div>
+        <div class="stat-label">Audit Logs</div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="dashboard-content">
+    {% if recent_cases %}
+    <div class="dashboard-section">
+      <div class="section-header">
+        <h2>Recent Cases</h2>
+        {% if user_role == 'regular_user' %}
+        <a href="{% url 'cases:case_list' %}" class="view-all-link">View All</a>
+        {% elif user_role == 'investigator' %}
+        <a href="{% url 'cases:assigned_cases' %}" class="view-all-link">View All</a>
+        {% elif is_superuser %}
+        <a href="{% url 'cases:case_list' %}" class="view-all-link">View All</a>
+        {% endif %}
+      </div>
+      <div class="recent-list">
+        {% for case in recent_cases %}
+        <div class="recent-item">
+          <div class="recent-item-icon">
+            <i class='bx bx-briefcase'></i>
+          </div>
+          <div class="recent-item-content">
+            <div class="recent-item-title">{{ case.get_title }}</div>
+            <div class="recent-item-meta">
+              <span class="status-badge status-{{ case.case_status|lower }}">{{ case.case_status }}</span>
+              <span class="date">{{ case.created_at|date:"M d, Y" }}</span>
+            </div>
+          </div>
+          <a href="{% url 'cases:view_case' case.id %}" class="recent-item-action">
+            <i class='bx bx-right-arrow-alt'></i>
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if recent_audit_logs %}
+    <div class="dashboard-section">
+      <div class="section-header">
+        <h2>Recent Activity</h2>
+      </div>
+      <div class="recent-list">
+        {% for log in recent_audit_logs %}
+        <div class="recent-item">
+          <div class="recent-item-icon">
+            <i class='bx bx-history'></i>
+          </div>
+          <div class="recent-item-content">
+            <div class="recent-item-title">{{ log.action }}</div>
+            <div class="recent-item-meta">
+              <span class="user">{{ log.user.get_full_name }}</span>
+              <span class="date">{{ log.timestamp|date:"M d, Y H:i" }}</span>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if recent_evidence %}
+    <div class="dashboard-section">
+      <div class="section-header">
+        <h2>Recent Evidence</h2>
+      </div>
+      <div class="recent-list">
+        {% for evidence in recent_evidence %}
+        <div class="recent-item">
+          <div class="recent-item-icon">
+            <i class='bx bx-archive'></i>
+          </div>
+          <div class="recent-item-content">
+            <div class="recent-item-title">{{ evidence.get_filename }}</div>
+            <div class="recent-item-meta">
+              <span class="status-badge status-{{ evidence.status|lower }}">{{ evidence.status }}</span>
+              <span class="date">{{ evidence.uploaded_at|date:"M d, Y" }}</span>
+            </div>
+          </div>
+          <a href="{% url 'evidence:view_media' evidence.id %}" class="recent-item-action">
+            <i class='bx bx-right-arrow-alt'></i>
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if user_role == 'regular_user' %}
+    <div class="dashboard-section">
+      <div class="section-header">
+        <h2>Quick Actions</h2>
+      </div>
+      <div class="quick-actions">
+        <a href="{% url 'cases:create_case' %}" class="quick-action-card">
+          <div class="quick-action-icon">
+            <i class='bx bx-plus-circle'></i>
+          </div>
+          <div class="quick-action-title">Create New Case</div>
+          <div class="quick-action-description">Start a new investigation case</div>
+        </a>
+        <a href="{% url 'cases:case_list' %}" class="quick-action-card">
+          <div class="quick-action-icon">
+            <i class='bx bx-briefcase'></i>
+          </div>
+          <div class="quick-action-title">View My Cases</div>
+          <div class="quick-action-description">Browse all your cases</div>
+        </a>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if user_role == 'investigator' %}
+    <div class="dashboard-section">
+      <div class="section-header">
+        <h2>Quick Actions</h2>
+      </div>
+      <div class="quick-actions">
+        <a href="{% url 'cases:assigned_cases' %}" class="quick-action-card">
+          <div class="quick-action-icon">
+            <i class='bx bx-briefcase'></i>
+          </div>
+          <div class="quick-action-title">Assigned Cases</div>
+          <div class="quick-action-description">View cases assigned to you</div>
+        </a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
 {% endblock %}
