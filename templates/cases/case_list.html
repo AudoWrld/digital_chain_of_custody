@@ -54,10 +54,6 @@
         <td class="cases-table-cell">{{ case.get_category }}</td>
         <td class="cases-table-cell">
           <a href="{% url 'cases:view_case' case.id %}" class="cases-action-link">View</a>
-          {% if case.case_status in 'Open,Under Review' %}
-          <span class="cases-action-separator">|</span>
-          <a href="{% url 'cases:edit_case' case.id %}" class="cases-action-link">Edit</a>
-          {% endif %}
         </td>
       </tr>
       {% endfor %}
