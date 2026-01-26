@@ -7,6 +7,8 @@
 {% endblock %}
 
 {% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
 <div class="dashboard-container">
   <div class="dashboard-header">
     <h1>Welcome back, {{ user.first_name }}!</h1>
@@ -82,7 +84,80 @@
       </div>
     </div>
     {% endif %}
+    {% if total_evidence > 0 %}
+    <div class="stat-card stat-secondary">
+      <div class="stat-icon">
+        <i class='bx bx-archive'></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ total_evidence }}</div>
+        <div class="stat-label">Total Evidence</div>
+      </div>
+    </div>
+
+    <div class="stat-card stat-success">
+      <div class="stat-icon">
+        <i class='bx bx-check-circle'></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ valid_evidence }}</div>
+        <div class="stat-label">Valid Evidence</div>
+      </div>
+    </div>
+
+    <div class="stat-card stat-danger">
+      <div class="stat-icon">
+        <i class='bx bx-x-circle'></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ invalid_evidence }}</div>
+        <div class="stat-label">Invalid Evidence</div>
+      </div>
+    </div>
+    {% endif %}
   </div>
+
+  {% if is_superuser %}
+  <div class="stats-grid" style="margin-top: 24px;">
+    <div class="stat-card" style="grid-column: span 2;">
+      <h3 style="margin-bottom: 16px; font-size: 18px; font-weight: 600; color: #1e293b;">Case Status Distribution</h3>
+      <div style="height: 300px; position: relative;">
+        <canvas id="caseStatusChart"></canvas>
+      </div>
+    </div>
+    <div class="stat-card" style="grid-column: span 1;">
+      <h3 style="margin-bottom: 16px; font-size: 18px; font-weight: 600; color: #1e293b;">Case Priority Distribution</h3>
+      <div style="height: 300px; position: relative;">
+        <canvas id="casePriorityChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-grid" style="margin-top: 24px;">
+    <div class="stat-card" style="grid-column: span 2;">
+      <h3 style="margin-bottom: 16px; font-size: 18px; font-weight: 600; color: #1e293b;">Cases Created (Last 30 Days)</h3>
+      <div style="height: 300px; position: relative;">
+        <canvas id="casesByDateChart"></canvas>
+      </div>
+    </div>
+    <div class="stat-card" style="grid-column: span 1;">
+      <h3 style="margin-bottom: 16px; font-size: 18px; font-weight: 600; color: #1e293b;">User Role Distribution</h3>
+      <div style="height: 300px; position: relative;">
+        <canvas id="userRoleChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  {% if total_evidence > 0 %}
+  <div class="stats-grid" style="margin-top: 24px;">
+    <div class="stat-card" style="grid-column: span 1;">
+      <h3 style="margin-bottom: 16px; font-size: 18px; font-weight: 600; color: #1e293b;">Evidence by Type</h3>
+      <div style="height: 300px; position: relative;">
+        <canvas id="evidenceTypeChart"></canvas>
+      </div>
+    </div>
+  </div>
+  {% endif %}
   {% endif %}
 
   {% if user_role == 'custodian' %}
@@ -123,7 +198,110 @@
   </div>
   {% endif %}
 
-  <div class="dashboard-content">
+  {% if system_alerts %}
+  <div class="dashboard-section" style="margin-top: 24px; margin-bottom: 24px;">
+    <div class="section-header">
+      <h2>System Alerts</h2>
+    </div>
+    <div class="alerts-list">
+      {% for alert in system_alerts %}
+      <div class="alert-item alert-{{ alert.type }}">
+        <div class="alert-icon">
+          <i class='bx {{ alert.icon }}'></i>
+        </div>
+        <div class="alert-content">
+          <div class="alert-message">{{ alert.message }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="dashboard-content" style="margin-top: 24px;">
+    {% if recent_users and is_superuser %}
+    <div class="dashboard-section">
+      <div class="section-header">
+        <h2>Recent Users</h2>
+        <a href="{% url 'admin:accounts_user_changelist' %}" class="view-all-link">View All</a>
+      </div>
+      <div class="recent-list">
+        {% for user in recent_users %}
+        <div class="recent-item">
+          <div class="recent-item-icon">
+            <i class='bx bx-user'></i>
+          </div>
+          <div class="recent-item-content">
+            <div class="recent-item-title">{{ user.get_full_name }}</div>
+            <div class="recent-item-meta">
+              <span class="status-badge status-{{ user.role }}">{{ user.get_role_display }}</span>
+              <span class="date">{{ user.date_joined|date:"M d, Y" }}</span>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if is_superuser %}
+    <div class="dashboard-section">
+      <div class="section-header">
+        <h2>Admin Quick Actions</h2>
+      </div>
+      <div class="quick-actions">
+        <a href="{% url 'admin:index' %}" class="quick-action-card">
+          <div class="quick-action-icon">
+            <i class='bx bx-cog'></i>
+          </div>
+          <div class="quick-action-title">Admin Panel</div>
+          <div class="quick-action-description">Access Django admin interface</div>
+        </a>
+        <a href="{% url 'cases:case_list' %}" class="quick-action-card">
+          <div class="quick-action-icon">
+            <i class='bx bx-briefcase'></i>
+          </div>
+          <div class="quick-action-title">Manage Cases</div>
+          <div class="quick-action-description">View and manage all cases</div>
+        </a>
+        <a href="{% url 'admin:accounts_user_changelist' %}" class="quick-action-card">
+          <div class="quick-action-icon">
+            <i class='bx bx-user'></i>
+          </div>
+          <div class="quick-action-title">Manage Users</div>
+          <div class="quick-action-description">View and manage user accounts</div>
+        </a>
+        {% if pending_approval_cases > 0 %}
+        <a href="{% url 'cases:case_list' %}?status=Pending+Admin+Approval" class="quick-action-card" style="border: 2px solid #f59e0b;">
+          <div class="quick-action-icon" style="color: #f59e0b;">
+            <i class='bx bx-time'></i>
+          </div>
+          <div class="quick-action-title">Pending Approvals</div>
+          <div class="quick-action-description">{{ pending_approval_cases }} cases awaiting approval</div>
+        </a>
+        {% endif %}
+        {% if cases_without_investigators > 0 %}
+        <a href="{% url 'cases:case_list' %}?no_investigators=true" class="quick-action-card" style="border: 2px solid #ef4444;">
+          <div class="quick-action-icon" style="color: #ef4444;">
+            <i class='bx bx-user-x'></i>
+          </div>
+          <div class="quick-action-title">Assign Investigators</div>
+          <div class="quick-action-description">{{ cases_without_investigators }} cases need investigators</div>
+        </a>
+        {% endif %}
+        {% if unverified_users > 0 %}
+        <a href="{% url 'admin:accounts_user_changelist' %}?is_verified__exact=0" class="quick-action-card" style="border: 2px solid #3b82f6;">
+          <div class="quick-action-icon" style="color: #3b82f6;">
+            <i class='bx bx-user-plus'></i>
+          </div>
+          <div class="quick-action-title">Verify Users</div>
+          <div class="quick-action-description">{{ unverified_users }} users need verification</div>
+        </a>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
     {% if recent_cases %}
     <div class="dashboard-section">
       <div class="section-header">
@@ -258,4 +436,177 @@
     {% endif %}
   </div>
 </div>
+{% endif %}
+
+{% if is_superuser %}
+<script id="caseStatusData" type="application/json">{{ case_status_counts|safe }}</script>
+<script id="casePriorityData" type="application/json">{{ case_priority_counts|safe }}</script>
+<script id="casesByDateData" type="application/json">{{ cases_by_date|safe }}</script>
+<script id="userRoleData" type="application/json">{{ user_role_counts|safe }}</script>
+<script id="evidenceTypeData" type="application/json">{{ evidence_by_type|default:"{}" }}</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const caseStatusCounts = JSON.parse(document.getElementById('caseStatusData').textContent);
+    const casePriorityCounts = JSON.parse(document.getElementById('casePriorityData').textContent);
+    const casesByDate = JSON.parse(document.getElementById('casesByDateData').textContent);
+    const userRoleCounts = JSON.parse(document.getElementById('userRoleData').textContent);
+
+    const statusLabels = ['Open', 'Under Review', 'Closed', 'Archived', 'Invalid', 'Withdrawn', 'Pending Admin Approval'];
+    const statusData = statusLabels.map(status => caseStatusCounts[status] || 0);
+    const statusColors = ['#3b82f6', '#f59e0b', '#10b981', '#6366f1', '#ef4444', '#8b5cf6', '#f97316'];
+
+    new Chart(document.getElementById('caseStatusChart'), {
+        type: 'bar',
+        data: {
+            labels: statusLabels,
+            datasets: [{
+                label: 'Number of Cases',
+                data: statusData,
+                backgroundColor: statusColors,
+                borderColor: statusColors.map(color => color),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+
+    const priorityLabels = ['low', 'medium', 'high', 'critical'];
+    const priorityData = priorityLabels.map(priority => casePriorityCounts[priority] || 0);
+    const priorityColors = ['#10b981', '#f59e0b', '#f97316', '#ef4444'];
+
+    new Chart(document.getElementById('casePriorityChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Low', 'Medium', 'High', 'Critical'],
+            datasets: [{
+                data: priorityData,
+                backgroundColor: priorityColors,
+                borderColor: '#ffffff',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    const dateLabels = Object.keys(casesByDate).sort();
+    const dateData = dateLabels.map(date => casesByDate[date]);
+
+    new Chart(document.getElementById('casesByDateChart'), {
+        type: 'bar',
+        data: {
+            labels: dateLabels,
+            datasets: [{
+                label: 'Cases Created',
+                data: dateData,
+                backgroundColor: '#3b82f6',
+                borderColor: '#2563eb',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+
+    const roleLabels = ['regular_user', 'investigator', 'analyst', 'custodian', 'auditor'];
+    const roleData = roleLabels.map(role => userRoleCounts[role] || 0);
+    const roleColors = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444'];
+
+    new Chart(document.getElementById('userRoleChart'), {
+        type: 'pie',
+        data: {
+            labels: ['Regular User', 'Investigator', 'Analyst', 'Custodian', 'Auditor'],
+            datasets: [{
+                data: roleData,
+                backgroundColor: roleColors,
+                borderColor: '#ffffff',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    const evidenceTypeDataElement = document.getElementById('evidenceTypeData');
+    if (evidenceTypeDataElement) {
+        const evidenceTypeData = JSON.parse(evidenceTypeDataElement.textContent);
+        const hasEvidenceData = Object.keys(evidenceTypeData).length > 0;
+        
+        if (hasEvidenceData) {
+            const evidenceTypeLabels = ['image', 'video', 'audio', 'document', 'text', 'other'];
+            const evidenceTypeDataArray = evidenceTypeLabels.map(type => evidenceTypeData[type] || 0);
+            const evidenceTypeColors = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#6366f1'];
+
+            new Chart(document.getElementById('evidenceTypeChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Image', 'Video', 'Audio', 'Document', 'Text', 'Other'],
+                    datasets: [{
+                        data: evidenceTypeDataArray,
+                        backgroundColor: evidenceTypeColors,
+                        borderColor: '#ffffff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+    }
+});
+</script>
+{% endif %}
+
 {% endblock %}
