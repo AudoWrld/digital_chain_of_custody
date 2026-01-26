@@ -1,110 +1,233 @@
 {% extends 'base.html' %}
 {% block title %}View Case{% endblock %}
-
+{% load static %}
 {% block content %}
-<h1>Case: {{ title }}</h1>
-<p><strong>Description:</strong> {{ case.get_description }}</p>
-<p><strong>Category:</strong> {{ category }}</p>
-<p><strong>Status:</strong> {{ case.case_status }}</p>
-<p><strong>Priority:</strong> {{ case.case_priority }}</p>
-<p><strong>Created By:</strong> {{ case.created_by.get_full_name }}</p>
-<p><strong>Created At:</strong> {{ case.created_at }}</p>
-<p><strong>Assigned Investigators:</strong>
-    {% for inv in case.assigned_investigators.all %}
-        {{ inv.get_full_name }}{% if not forloop.last %}, {% endif %}
-    {% empty %}
-        None
-    {% endfor %}
-</p>
-{% if case.close_reason %}
-<p><strong>Close Reason:</strong> {{ case.close_reason }}</p>
-{% endif %}
-{% if case.closure_requested %}
-<p><strong>Closure Requested:</strong> Yes</p>
-<p><strong>Creator Approved:</strong> {{ case.closure_creator_approved|yesno:"Yes,No" }}</p>
-<p><strong>Admin Approved:</strong> {{ case.closure_approved|yesno:"Yes,No" }}</p>
-{% endif %}
+<link rel="stylesheet" href="{% static 'css/cases/view_case.css' %}?v={{ STATIC_VERSION }}" />
 
-<h2>Media</h2>
-{% if media_files %}
-<ul>
-    {% for media in media_files %}
-    <li>
-        {{ media.description }} -
-        <a href="{% url 'cases:view_media' media.id %}">Download</a> |
-        {% if case.case_status not in 'Closed,Archived,Withdrawn,Invalid' %}
-        <a href="{% url 'cases:edit_media_description' media.id %}">Edit Description</a> |
-        <a href="{% url 'cases:mark_media_invalid' media.id %}">Mark Invalid</a> |
-        {% endif %}
-        <a href="{% url 'cases:view_media_audit_log' media.id %}">Audit Log</a>
-    </li>
-    {% endfor %}
-</ul>
-{% else %}
-<p>No media uploaded for this case. {% if case.case_status not in 'Closed,Archived,Withdrawn,Invalid' %}<a href="{% url 'cases:upload_media' case.id %}">Upload Media</a>{% endif %}</p>
-{% endif %}
+<div class="view-case-container">
+  <div class="view-case-header">
+    <h1 class="view-case-title">{{ title }}</h1>
+    <div class="view-case-meta">
+      <div class="view-case-meta-item">
+        <span class="view-case-meta-label">Created By:</span>
+        <span class="view-case-meta-value">{{ case.created_by.get_full_name }}</span>
+      </div>
+      <div class="view-case-meta-item">
+        <span class="view-case-meta-label">Created At:</span>
+        <span class="view-case-meta-value">{{ case.date_created|date:"F d, Y g:i A" }}</span>
+      </div>
+      <div class="view-case-meta-item">
+        <span class="view-case-meta-label">Last Modified:</span>
+        <span class="view-case-meta-value">{{ case.last_modified|date:"F d, Y g:i A" }}</span>
+      </div>
+    </div>
+  </div>
 
-<h2>Actions</h2>
-{% if case.case_status not in 'Closed,Archived,Withdrawn,Invalid' %}
-<a href="{% url 'cases:upload_media' case.id %}">Upload Media</a> |
-{% endif %}
-{% if case.case_status == 'Open' or case.case_status == 'Under Review' %}
-<a href="{% url 'cases:edit_case' case.id %}">Edit Case</a> |
-<a href="{% url 'cases:assign_investigators' case.id %}">Assign Investigators</a> |
-{% if not case.closure_requested %}
-<a href="{% url 'cases:request_case_closure' case.id %}">Request Closure</a> |
-{% endif %}
-<a href="{% url 'cases:close_case' case.id %}">Close Case</a> |
-<a href="{% url 'cases:withdraw_case' case.id %}">Withdraw Case</a> |
-<a href="{% url 'cases:invalidate_case' case.id %}">Mark Invalid</a> |
-{% endif %}
-{% if case.case_status == 'Closed' %}
-<a href="{% url 'cases:archive_case' case.id %}">Archive Case</a> |
-{% endif %}
-{% if case.case_status == 'Pending Admin Approval' and request.user.is_staff %}
-  <h3>Pending Investigator Assignment</h3>
-  {% for req in case.assignment_requests.all %}
-    {% if req.status == 'pending_admin' %}
-      <p>Proposed by: {{ req.requested_by.get_full_name }}</p>
-      <p>Proposed Investigators: {% for u in req.assigned_users.all %}{{ u.get_full_name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
-      <p>Notes: {{ req.notes }}</p>
-      <form method="post" style="display:inline;">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="approve">
-        <input type="hidden" name="request_id" value="{{ req.id }}">
-        <button type="submit">Approve Assignment</button>
-      </form>
-      <form method="post" style="display:inline;">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="reject">
-        <input type="hidden" name="request_id" value="{{ req.id }}">
-        <button type="submit">Reject Assignment</button>
-      </form>
+  <div class="view-case-section">
+    <h2 class="view-case-section-title">Case Details</h2>
+    <div class="view-case-details-grid">
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">Status</span>
+        <span class="view-case-detail-value">
+          {% if case.case_status == 'Open' %}
+          <span class="view-case-status-badge view-case-status-open">{{ case.case_status }}</span>
+          {% elif case.case_status == 'Pending Admin Approval' %}
+          <span class="view-case-status-badge view-case-status-pending">{{ case.case_status }}</span>
+          {% elif case.case_status == 'Under Review' %}
+          <span class="view-case-status-badge view-case-status-under">{{ case.case_status }}</span>
+          {% elif case.case_status == 'Closed' %}
+          <span class="view-case-status-badge view-case-status-closed">{{ case.case_status }}</span>
+          {% elif case.case_status == 'Archived' %}
+          <span class="view-case-status-badge view-case-status-archived">{{ case.case_status }}</span>
+          {% elif case.case_status == 'Invalid' %}
+          <span class="view-case-status-badge view-case-status-invalid">{{ case.case_status }}</span>
+          {% elif case.case_status == 'Withdrawn' %}
+          <span class="view-case-status-badge view-case-status-withdrawn">{{ case.case_status }}</span>
+          {% else %}
+          <span class="view-case-status-badge">{{ case.case_status }}</span>
+          {% endif %}
+        </span>
+      </div>
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">Priority</span>
+        <span class="view-case-detail-value">
+          {% if case.case_priority == 'low' %}
+          <span class="view-case-priority-badge view-case-priority-low">{{ case.get_case_priority_display }}</span>
+          {% elif case.case_priority == 'medium' %}
+          <span class="view-case-priority-badge view-case-priority-medium">{{ case.get_case_priority_display }}</span>
+          {% elif case.case_priority == 'high' %}
+          <span class="view-case-priority-badge view-case-priority-high">{{ case.get_case_priority_display }}</span>
+          {% elif case.case_priority == 'critical' %}
+          <span class="view-case-priority-badge view-case-priority-critical">{{ case.get_case_priority_display }}</span>
+          {% endif %}
+        </span>
+      </div>
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">Category</span>
+        <span class="view-case-detail-value">{{ case.get_category }}</span>
+      </div>
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">Assigned Investigators</span>
+        <span class="view-case-detail-value">
+          {% if case.assigned_investigators.all %}
+          <div class="view-case-investigators-list">
+            {% for inv in case.assigned_investigators.all %}
+            <span class="view-case-investigator-tag">{{ inv.get_full_name }}</span>
+            {% endfor %}
+          </div>
+          {% else %}
+          <span style="color: #94a3b8;">None assigned</span>
+          {% endif %}
+        </span>
+      </div>
+    </div>
+
+    {% if case.close_reason %}
+    <div style="margin-top: 20px;">
+      <span class="view-case-detail-label">Close Reason:</span>
+      <p style="margin-top: 8px; color: #475569; line-height: 1.6;">{{ case.close_reason }}</p>
+    </div>
     {% endif %}
-  {% endfor %}
-  <hr>
-  <h4>Assign New Investigators</h4>
-  <form method="post">
-    {% csrf_token %}
-    <input type="hidden" name="action" value="assign_direct">
-    <label for="direct_investigators">Select Investigators:</label><br>
-    <select name="direct_investigators" id="direct_investigators" multiple>
-      {% for user_obj in investigators %}
-      <option value="{{ user_obj.id }}">{{ user_obj.get_full_name }}</option>
-      {% endfor %}
-    </select><br>
-    <button type="submit">Assign Directly</button>
-  </form>
-{% endif %}
 
-{% if case.closure_requested %}
-  {% if request.user == case.created_by and not case.closure_creator_approved %}
-    <a href="{% url 'cases:admin_approve_case_closure' case.id %}">Approve Closure (Creator)</a> |
+    {% if case.invalid_reason %}
+    <div style="margin-top: 20px;">
+      <span class="view-case-detail-label">Invalid Reason:</span>
+      <p style="margin-top: 8px; color: #475569; line-height: 1.6;">{{ case.invalid_reason }}</p>
+    </div>
+    {% endif %}
+
+    {% if case.withdraw_reason %}
+    <div style="margin-top: 20px;">
+      <span class="view-case-detail-label">Withdraw Reason:</span>
+      <p style="margin-top: 8px; color: #475569; line-height: 1.6;">{{ case.withdraw_reason }}</p>
+    </div>
+    {% endif %}
+
+    {% if case.closure_requested %}
+    <div class="view-case-closure-info">
+      <div class="view-case-closure-info-title">Closure Requested</div>
+      <div class="view-case-closure-info-item">Creator Approved: {{ case.closure_creator_approved|yesno:"Yes,No" }}</div>
+      <div class="view-case-closure-info-item">Admin Approved: {{ case.closure_approved|yesno:"Yes,No" }}</div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="view-case-section">
+    <h2 class="view-case-section-title">Description</h2>
+    <div class="view-case-description">{{ case.get_description }}</div>
+  </div>
+
+  <div class="view-case-section">
+    <h2 class="view-case-section-title">Media</h2>
+    {% if media_files %}
+    <div class="view-case-media-list">
+      {% for media in media_files %}
+      <div class="view-case-media-item">
+        <div class="view-case-media-info">
+          <div class="view-case-media-description">{{ media.description }}</div>
+          <div class="view-case-media-type">{{ media.get_media_type_display }}</div>
+        </div>
+        <div class="view-case-media-actions">
+          <a href="{% url 'cases:view_media' media.id %}" class="view-case-media-link view-case-media-link-primary">Download</a>
+          {% if case.case_status not in 'Closed,Archived,Withdrawn,Invalid' %}
+          <a href="{% url 'cases:edit_media_description' media.id %}" class="view-case-media-link view-case-media-link-secondary">Edit</a>
+          <a href="{% url 'cases:mark_media_invalid' media.id %}" class="view-case-media-link view-case-media-link-danger">Mark Invalid</a>
+          {% endif %}
+          <a href="{% url 'cases:view_media_audit_log' media.id %}" class="view-case-media-link view-case-media-link-secondary">Audit Log</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="view-case-empty-media">
+      No media uploaded for this case.
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="view-case-section">
+    <h2 class="view-case-section-title">Actions</h2>
+    <div class="view-case-actions">
+      {% if user.role == 'regular_user' and not is_superuser %}
+        {% if case.case_status == 'Open' or case.case_status == 'Under Review' %}
+        <a href="{% url 'cases:edit_case' case.id %}" class="view-case-action-btn view-case-action-primary">Edit Case</a>
+        {% endif %}
+        {% if not case.closure_requested %}
+        <a href="{% url 'cases:request_case_closure' case.id %}" class="view-case-action-btn view-case-action-warning">Request Closure</a>
+        {% endif %}
+      {% else %}
+        {% if case.case_status not in 'Closed,Archived,Withdrawn,Invalid' %}
+        <a href="{% url 'cases:upload_media' case.id %}" class="view-case-action-btn view-case-action-primary">Upload Media</a>
+        {% endif %}
+        {% if case.case_status == 'Open' or case.case_status == 'Under Review' %}
+        <a href="{% url 'cases:edit_case' case.id %}" class="view-case-action-btn view-case-action-secondary">Edit Case</a>
+        <a href="{% url 'cases:assign_investigators' case.id %}" class="view-case-action-btn view-case-action-secondary">Assign Investigators</a>
+        {% if not case.closure_requested %}
+        <a href="{% url 'cases:request_case_closure' case.id %}" class="view-case-action-btn view-case-action-warning">Request Closure</a>
+        {% endif %}
+        <a href="{% url 'cases:close_case' case.id %}" class="view-case-action-btn view-case-action-danger">Close Case</a>
+        <a href="{% url 'cases:withdraw_case' case.id %}" class="view-case-action-btn view-case-action-danger">Withdraw Case</a>
+        <a href="{% url 'cases:invalidate_case' case.id %}" class="view-case-action-btn view-case-action-danger">Mark Invalid</a>
+        {% endif %}
+        {% if case.case_status == 'Closed' %}
+        <a href="{% url 'cases:archive_case' case.id %}" class="view-case-action-btn view-case-action-secondary">Archive Case</a>
+        {% endif %}
+      {% endif %}
+      <a href="{% url 'cases:view_case_audit_log' case.id %}" class="view-case-action-btn view-case-action-secondary">Case Audit Log</a>
+      <a href="{% url 'cases:case_list' %}" class="view-case-action-btn view-case-action-secondary">Back to Cases</a>
+    </div>
+  </div>
+
+  {% if case.case_status == 'Pending Admin Approval' and request.user.is_staff %}
+  <div class="view-case-section">
+    <h2 class="view-case-section-title">Pending Investigator Assignment</h2>
+    {% for req in case.assignment_requests.all %}
+      {% if req.status == 'pending_admin' %}
+      <div style="margin-bottom: 16px; padding: 16px; background: #f8fafc; border-radius: 8px;">
+        <p style="margin-bottom: 8px;"><strong>Proposed by:</strong> {{ req.requested_by.get_full_name }}</p>
+        <p style="margin-bottom: 8px;"><strong>Proposed Investigators:</strong> {% for u in req.assigned_users.all %}{{ u.get_full_name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+        <p style="margin-bottom: 12px;"><strong>Notes:</strong> {{ req.notes }}</p>
+        <form method="post" style="display:inline;">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="approve">
+          <input type="hidden" name="request_id" value="{{ req.id }}">
+          <button type="submit" class="view-case-action-btn view-case-action-primary">Approve Assignment</button>
+        </form>
+        <form method="post" style="display:inline;">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="reject">
+          <input type="hidden" name="request_id" value="{{ req.id }}">
+          <button type="submit" class="view-case-action-btn view-case-action-danger">Reject Assignment</button>
+        </form>
+      </div>
+      {% endif %}
+    {% endfor %}
+    <hr style="margin: 20px 0; border: none; border-top: 1px solid #e2e8f0;">
+    <h3 style="margin-bottom: 12px; font-size: 16px; font-weight: 600; color: #1e293b;">Assign New Investigators</h3>
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="assign_direct">
+      <label for="direct_investigators" style="display: block; margin-bottom: 8px; font-weight: 500; color: #475569;">Select Investigators:</label>
+      <select name="direct_investigators" id="direct_investigators" multiple style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; min-height: 120px;">
+        {% for user_obj in investigators %}
+        <option value="{{ user_obj.id }}">{{ user_obj.get_full_name }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="view-case-action-btn view-case-action-primary" style="margin-top: 12px;">Assign Directly</button>
+    </form>
+  </div>
   {% endif %}
-  {% if request.user.is_staff and not case.closure_approved %}
-    <a href="{% url 'cases:admin_approve_case_closure' case.id %}">Approve Closure (Admin)</a> |
+
+  {% if case.closure_requested %}
+  <div class="view-case-section">
+    <h2 class="view-case-section-title">Closure Approval</h2>
+    {% if request.user == case.created_by and not case.closure_creator_approved %}
+    <a href="{% url 'cases:admin_approve_case_closure' case.id %}" class="view-case-action-btn view-case-action-primary">Approve Closure (Creator)</a>
+    {% endif %}
+    {% if request.user.is_staff and not case.closure_approved %}
+    <a href="{% url 'cases:admin_approve_case_closure' case.id %}" class="view-case-action-btn view-case-action-primary">Approve Closure (Admin)</a>
+    {% endif %}
+  </div>
   {% endif %}
-{% endif %}
-<a href="{% url 'cases:view_case_audit_log' case.id %}">Case Audit Log</a> |
-<a href="{% url 'cases:case_list' %}">Back to Cases</a>
+</div>
 {% endblock %}
