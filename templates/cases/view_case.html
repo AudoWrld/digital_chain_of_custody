@@ -118,7 +118,7 @@
   </div>
 
   <div class="view-case-section">
-    <h2 class="view-case-section-title">Media</h2>
+    <h2 class="view-case-section-title">Evidence</h2>
     {% if media_files %}
     <div class="view-case-media-list">
       {% for media in media_files %}
@@ -126,6 +126,22 @@
         <div class="view-case-media-info">
           <div class="view-case-media-description">{{ media.description }}</div>
           <div class="view-case-media-type">{{ media.get_media_type_display }}</div>
+          <div class="view-case-media-hash" style="font-size: 12px; color: #64748b; margin-top: 4px; word-break: break-all;">
+            SHA-256: {{ media.sha256_hash }}
+          </div>
+          <div class="view-case-media-status" style="font-size: 12px; margin-top: 4px;">
+            Status:
+            {% if media.media_status == 'Valid' %}
+              <span style="color: #10b981;">{{ media.media_status }}</span>
+            {% elif media.media_status == 'Invalid' %}
+              <span style="color: #ef4444;">{{ media.media_status }}</span>
+            {% else %}
+              <span>{{ media.media_status }}</span>
+            {% endif %}
+            {% if media.is_immutable %}
+              <span style="color: #64748b; margin-left: 8px;">(Immutable)</span>
+            {% endif %}
+          </div>
         </div>
         <div class="view-case-media-actions">
           <a href="{% url 'cases:view_media' media.id %}" class="view-case-media-link view-case-media-link-primary">Download</a>
@@ -140,7 +156,7 @@
     </div>
     {% else %}
     <div class="view-case-empty-media">
-      No media uploaded for this case.
+      No evidence uploaded for this case.
     </div>
     {% endif %}
   </div>
@@ -155,9 +171,16 @@
         {% if not case.closure_requested %}
         <a href="{% url 'cases:request_case_closure' case.id %}" class="view-case-action-btn view-case-action-warning">Request Closure</a>
         {% endif %}
+      {% elif user.role == 'investigator' %}
+        {% if case.case_status not in 'Closed,Archived,Withdrawn,Invalid' %}
+        <a href="{% url 'cases:upload_media' case.id %}" class="view-case-action-btn view-case-action-primary">Upload Evidence</a>
+        {% endif %}
+        {% if case.case_status == 'Open' or case.case_status == 'Under Review' %}
+        <a href="{% url 'cases:edit_case' case.id %}" class="view-case-action-btn view-case-action-secondary">Edit Case</a>
+        {% endif %}
       {% else %}
         {% if case.case_status not in 'Closed,Archived,Withdrawn,Invalid' %}
-        <a href="{% url 'cases:upload_media' case.id %}" class="view-case-action-btn view-case-action-primary">Upload Media</a>
+        <a href="{% url 'cases:upload_media' case.id %}" class="view-case-action-btn view-case-action-primary">Upload Evidence</a>
         {% endif %}
         {% if case.case_status == 'Open' or case.case_status == 'Under Review' %}
         <a href="{% url 'cases:edit_case' case.id %}" class="view-case-action-btn view-case-action-secondary">Edit Case</a>
