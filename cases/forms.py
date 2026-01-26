@@ -1,4 +1,4 @@
-from .models import Case, CaseMedia
+from .models import Case
 from django import forms
 from django.contrib.auth import get_user_model
 
@@ -129,22 +129,6 @@ class EditCaseForm(forms.ModelForm):
             ]
             for field in fields_to_remove:
                 self.fields.pop(field, None)
-
-
-class CaseMediaForm(forms.ModelForm):
-    description_text = forms.CharField(max_length=255)
-
-    class Meta:
-        model = CaseMedia
-        fields = ["media", "media_type"]
-
-    def save(self, commit=True):
-        media = super().save(commit=False)
-        media.description = self.cleaned_data["description_text"]
-
-        if commit:
-            media.save()
-        return media
 
 
 class AssignInvestigatorForm(forms.ModelForm):

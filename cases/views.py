@@ -2,11 +2,11 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseForbidden, FileResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.core.files.base import ContentFile
 from django.db.models import Q
 from django.utils import timezone
-from .models import Case, CaseMedia, EncryptionKey, CaseAuditLog, AssignmentRequest
-from .forms import CaseForm, CaseMediaForm, EditCaseForm
+from .models import Case, CaseAuditLog, AssignmentRequest
+from evidence.models import Evidence
+from .forms import CaseForm, EditCaseForm
 from .permissions import regular_user_required, role_required
 import csv
 from django.contrib.auth import get_user_model
@@ -21,15 +21,15 @@ def case_list(request):
     if request.user.is_superuser:
         cases = Case.objects.all().select_related("encryption_key")
         is_superuser = True
-    elif request.user.role == 'regular_user':
-        cases = Case.objects.filter(
-            created_by=request.user
-        ).select_related("encryption_key")
+    elif request.user.role == "regular_user":
+        cases = Case.objects.filter(created_by=request.user).select_related(
+            "encryption_key"
+        )
         is_superuser = False
-    elif request.user.role == 'investigator':
-        cases = Case.objects.filter(
-            assigned_investigators=request.user
-        ).select_related("encryption_key")
+    elif request.user.role == "investigator":
+        cases = Case.objects.filter(assigned_investigators=request.user).select_related(
+            "encryption_key"
+        )
         is_superuser = False
     else:
         return HttpResponseForbidden("You do not have permission to view cases.")
@@ -44,16 +44,18 @@ def assigned_cases(request):
     if request.user.is_superuser:
         cases = Case.objects.all().select_related("encryption_key")
         is_superuser = True
-    elif request.user.role == 'investigator':
-        cases = Case.objects.filter(
-            assigned_investigators=request.user
-        ).select_related("encryption_key")
+    elif request.user.role == "investigator":
+        cases = Case.objects.filter(assigned_investigators=request.user).select_related(
+            "encryption_key"
+        )
         is_superuser = False
     else:
         return HttpResponseForbidden("Only investigators can view assigned cases.")
 
     return render(
-        request, "cases/assigned_cases.html", {"cases": cases, "is_superuser": is_superuser}
+        request,
+        "cases/assigned_cases.html",
+        {"cases": cases, "is_superuser": is_superuser},
     )
 
 
@@ -170,10 +172,10 @@ def edit_case(request, case_id):
 
     if request.user.is_superuser:
         pass
-    elif request.user.role == 'regular_user':
+    elif request.user.role == "regular_user":
         if request.user != case.created_by:
             return HttpResponseForbidden("You can only edit your own cases.")
-    elif request.user.role == 'investigator':
+    elif request.user.role == "investigator":
         if request.user not in case.assigned_investigators.all():
             return HttpResponseForbidden("You can only edit cases assigned to you.")
     else:
@@ -541,38 +543,40 @@ def upload_media(request, case_id):
         )
 
     if request.method == "POST":
-        form = CaseMediaForm(request.POST, request.FILES)
-        if form.is_valid():
-            media = form.save(commit=False)
-            media.case = case
-            media.save()
+        media_file = request.FILES.get("media")
+        description = request.POST.get("description")
+        media_type = request.POST.get("media_type")
+
+        if media_file and description and media_type:
+            evidence = Evidence.objects.create(
+                case=case,
+                media=media_file,
+                description=description,
+                media_type=media_type,
+                uploaded_by=request.user,
+            )
 
             try:
                 CaseAuditLog.log_action(
                     user=request.user,
                     case=case,
                     action="Uploaded media",
-                    details=f"File: {media.media.name}, Type: {media.media_type}, Description: {media.description}",
+                    details=f"File: {evidence.media.name}, Type: {evidence.media_type}, Description: {evidence.description}",
                 )
             except Exception as e:
                 logger.error(f"Failed to log media upload for case {case.id}: {e}")
             return redirect("cases:view_case", case_id=case.id)
 
-    else:
-        form = CaseMediaForm()
-
-    return render(request, "cases/upload_media.html", {"form": form, "case": case})
+    return render(request, "cases/upload_media.html", {"case": case})
 
 
 @login_required
 def view_media(request, media_id):
-    media = get_object_or_404(CaseMedia, id=media_id)
+    media = get_object_or_404(Evidence, id=media_id)
     case = media.case
 
     if request.user != case.created_by and not request.user.is_staff:
         return HttpResponseForbidden("Your are not authorized to access this evidence")
-
-    decrypted_file = media.download_decrypted()
 
     try:
         CaseAuditLog.log_action(
@@ -584,14 +588,14 @@ def view_media(request, media_id):
     except Exception as e:
         logger.error(f"Failed to log media view for case {case.id}: {e}")
 
-    response = FileResponse(decrypted_file, content_type="application/octet-stream")
-    response["Content-Disposition"] = f'inline; filename="{decrypted_file.name}"'
+    response = FileResponse(media.media, content_type="application/octet-stream")
+    response["Content-Disposition"] = f'inline; filename="{media.media.name}"'
     return response
 
 
 @login_required
 def edit_media_description(request, media_id):
-    media = get_object_or_404(CaseMedia, id=media_id)
+    media = get_object_or_404(Evidence, id=media_id)
     case = media.case
 
     if case.case_status in ["Closed", "Archived", "Withdrawn", "Invalid"]:
@@ -620,7 +624,7 @@ def edit_media_description(request, media_id):
 
 @login_required
 def mark_media_invalid(request, media_id):
-    media = get_object_or_404(CaseMedia, id=media_id)
+    media = get_object_or_404(Evidence, id=media_id)
     case = media.case
     if request.user != case.created_by and not request.user.is_staff:
         return HttpResponseForbidden("Not authorized to mark this media invalid.")
@@ -706,7 +710,7 @@ def download_case_audit_log(request, case_id):
 
 @login_required
 def view_media_audit_log(request, media_id):
-    media = get_object_or_404(CaseMedia, id=media_id)
+    media = get_object_or_404(Evidence, id=media_id)
     case = media.case
 
     if request.user != case.created_by and not request.user.is_staff:
@@ -728,7 +732,7 @@ def view_media_audit_log(request, media_id):
 
 @login_required
 def download_media_audit_log(request, media_id):
-    media = get_object_or_404(CaseMedia, id=media_id)
+    media = get_object_or_404(Evidence, id=media_id)
     case = media.case
 
     if request.user != case.created_by and not request.user.is_staff:
