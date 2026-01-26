@@ -53,16 +53,26 @@ class Case(models.Model):
     ('critical', 'Critical'),
 ]
     CASE_CATEGORIES = [
-        ('Murder','Murder'),
-        ('Theft','Theft'),
-        ('SexualAbuse','SexualAbuse'),
-        ('Bullying','Bullying'),
-        
+        ('Homicide', 'Homicide'),
+        ('Assault and Violence', 'Assault and Violence'),
+        ('Sexual Offenses', 'Sexual Offenses'),
+        ('Theft and Property Crimes', 'Theft and Property Crimes'),
+        ('Fraud and Financial Crimes', 'Fraud and Financial Crimes'),
+        ('Drug Offenses', 'Drug Offenses'),
+        ('Cybercrime', 'Cybercrime'),
+        ('Domestic and Family Violence', 'Domestic and Family Violence'),
+        ('Human Trafficking', 'Human Trafficking'),
+        ('Child Abuse and Exploitation', 'Child Abuse and Exploitation'),
+        ('Elder Abuse', 'Elder Abuse'),
+        ('Public Order and Nuisance', 'Public Order and Nuisance'),
+        ('Traffic and Vehicle Offenses', 'Traffic and Vehicle Offenses'),
+        ('White Collar and Corporate Crime', 'White Collar and Corporate Crime'),
+        ('Terrorism and National Security', 'Terrorism and National Security'),
     ]
 
     case_title = models.TextField()
     case_description = models.TextField()
-    case_category = models.CharField(max_length=20, choices=CASE_CATEGORIES)
+    case_category = models.CharField(max_length=50, choices=CASE_CATEGORIES)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='cases')
     case_status = models.CharField(max_length=200, choices=STATUS_CHOICES, default='Open')
     case_status_notes = models.TextField()
