@@ -162,6 +162,7 @@ def view_case(request, case_id):
             "category": case_category,
             "media_files": media_files,
             "investigators": investigators,
+            "is_superuser": request.user.is_superuser,
         },
     )
 
