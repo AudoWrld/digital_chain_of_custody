@@ -532,9 +532,13 @@ def mark_invalid_case(request, case_id):
 @login_required
 def upload_media(request, case_id):
     case = get_object_or_404(Case, id=case_id)
-    if request.user != case.created_by or case.assigned_investigators.exists():
+    if request.user.role != 'investigator':
         return HttpResponseForbidden(
-            "You are not allowed to upload evidence in this case"
+            "Only investigators can upload evidence"
+        )
+    if request.user not in case.assigned_investigators.all():
+        return HttpResponseForbidden(
+            "You are not assigned to this case"
         )
 
     if case.case_status in ["Closed", "Archived", "Invalid"]:
@@ -575,7 +579,7 @@ def view_media(request, media_id):
     media = get_object_or_404(Evidence, id=media_id)
     case = media.case
 
-    if request.user != case.created_by and not request.user.is_staff:
+    if request.user != case.created_by and request.user not in case.assigned_investigators.all() and not request.user.is_staff:
         return HttpResponseForbidden("Your are not authorized to access this evidence")
 
     try:
@@ -588,8 +592,9 @@ def view_media(request, media_id):
     except Exception as e:
         logger.error(f"Failed to log media view for case {case.id}: {e}")
 
-    response = FileResponse(media.media, content_type="application/octet-stream")
-    response["Content-Disposition"] = f'inline; filename="{media.media.name}"'
+    decrypted_file = media.get_decrypted_file()
+    response = FileResponse(decrypted_file, content_type="application/octet-stream")
+    response["Content-Disposition"] = f'inline; filename="{decrypted_file.name}"'
     return response
 
 
@@ -601,7 +606,7 @@ def edit_media_description(request, media_id):
     if case.case_status in ["Closed", "Archived", "Withdrawn", "Invalid"]:
         return HttpResponseForbidden("Cannot edit media in a read-only case.")
 
-    if request.user != case.created_by:
+    if request.user != case.created_by and request.user not in case.assigned_investigators.all():
         return HttpResponseForbidden("Not authorized to edit case media")
 
     old_description = media.description
@@ -626,7 +631,7 @@ def edit_media_description(request, media_id):
 def mark_media_invalid(request, media_id):
     media = get_object_or_404(Evidence, id=media_id)
     case = media.case
-    if request.user != case.created_by and not request.user.is_staff:
+    if request.user != case.created_by and request.user not in case.assigned_investigators.all() and not request.user.is_staff:
         return HttpResponseForbidden("Not authorized to mark this media invalid.")
     if case.case_status in ["Closed", "Archived"]:
         return HttpResponseForbidden(
@@ -713,7 +718,7 @@ def view_media_audit_log(request, media_id):
     media = get_object_or_404(Evidence, id=media_id)
     case = media.case
 
-    if request.user != case.created_by and not request.user.is_staff:
+    if request.user != case.created_by and request.user not in case.assigned_investigators.all() and not request.user.is_staff:
         return HttpResponseForbidden("Not authorized to view this media audit log.")
     audit_logs = case.audit_logs.filter(
         Q(action__icontains=media.media.name) | Q(details__icontains=media.media.name)
@@ -735,7 +740,7 @@ def download_media_audit_log(request, media_id):
     media = get_object_or_404(Evidence, id=media_id)
     case = media.case
 
-    if request.user != case.created_by and not request.user.is_staff:
+    if request.user != case.created_by and request.user not in case.assigned_investigators.all() and not request.user.is_staff:
         return HttpResponseForbidden("Not authorized to download this media audit log.")
 
     response = HttpResponse(content_type="text/csv")
