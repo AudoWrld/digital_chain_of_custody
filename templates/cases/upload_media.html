@@ -6,9 +6,28 @@
 
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Upload</button>
+    <div style="margin-bottom: 16px;">
+        <label for="media" style="display: block; margin-bottom: 8px; font-weight: 500;">Media File:</label>
+        <input type="file" id="media" name="media" required style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px;">
+    </div>
+    <div style="margin-bottom: 16px;">
+        <label for="description" style="display: block; margin-bottom: 8px; font-weight: 500;">Description:</label>
+        <input type="text" id="description" name="description" required maxlength="255" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px;">
+    </div>
+    <div style="margin-bottom: 16px;">
+        <label for="media_type" style="display: block; margin-bottom: 8px; font-weight: 500;">Media Type:</label>
+        <select id="media_type" name="media_type" required style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px;">
+            <option value="">Select Type</option>
+            <option value="image">Image</option>
+            <option value="video">Video</option>
+            <option value="audio">Audio</option>
+            <option value="document">Document</option>
+            <option value="text">Text</option>
+            <option value="other">Other</option>
+        </select>
+    </div>
+    <button type="submit" style="padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer;">Upload</button>
 </form>
 
-<a href="{% url 'cases:view_case' case.id %}">Back to Case</a>
+<a href="{% url 'cases:view_case' case.id %}" style="display: inline-block; margin-top: 16px; padding: 10px 20px; background: #f1f5f9; color: #475569; text-decoration: none; border-radius: 8px;">Back to Case</a>
 {% endblock %}

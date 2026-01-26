@@ -191,33 +191,6 @@ class Case(models.Model):
         return self.decrypt_field(self.case_status_notes)
 
 
-class CaseMedia(models.Model):
-    MEDIA_TYPE_CHOICES = [
-        ('image', 'Image'),
-        ('video', 'Video'),
-        ('audio', 'Audio'),
-        ('document', 'Document'),
-        ('text', 'Text'),
-        ('other', 'Other'),
-    ]
-
-    MEDIA_STATUS_CHOICES = [
-        ('Valid','Valid'),
-        ('Invalid',"Invalid"),
-        ('Archived','Archived')
-    ]
-    case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name='evidence')
-    media = models.FileField(max_length=500)
-    description = models.CharField(max_length=255)
-    media_type = models.CharField(max_length=50, choices=MEDIA_TYPE_CHOICES)
-    date_uploaded = models.DateTimeField(auto_now_add=True)
-    media_status = models.CharField(max_length=20, choices=MEDIA_STATUS_CHOICES, default='Valid')
-    
-    def __str__(self):
-        title_preview = self.case.case_title[:30] + "..." if self.case.case_title and len(self.case.case_title) > 30 else self.case.case_title
-        return f"Media for Case (Encrypted: {title_preview or 'N/A'})"
-
-
 
 class AssignmentRequest(models.Model):
     STATUS_CHOICES = [
