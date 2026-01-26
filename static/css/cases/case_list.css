@@ -1,0 +1,185 @@
+.cases-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  gap: 16px;
+}
+
+.cases-page-title h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.cases-page-actions {
+  flex-shrink: 0;
+}
+
+.cases-create-btn {
+  background: #3b82f6;
+  color: #ffffff;
+  padding: 12px 24px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 14px;
+  transition: background 0.2s ease;
+  white-space: nowrap;
+  display: inline-block;
+}
+
+.cases-create-btn:hover {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.cases-table-wrapper {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+}
+
+.cases-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+}
+
+.cases-table-head {
+  background: #f8fafc;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.cases-table-header {
+  padding: 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 13px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cases-table-row {
+  border-bottom: 1px solid #e2e8f0;
+  transition: background 0.2s ease;
+}
+
+.cases-table-row:hover {
+  background: #f8fafc;
+}
+
+.cases-table-row:last-child {
+  border-bottom: none;
+}
+
+.cases-table-cell {
+  padding: 16px;
+  font-size: 14px;
+  color: #1e293b;
+}
+
+.cases-action-link {
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.cases-action-link:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.cases-action-separator {
+  color: #94a3b8;
+  margin: 0 8px;
+}
+
+.cases-status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.cases-status-open {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.cases-status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.cases-status-under {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.cases-status-closed {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.cases-status-archived {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.cases-status-invalid {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.cases-status-withdrawn {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.cases-empty-state {
+  text-align: center;
+  padding: 64px 24px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.cases-empty-state p {
+  margin: 0;
+  color: #64748b;
+  font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  .cases-page-header {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .cases-page-title h1 {
+    font-size: 24px;
+  }
+
+  .cases-create-btn {
+    padding: 10px 20px;
+    font-size: 13px;
+  }
+
+  .cases-table-header {
+    padding: 12px;
+    font-size: 12px;
+  }
+
+  .cases-table-cell {
+    padding: 12px;
+    font-size: 13px;
+  }
+}

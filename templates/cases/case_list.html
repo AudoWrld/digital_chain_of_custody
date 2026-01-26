@@ -1,42 +1,72 @@
 {% extends 'base.html' %}
 {% block title %}{% if is_superuser %}All Cases{% else %}My Cases{% endif %}{% endblock %}
-
+{% load static %}
 {% block content %}
-<h1>{% if is_superuser %}All Cases{% else %}My Cases{% endif %}</h1>
+<link rel="stylesheet" href="{% static 'css/cases/case_list.css' %}?v={{ STATIC_VERSION }}" />
 
-{% if user.role == 'regular_user' and not is_superuser %}
-<a href="{% url 'cases:create_case' %}" class="btn btn-primary">Create New Case</a>
-{% endif %}
+<div class="cases-page-header">
+  <div class="cases-page-title">
+    <h1>{% if is_superuser %}All Cases{% else %}My Cases{% endif %}</h1>
+  </div>
+  {% if user.role == 'regular_user' and not is_superuser %}
+  <div class="cases-page-actions">
+    <a href="{% url 'cases:create_case' %}" class="cases-create-btn">Create New Case</a>
+  </div>
+  {% endif %}
+</div>
 
 {% if cases %}
-<table>
-    <thead>
-        <tr>
-            <th>Title</th>
-            {% if is_superuser %}<th>Created By</th>{% endif %}
-            <th>Status</th>
-            <th>Category</th>
-            <th>Actions</th>
-        </tr>
+<div class="cases-table-wrapper">
+  <table class="cases-data-table">
+    <thead class="cases-table-head">
+      <tr>
+        <th class="cases-table-header">Title</th>
+        {% if is_superuser %}<th class="cases-table-header">Created By</th>{% endif %}
+        <th class="cases-table-header">Status</th>
+        <th class="cases-table-header">Category</th>
+        <th class="cases-table-header">Actions</th>
+      </tr>
     </thead>
-    <tbody>
-        {% for case in cases %}
-        <tr>
-            <td>{{ case.get_title }}</td>
-            {% if is_superuser %}<td>{{ case.created_by.get_full_name }}</td>{% endif %}
-            <td>{{ case.case_status }}</td>
-            <td>{{ case.get_category }}</td>
-            <td>
-                <a href="{% url 'cases:view_case' case.id %}">View</a>
-                {% if case.case_status in 'Open,Under Review' %}
-                    | <a href="{% url 'cases:edit_case' case.id %}">Edit</a>
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
+    <tbody class="cases-table-body">
+      {% for case in cases %}
+      <tr class="cases-table-row">
+        <td class="cases-table-cell">{{ case.get_title }}</td>
+        {% if is_superuser %}<td class="cases-table-cell">{{ case.created_by.get_full_name }}</td>{% endif %}
+        <td class="cases-table-cell">
+          {% if case.case_status == 'Open' %}
+          <span class="cases-status-badge cases-status-open">{{ case.case_status }}</span>
+          {% elif case.case_status == 'Pending Admin Approval' %}
+          <span class="cases-status-badge cases-status-pending">{{ case.case_status }}</span>
+          {% elif case.case_status == 'Under Review' %}
+          <span class="cases-status-badge cases-status-under">{{ case.case_status }}</span>
+          {% elif case.case_status == 'Closed' %}
+          <span class="cases-status-badge cases-status-closed">{{ case.case_status }}</span>
+          {% elif case.case_status == 'Archived' %}
+          <span class="cases-status-badge cases-status-archived">{{ case.case_status }}</span>
+          {% elif case.case_status == 'Invalid' %}
+          <span class="cases-status-badge cases-status-invalid">{{ case.case_status }}</span>
+          {% elif case.case_status == 'Withdrawn' %}
+          <span class="cases-status-badge cases-status-withdrawn">{{ case.case_status }}</span>
+          {% else %}
+          <span class="cases-status-badge">{{ case.case_status }}</span>
+          {% endif %}
+        </td>
+        <td class="cases-table-cell">{{ case.get_category }}</td>
+        <td class="cases-table-cell">
+          <a href="{% url 'cases:view_case' case.id %}" class="cases-action-link">View</a>
+          {% if case.case_status in 'Open,Under Review' %}
+          <span class="cases-action-separator">|</span>
+          <a href="{% url 'cases:edit_case' case.id %}" class="cases-action-link">Edit</a>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
     </tbody>
-</table>
+  </table>
+</div>
 {% else %}
-<p>No cases available.</p>
+<div class="cases-empty-state">
+  <p>No cases available.</p>
+</div>
 {% endif %}
 {% endblock %}
