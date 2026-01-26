@@ -56,7 +56,7 @@
             {% if user.is_superuser %}
             Admin
             {% else %}
-            {{ user.role }}
+            {{ user.get_role_display }}
             {% endif %}
           </div>
         </div>
