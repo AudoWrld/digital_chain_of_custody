@@ -176,9 +176,13 @@ def edit_case(request, case_id):
     elif request.user.role == "regular_user":
         if request.user != case.created_by:
             return HttpResponseForbidden("You can only edit your own cases.")
+        if case.case_status == "Pending Admin Approval":
+            return HttpResponseForbidden("Cannot edit case while pending admin approval.")
     elif request.user.role == "investigator":
         if request.user not in case.assigned_investigators.all():
             return HttpResponseForbidden("You can only edit cases assigned to you.")
+        if case.case_status == "Pending Admin Approval":
+            return HttpResponseForbidden("Cannot edit case while pending admin approval.")
     else:
         return HttpResponseForbidden("You do not have permission to edit cases.")
 
@@ -306,7 +310,7 @@ def assign_investigator(request, case_id):
                 request_obj.approved_at = timezone.now()
                 request_obj.save()
                 case.assigned_investigators.set(request_obj.assigned_users.all())
-                case.case_status = "Under Review"
+                case.case_status = "Approved & Assigned"
                 case.save()
                 CaseAuditLog.log_action(
                     user=request.user,
@@ -334,6 +338,8 @@ def assign_investigator(request, case_id):
                 return HttpResponseForbidden("Only admins can assign.")
             investigators = request.POST.getlist("direct_investigators")
             case.assigned_investigators.set(investigators)
+            if case.case_status == "Open":
+                case.case_status = "Approved & Assigned"
             case.save()
             CaseAuditLog.log_action(
                 user=request.user,
@@ -341,9 +347,24 @@ def assign_investigator(request, case_id):
                 action="Directly assigned investigators",
                 details=f"Investigators: {[u.username for u in case.assigned_investigators.all()]}",
             )
+        elif action == "remove_investigator":
+            if not request.user.is_staff:
+                return HttpResponseForbidden("Only admins can remove investigators.")
+            investigator_id = request.POST.get("investigator_id")
+            try:
+                investigator = User.objects.get(id=investigator_id)
+                case.assigned_investigators.remove(investigator)
+                CaseAuditLog.log_action(
+                    user=request.user,
+                    case=case,
+                    action="Removed investigator",
+                    details=f"Investigator: {investigator.username}",
+                )
+            except User.DoesNotExist:
+                pass
         return redirect("cases:assign_investigators", case_id=case.id)
 
-    users = User.objects.filter(role="investigator", is_active=True, verified=True)
+    users = User.objects.filter(role="investigator", is_active=True, verified=True).exclude(id__in=case.assigned_investigators.all())
     pending_requests = case.assignment_requests.filter(status__in=["pending_admin"])
 
     return render(

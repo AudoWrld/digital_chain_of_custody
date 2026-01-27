@@ -5,6 +5,77 @@
 {% block extra_css %}
 {% load static %}
 <link rel="stylesheet" href="{% static 'css/cases/create_case.css' %}">
+<style>
+.assigned-investigators {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+.assigned-investigators h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #374151;
+    margin: 0 0 0.75rem 0;
+}
+
+.investigator-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.investigator-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.75rem;
+    background-color: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+}
+
+.investigator-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.investigator-name {
+    font-weight: 500;
+    color: #111827;
+}
+
+.investigator-email {
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.btn-remove {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #dc2626;
+    background-color: #ffffff;
+    border: 1px solid #dc2626;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.btn-remove:hover {
+    background-color: #dc2626;
+    color: #ffffff;
+}
+
+.no-investigators {
+    color: #6b7280;
+    font-style: italic;
+    font-size: 0.875rem;
+}
+</style>
 {% endblock %}
 
 {% block content %}
@@ -13,6 +84,33 @@
         <div class="create-case-header">
             <h2>Assign Investigators</h2>
         </div>
+
+        {% if assigned %}
+        <div class="assigned-investigators">
+            <h3>Currently Assigned Investigators</h3>
+            <div class="investigator-list">
+                {% for investigator in assigned %}
+                <div class="investigator-item">
+                    <div class="investigator-info">
+                        <span class="investigator-name">{{ investigator.get_full_name }}</span>
+                        <span class="investigator-email">({{ investigator.email }})</span>
+                    </div>
+                    <form method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="remove_investigator">
+                        <input type="hidden" name="investigator_id" value="{{ investigator.id }}">
+                        <button type="submit" class="btn-remove">Remove</button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="assigned-investigators">
+            <h3>Currently Assigned Investigators</h3>
+            <p class="no-investigators">No investigators assigned yet.</p>
+        </div>
+        {% endif %}
 
         <form method="post">
             {% csrf_token %}

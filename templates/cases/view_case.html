@@ -33,6 +33,8 @@
           <span class="view-case-status-badge view-case-status-open">{{ case.case_status }}</span>
           {% elif case.case_status == 'Pending Admin Approval' %}
           <span class="view-case-status-badge view-case-status-pending">{{ case.case_status }}</span>
+          {% elif case.case_status == 'Approved & Assigned' %}
+          <span class="view-case-status-badge view-case-status-approved">{{ case.case_status }}</span>
           {% elif case.case_status == 'Under Review' %}
           <span class="view-case-status-badge view-case-status-under">{{ case.case_status }}</span>
           {% elif case.case_status == 'Closed' %}
@@ -170,8 +172,10 @@
         <a href="{% url 'cases:view_case_audit_log' case.id %}" class="view-case-action-btn view-case-action-secondary">Case Audit Log</a>
         <a href="{% url 'cases:case_list' %}" class="view-case-action-btn view-case-action-secondary">Back to Cases</a>
       {% elif user.role == 'regular_user' and not is_superuser %}
-        {% if case.case_status == 'Open' or case.case_status == 'Under Review' %}
+        {% if case.case_status == 'Open' %}
         <a href="{% url 'cases:edit_case' case.id %}" class="view-case-action-btn view-case-action-primary">Edit Case</a>
+        {% else %}
+        <span class="view-case-action-disabled">Case editing disabled - case has moved past Open status</span>
         {% endif %}
         {% if not case.closure_requested %}
         <a href="{% url 'cases:request_case_closure' case.id %}" class="view-case-action-btn view-case-action-warning">Request Closure</a>
@@ -181,7 +185,7 @@
         {% if case.case_status not in 'Closed,Archived,Withdrawn,Invalid' %}
         <a href="{% url 'cases:upload_media' case.id %}" class="view-case-action-btn view-case-action-primary">Upload Evidence</a>
         {% endif %}
-        {% if case.case_status == 'Open' or case.case_status == 'Under Review' %}
+        {% if case.case_status == 'Open' %}
         <a href="{% url 'cases:edit_case' case.id %}" class="view-case-action-btn view-case-action-secondary">Edit Case</a>
         {% endif %}
         <a href="{% url 'cases:case_list' %}" class="view-case-action-btn view-case-action-secondary">Back to Cases</a>
@@ -189,7 +193,7 @@
         {% if case.case_status not in 'Closed,Archived,Withdrawn,Invalid' %}
         <a href="{% url 'cases:upload_media' case.id %}" class="view-case-action-btn view-case-action-primary">Upload Evidence</a>
         {% endif %}
-        {% if case.case_status == 'Open' or case.case_status == 'Under Review' %}
+        {% if case.case_status == 'Open' %}
         <a href="{% url 'cases:edit_case' case.id %}" class="view-case-action-btn view-case-action-secondary">Edit Case</a>
         <a href="{% url 'cases:assign_investigators' case.id %}" class="view-case-action-btn view-case-action-secondary">Assign Investigators</a>
         {% if not case.closure_requested %}
