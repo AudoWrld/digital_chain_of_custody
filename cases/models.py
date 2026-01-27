@@ -11,7 +11,9 @@ import hashlib
 
 
 class EncryptionKey(models.Model):
-    case = models.OneToOneField('Case', on_delete=models.CASCADE, related_name='encryption_key', unique=True)
+    case = models.OneToOneField(
+        "Case", on_delete=models.CASCADE, related_name="encryption_key", unique=True
+    )
     key = models.BinaryField(editable=False)
     iv = models.BinaryField(null=True, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -24,9 +26,7 @@ class EncryptionKey(models.Model):
 
     def get_cipher(self):
         cipher = Cipher(
-            algorithms.AES(self.key),
-            modes.CBC(self.iv),
-            backend=default_backend()
+            algorithms.AES(self.key), modes.CBC(self.iv), backend=default_backend()
         )
         return cipher
 
@@ -36,45 +36,49 @@ class EncryptionKey(models.Model):
 
 class Case(models.Model):
     STATUS_CHOICES = [
-    ('Open', 'Open'),
-    ('Pending Admin Approval', 'Pending Admin Approval'),
-    ('Under Review', 'Under Review'),
-    ('Closed', 'Closed'),
-    ('Archived', 'Archived'),
-    ('Invalid', 'Invalid'),
-    ('Withdrawn','Withdrawn'),
+        ("Open", "Open"),
+        ("Pending Admin Approval", "Pending Admin Approval"),
+        ("Approved & Assigned", "Approved & Assigned"),
+        ("Under Review", "Under Review"),
+        ("Closed", "Closed"),
+        ("Archived", "Archived"),
+        ("Invalid", "Invalid"),
+        ("Withdrawn", "Withdrawn"),
     ]
 
-
     PRIORITY_CHOICES = [
-    ('low', 'Low'),
-    ('medium', 'Medium'),
-    ('high', 'High'),
-    ('critical', 'Critical'),
-]
+        ("low", "Low"),
+        ("medium", "Medium"),
+        ("high", "High"),
+        ("critical", "Critical"),
+    ]
     CASE_CATEGORIES = [
-        ('Homicide', 'Homicide'),
-        ('Assault and Violence', 'Assault and Violence'),
-        ('Sexual Offenses', 'Sexual Offenses'),
-        ('Theft and Property Crimes', 'Theft and Property Crimes'),
-        ('Fraud and Financial Crimes', 'Fraud and Financial Crimes'),
-        ('Drug Offenses', 'Drug Offenses'),
-        ('Cybercrime', 'Cybercrime'),
-        ('Domestic and Family Violence', 'Domestic and Family Violence'),
-        ('Human Trafficking', 'Human Trafficking'),
-        ('Child Abuse and Exploitation', 'Child Abuse and Exploitation'),
-        ('Elder Abuse', 'Elder Abuse'),
-        ('Public Order and Nuisance', 'Public Order and Nuisance'),
-        ('Traffic and Vehicle Offenses', 'Traffic and Vehicle Offenses'),
-        ('White Collar and Corporate Crime', 'White Collar and Corporate Crime'),
-        ('Terrorism and National Security', 'Terrorism and National Security'),
+        ("Homicide", "Homicide"),
+        ("Assault and Violence", "Assault and Violence"),
+        ("Sexual Offenses", "Sexual Offenses"),
+        ("Theft and Property Crimes", "Theft and Property Crimes"),
+        ("Fraud and Financial Crimes", "Fraud and Financial Crimes"),
+        ("Drug Offenses", "Drug Offenses"),
+        ("Cybercrime", "Cybercrime"),
+        ("Domestic and Family Violence", "Domestic and Family Violence"),
+        ("Human Trafficking", "Human Trafficking"),
+        ("Child Abuse and Exploitation", "Child Abuse and Exploitation"),
+        ("Elder Abuse", "Elder Abuse"),
+        ("Public Order and Nuisance", "Public Order and Nuisance"),
+        ("Traffic and Vehicle Offenses", "Traffic and Vehicle Offenses"),
+        ("White Collar and Corporate Crime", "White Collar and Corporate Crime"),
+        ("Terrorism and National Security", "Terrorism and National Security"),
     ]
 
     case_title = models.TextField()
     case_description = models.TextField()
     case_category = models.CharField(max_length=50, choices=CASE_CATEGORIES)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='cases')
-    case_status = models.CharField(max_length=200, choices=STATUS_CHOICES, default='Open')
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="cases"
+    )
+    case_status = models.CharField(
+        max_length=200, choices=STATUS_CHOICES, default="Open"
+    )
     case_status_notes = models.TextField()
     date_created = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)
@@ -83,14 +87,20 @@ class Case(models.Model):
     close_reason = models.TextField(blank=True, null=True)
     closure_approved = models.BooleanField(default=False)
     closure_creator_approved = models.BooleanField(default=False)
-    case_priority = models.CharField(max_length=10,choices=PRIORITY_CHOICES,default='medium')
-    assigned_investigators = models.ManyToManyField(settings.AUTH_USER_MODEL,related_name='assigned_cases',blank=True)
+    case_priority = models.CharField(
+        max_length=10, choices=PRIORITY_CHOICES, default="medium"
+    )
+    assigned_investigators = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, related_name="assigned_cases", blank=True
+    )
     closure_requested = models.BooleanField(default=False)
 
-
-
     def __str__(self):
-        title_preview = self.case_title[:30] + "..." if self.case_title and len(self.case_title) > 30 else self.case_title
+        title_preview = (
+            self.case_title[:30] + "..."
+            if self.case_title and len(self.case_title) > 30
+            else self.case_title
+        )
         return f"Case (Encrypted: {title_preview or 'N/A'}) - {self.case_status}"
 
     def _pad_data(self, data):
@@ -109,21 +119,21 @@ class Case(models.Model):
         cipher = self.encryption_key.get_cipher()
         encryptor = cipher.encryptor()
 
-        data = value.encode('utf-8')
+        data = value.encode("utf-8")
         padded_data = self._pad_data(data)
         encrypted_bytes = encryptor.update(padded_data) + encryptor.finalize()
-        
+
         return base64.b64encode(encrypted_bytes).decode()
 
     def encrypt_field_with_cipher(self, value, cipher):
         if value is None or value == "":
             return None
         encryptor = cipher.encryptor()
-        
-        data = value.encode('utf-8')
+
+        data = value.encode("utf-8")
         padded_data = self._pad_data(data)
         encrypted_bytes = encryptor.update(padded_data) + encryptor.finalize()
-        
+
         return base64.b64encode(encrypted_bytes).decode()
 
     def decrypt_field(self, encrypted_value):
@@ -132,21 +142,21 @@ class Case(models.Model):
         try:
             cipher = self.encryption_key.get_cipher()
             decryptor = cipher.decryptor()
-            
+
             encrypted_bytes = base64.b64decode(encrypted_value)
             padded_data = decryptor.update(encrypted_bytes) + decryptor.finalize()
             data = self._unpad_data(padded_data)
-            
-            return data.decode('utf-8')
+
+            return data.decode("utf-8")
         except Exception as e:
             import logging
+
             logger = logging.getLogger(__name__)
             logger.error(f"Decryption failed for Case ID {self.id}: {e}")
             return encrypted_value  # Return the encrypted value if decryption fails
 
-
     def encrypt_fields(self):
-        if hasattr(self, 'encryption_key'):
+        if hasattr(self, "encryption_key"):
             cipher = self.encryption_key.get_cipher()
         else:
             self._temp_key = os.urandom(32)
@@ -154,16 +164,23 @@ class Case(models.Model):
             cipher = Cipher(
                 algorithms.AES(self._temp_key),
                 modes.CBC(self._temp_iv),
-                backend=default_backend()
+                backend=default_backend(),
             )
 
-        for field_name in ['case_title', 'case_description', 'case_category', 'case_status_notes']:
+        for field_name in [
+            "case_title",
+            "case_description",
+            "case_category",
+            "case_status_notes",
+        ]:
             value = getattr(self, field_name)
             if isinstance(value, str) and value:
                 try:
                     encrypted_bytes = base64.b64decode(value)
                     decryptor = cipher.decryptor()
-                    padded_data = decryptor.update(encrypted_bytes) + decryptor.finalize()
+                    padded_data = (
+                        decryptor.update(encrypted_bytes) + decryptor.finalize()
+                    )
                     self._unpad_data(padded_data)
                     continue
                 except Exception:
@@ -173,10 +190,12 @@ class Case(models.Model):
     def save(self, *args, **kwargs):
         self.encrypt_fields()
         super().save(*args, **kwargs)
-        if hasattr(self, '_temp_key'):
-            EncryptionKey.objects.create(case=self, key=self._temp_key, iv=self._temp_iv)
-            delattr(self, '_temp_key')
-            delattr(self, '_temp_iv')
+        if hasattr(self, "_temp_key"):
+            EncryptionKey.objects.create(
+                case=self, key=self._temp_key, iv=self._temp_iv
+            )
+            delattr(self, "_temp_key")
+            delattr(self, "_temp_iv")
 
     def get_title(self):
         return self.decrypt_field(self.case_title)
@@ -191,36 +210,50 @@ class Case(models.Model):
         return self.decrypt_field(self.case_status_notes)
 
 
-
 class AssignmentRequest(models.Model):
     STATUS_CHOICES = [
-        ('pending_creator', 'Pending Creator Approval'),
-        ('pending_admin', 'Pending Admin Approval'),
-        ('approved', 'Approved'),
-        ('rejected', 'Rejected'),
+        ("pending_creator", "Pending Creator Approval"),
+        ("pending_admin", "Pending Admin Approval"),
+        ("approved", "Approved"),
+        ("rejected", "Rejected"),
     ]
 
     REQUEST_TYPE_CHOICES = [
-        ('assignment', 'Assignment'),
-        ('handover', 'Handover'),
+        ("assignment", "Assignment"),
+        ("handover", "Handover"),
     ]
 
-    case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name='assignment_requests')
+    case = models.ForeignKey(
+        Case, on_delete=models.CASCADE, related_name="assignment_requests"
+    )
     requested_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    assigned_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='assignment_requests')
-    request_type = models.CharField(max_length=20, choices=REQUEST_TYPE_CHOICES, default='assignment')
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending_creator')
+    assigned_users = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, related_name="assignment_requests"
+    )
+    request_type = models.CharField(
+        max_length=20, choices=REQUEST_TYPE_CHOICES, default="assignment"
+    )
+    status = models.CharField(
+        max_length=20, choices=STATUS_CHOICES, default="pending_creator"
+    )
     notes = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     approved_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        title_preview = self.case.case_title[:30] + "..." if self.case.case_title and len(self.case_title) > 30 else self.case_title
+        title_preview = (
+            self.case.case_title[:30] + "..."
+            if self.case.case_title and len(self.case_title) > 30
+            else self.case_title
+        )
         return f"{self.request_type} for Case (Encrypted: {title_preview or 'N/A'}) by {self.requested_by}"
 
+
 class CaseAuditLog(models.Model):
-    case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name='audit_logs')
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name="audit_logs")
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True
+    )
     action = models.CharField(max_length=255)
     timestamp = models.DateTimeField(auto_now_add=True)
     details = models.TextField(blank=True, null=True)
