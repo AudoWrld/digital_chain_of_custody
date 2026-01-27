@@ -37,6 +37,8 @@
           <span class="cases-status-badge cases-status-open">{{ case.case_status }}</span>
           {% elif case.case_status == 'Pending Admin Approval' %}
           <span class="cases-status-badge cases-status-pending">{{ case.case_status }}</span>
+          {% elif case.case_status == 'Approved & Assigned' %}
+          <span class="cases-status-badge cases-status-approved">{{ case.case_status }}</span>
           {% elif case.case_status == 'Under Review' %}
           <span class="cases-status-badge cases-status-under">{{ case.case_status }}</span>
           {% elif case.case_status == 'Closed' %}

@@ -122,6 +122,10 @@
   background: #fef3c7;
   color: #92400e;
 }
+.cases-status-approved {
+  background: #d1fae5;
+  color: #065f46;
+}
 
 .cases-status-closed {
   background: #d1fae5;
