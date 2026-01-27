@@ -167,7 +167,7 @@
     <h2 class="view-case-section-title">Actions</h2>
     <div class="view-case-actions">
       {% if is_superuser %}
-        <a href="{% url 'cases:assign_investigators' case.id %}" class="view-case-action-btn view-case-action-primary">Assign Investigators</a>
+        <a href="{% url 'cases:assign_investigators' case.id %}" class="view-case-action-btn view-case-action-primary">{% if investigators %}Update Investigators{% else %}Assign Investigators{% endif %}</a>
         <a href="{% url 'cases:close_case' case.id %}" class="view-case-action-btn view-case-action-danger">Close Case</a>
         <a href="{% url 'cases:view_case_audit_log' case.id %}" class="view-case-action-btn view-case-action-secondary">Case Audit Log</a>
         <a href="{% url 'cases:case_list' %}" class="view-case-action-btn view-case-action-secondary">Back to Cases</a>
