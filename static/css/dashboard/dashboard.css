@@ -81,6 +81,11 @@
   color: #ffffff;
 }
 
+.stat-danger .stat-icon {
+  background: #ef4444;
+  color: #ffffff;
+}
+
 .stat-content {
   flex: 1;
 }
