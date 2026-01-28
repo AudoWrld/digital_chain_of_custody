@@ -9,7 +9,7 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'view_case' evidence.case.id %}">Case {{ evidence.case.case_number }}</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'cases:view_case' evidence.case.case_id %}">Case {{ evidence.case.case_number }}</a></li>
                     <li class="breadcrumb-item active">Evidence #{{ evidence.id }}</li>
                 </ol>
             </nav>
@@ -209,7 +209,7 @@
                     {% if user.role == 'auditor' %}
                         <a href="{% url 'evidence:audit' evidence.id %}" class="btn btn-info btn-block mb-2">Audit Evidence</a>
                     {% endif %}
-                    <a href="{% url 'view_case' evidence.case.id %}" class="btn btn-secondary btn-block">Back to Case</a>
+                    <a href="{% url 'cases:view_case' evidence.case.case_id %}" class="btn btn-secondary btn-block">Back to Case</a>
                 </div>
             </div>
             

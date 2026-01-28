@@ -163,12 +163,14 @@
           </div>
         </div>
         <div class="view-case-media-actions">
-          <a href="{% url 'cases:view_media' media.id %}" class="view-case-media-link view-case-media-link-primary">Download</a>
-          {% if case.case_status not in 'Closed,Archived,Withdrawn,Invalid' %}
-          <a href="{% url 'cases:edit_media_description' media.id %}" class="view-case-media-link view-case-media-link-secondary">Edit</a>
-          <a href="{% url 'cases:mark_media_invalid' media.id %}" class="view-case-media-link view-case-media-link-danger">Mark Invalid</a>
+          <a href="{% url 'evidence:view' media.id %}" class="view-case-media-link view-case-media-link-primary">View</a>
+          <a href="{% url 'evidence:audit' media.id %}" class="view-case-media-link view-case-media-link-secondary">Audit Log</a>
+          {% if user.role == 'analyst' %}
+          <a href="{% url 'evidence:analyze' media.id %}" class="view-case-media-link view-case-media-link-secondary">Analyze</a>
           {% endif %}
-          <a href="{% url 'cases:view_media_audit_log' media.id %}" class="view-case-media-link view-case-media-link-secondary">Audit Log</a>
+          {% if user.is_staff %}
+          <a href="{% url 'evidence:verify' media.id %}" class="view-case-media-link view-case-media-link-secondary">Verify Integrity</a>
+          {% endif %}
         </div>
       </div>
       {% endfor %}
@@ -205,7 +207,7 @@
         <a href="{% url 'cases:mark_under_review' case.case_id %}" class="view-case-action-btn view-case-action-primary">Mark as Under Review</a>
         {% elif investigator_status.under_review %}
         {% if case.case_status not in 'Closed,Archived,Withdrawn,Invalid' %}
-        <a href="{% url 'cases:upload_media' case.case_id %}" class="view-case-action-btn view-case-action-primary">Upload Evidence</a>
+        <a href="{% url 'evidence:upload' case.case_id %}" class="view-case-action-btn view-case-action-primary">Upload Evidence</a>
         {% endif %}
         {% if not case.closure_requested %}
         <a href="{% url 'cases:request_case_closure' case.case_id %}" class="view-case-action-btn view-case-action-warning">Request Closure</a>
@@ -214,7 +216,7 @@
         <a href="{% url 'cases:case_list' %}" class="view-case-action-btn view-case-action-secondary">Back to Cases</a>
       {% else %}
         {% if case.case_status not in 'Closed,Archived,Withdrawn,Invalid' %}
-        <a href="{% url 'cases:upload_media' case.case_id %}" class="view-case-action-btn view-case-action-primary">Upload Evidence</a>
+        <a href="{% url 'evidence:upload' case.case_id %}" class="view-case-action-btn view-case-action-primary">Upload Evidence</a>
         {% endif %}
         {% if case.case_status == 'Open' %}
         <a href="{% url 'cases:edit_case' case.case_id %}" class="view-case-action-btn view-case-action-secondary">Edit Case</a>
