@@ -63,7 +63,11 @@ def dashboard(request):
         unverified_users = User.objects.filter(verified=False).count()
         recent_users = User.objects.order_by('-date_joined')[:5]
         
-        critical_cases = Case.objects.filter(case_priority='critical', case_status__in=['Open', 'Under Review']).count()
+        critical_cases_without_investigators = Case.objects.filter(
+            case_priority='critical',
+            case_status__in=['Open', 'Under Review'],
+            assigned_investigators__isnull=True
+        ).count()
         high_priority_cases = Case.objects.filter(case_priority='high', case_status__in=['Open', 'Under Review']).count()
         long_open_cases = Case.objects.filter(
             case_status='Open',
@@ -71,10 +75,10 @@ def dashboard(request):
         ).count()
         
         system_alerts = []
-        if critical_cases > 0:
+        if critical_cases_without_investigators > 0:
             system_alerts.append({
                 'type': 'critical',
-                'message': f'{critical_cases} critical cases require immediate attention',
+                'message': f'{critical_cases_without_investigators} critical cases require immediate attention',
                 'icon': 'bx-error'
             })
         if pending_approval_cases > 0:
@@ -119,7 +123,7 @@ def dashboard(request):
             'cases_without_investigators': cases_without_investigators,
             'unverified_users': unverified_users,
             'recent_users': recent_users,
-            'critical_cases': critical_cases,
+            'critical_cases': critical_cases_without_investigators,
             'high_priority_cases': high_priority_cases,
             'long_open_cases': long_open_cases,
             'system_alerts': system_alerts,
