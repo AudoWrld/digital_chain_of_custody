@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.backends import default_backend
@@ -106,8 +107,9 @@ class Case(models.Model):
         return f"{self.case_id} - {title_preview or 'N/A'} - {self.case_status}"
 
     def generate_case_id(self):
-        date_str = self.date_created.strftime("%Y%m%d")
-        year_count = Case.objects.filter(date_created__year=self.date_created.year).count()
+        now = timezone.now()
+        date_str = now.strftime("%Y%m%d")
+        year_count = Case.objects.filter(date_created__year=now.year).count()
         return f"CASE{date_str}{year_count + 1:04d}"
 
     def _pad_data(self, data):
