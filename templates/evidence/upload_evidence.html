@@ -2,56 +2,268 @@
 
 {% block title %}Upload Evidence - {{ case.case_number }}{% endblock %}
 
+{% block extra_css %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/evidence/upload_evidence.css' %}">
+{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <div class="card">
-                <div class="card-header">
-                    <h4>Upload Evidence for Case {{ case.case_number }}</h4>
-                </div>
-                <div class="card-body">
-                    <div class="alert alert-info">
-                        <strong>Important:</strong> Evidence will be encrypted using the case encryption key. 
-                        SHA-256 hash will be computed before encryption. Original evidence is immutable.
+<div class="upload-evidence-container">
+    <div class="upload-evidence-card">
+        <div class="upload-evidence-header">
+            <h2>Upload Evidence</h2>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" id="upload-form">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="non-field-errors">
+                {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+
+            <input type="file" name="media" id="file-input" accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt">
+
+            <div class="drop-zone" id="drop-zone">
+                <svg class="drop-zone-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                </svg>
+                <div class="drop-zone-title">Drag & Drop Evidence File</div>
+                <div class="drop-zone-text">or click to browse</div>
+                <div class="drop-zone-hint">Supported formats: Images, Videos, Audio, Documents (Max 50MB)</div>
+            </div>
+
+            <div class="file-preview" id="file-preview">
+                <button type="button" class="remove-icon" id="remove-file">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+                <div class="file-preview-content">
+                    <div class="thumbnail-container" id="thumbnail-container">
+                        <img id="image-preview" class="thumbnail-image" style="display: none;">
+                        <video id="video-preview" class="thumbnail-video" style="display: none;" muted></video>
+                        <svg class="file-icon" id="file-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
                     </div>
-                    
-                    <form method="post" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        
-                        <div class="form-group mb-3">
-                            <label for="{{ form.media.id_for_label }}">Evidence File</label>
-                            {{ form.media }}
-                            {% if form.media.errors %}
-                                <div class="text-danger">{{ form.media.errors }}</div>
-                            {% endif %}
-                            <small class="form-text text-muted">Supported formats: Images, Videos, Audio, Documents. Max size: 50MB</small>
-                        </div>
-                        
-                        <div class="form-group mb-3">
-                            <label for="{{ form.description.id_for_label }}">Description</label>
-                            {{ form.description }}
-                            {% if form.description.errors %}
-                                <div class="text-danger">{{ form.description.errors }}</div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="form-group mb-3">
-                            <label for="{{ form.media_type.id_for_label }}">Media Type</label>
-                            {{ form.media_type }}
-                            {% if form.media_type.errors %}
-                                <div class="text-danger">{{ form.media_type.errors }}</div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-primary">Upload Evidence</button>
-                            <a href="{% url 'cases:view_case' case.case_id %}" class="btn btn-secondary">Cancel</a>
-                        </div>
-                    </form>
+                    <div class="file-info">
+                        <div class="file-name" id="file-name">filename.jpg</div>
+                        <div class="file-size" id="file-size">2.5 MB</div>
+                        <div class="file-type" id="file-type">Image</div>
+                    </div>
                 </div>
             </div>
+
+            {% if form.media.errors %}
+            <div class="errorlist">
+                {% for error in form.media.errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label for="id_description">Description <span class="required-asterisk">*</span></label>
+                {{ form.description.errors }}
+                <textarea class="form-control" id="id_description" name="description" rows="1" style="min-height: 180px;" placeholder="Describe the evidence and its relevance to the case..." required></textarea>
+            </div>
+
+            <div class="form-group" style="display: flex; align-items: center;">
+                <button type="submit" class="btn-submit" id="submit-btn">Upload Evidence</button>
+                <a href="{% url 'cases:view_case' case.case_id %}" class="btn-cancel">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="security-note">
+        <svg class="security-note-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+        </svg>
+        <div class="security-note-content">
+            <p class="security-note-title">Evidence Security</p>
+            <p class="security-note-text">
+                Your evidence will be automatically secured with:
+                <ul>
+                    <li>AES-256 encryption using the case encryption key</li>
+                    <li>SHA-256 hash computed before encryption for integrity verification</li>
+                    <li>Immutable storage - evidence cannot be modified after upload</li>
+                    <li>Full chain of custody logging for audit trail</li>
+                </ul>
+            </p>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const filePreview = document.getElementById('file-preview');
+    const fileName = document.getElementById('file-name');
+    const fileSize = document.getElementById('file-size');
+    const fileType = document.getElementById('file-type');
+    const fileIcon = document.getElementById('file-icon');
+    const imagePreview = document.getElementById('image-preview');
+    const videoPreview = document.getElementById('video-preview');
+    const thumbnailContainer = document.getElementById('thumbnail-container');
+    const removeFileBtn = document.getElementById('remove-file');
+    const submitBtn = document.getElementById('submit-btn');
+    const uploadForm = document.getElementById('upload-form');
+
+    dropZone.addEventListener('click', function() {
+        fileInput.click();
+    });
+
+    fileInput.addEventListener('change', function(e) {
+        handleFiles(e.target.files);
+    });
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, function() {
+            dropZone.classList.add('drag-over');
+        }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, function() {
+            dropZone.classList.remove('drag-over');
+        }, false);
+    });
+
+    dropZone.addEventListener('drop', function(e) {
+        const files = e.dataTransfer.files;
+        handleFiles(files);
+    }, false);
+
+    function handleFiles(files) {
+        if (files.length > 0) {
+            const file = files[0];
+            
+            const maxSize = 50 * 1024 * 1024;
+            if (file.size > maxSize) {
+                alert('File size exceeds 50MB limit. Please choose a smaller file.');
+                return;
+            }
+
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            fileInput.files = dataTransfer.files;
+
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            fileType.textContent = detectFileType(file);
+            
+            showPreview(file);
+            
+            dropZone.style.display = 'none';
+            filePreview.style.display = 'block';
+        }
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+    }
+
+    function detectFileType(file) {
+        const fileType = file.type.toLowerCase();
+        
+        if (fileType.startsWith('image/')) {
+            return 'Image';
+        } else if (fileType.startsWith('video/')) {
+            return 'Video';
+        } else if (fileType.startsWith('audio/')) {
+            return 'Audio';
+        } else if (fileType.includes('pdf') || file.name.endsWith('.pdf')) {
+            return 'PDF Document';
+        } else if (file.name.endsWith('.doc') || file.name.endsWith('.docx')) {
+            return 'Word Document';
+        } else if (file.name.endsWith('.txt')) {
+            return 'Text File';
+        } else {
+            return 'File';
+        }
+    }
+
+    function showPreview(file) {
+        const fileType = file.type.toLowerCase();
+        
+        imagePreview.style.display = 'none';
+        videoPreview.style.display = 'none';
+        fileIcon.style.display = 'none';
+        
+        if (fileType.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreview.src = e.target.result;
+                imagePreview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        } else if (fileType.startsWith('video/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                videoPreview.src = e.target.result;
+                videoPreview.style.display = 'block';
+                videoPreview.load();
+            };
+            reader.readAsDataURL(file);
+        } else {
+            fileIcon.style.display = 'block';
+            updateFileIcon(file);
+        }
+    }
+
+    function updateFileIcon(file) {
+        const fileType = file.type.toLowerCase();
+        let iconPath = '';
+        
+        if (fileType.startsWith('image/')) {
+            iconPath = 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z';
+        } else if (fileType.startsWith('video/')) {
+            iconPath = 'M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z';
+        } else if (fileType.startsWith('audio/')) {
+            iconPath = 'M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3';
+        } else if (fileType.includes('pdf') || file.name.endsWith('.pdf')) {
+            iconPath = 'M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z';
+        } else {
+            iconPath = 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z';
+        }
+        
+        fileIcon.querySelector('path').setAttribute('d', iconPath);
+    }
+
+    removeFileBtn.addEventListener('click', function() {
+        fileInput.value = '';
+        filePreview.style.display = 'none';
+        dropZone.style.display = 'block';
+        imagePreview.src = '';
+        videoPreview.src = '';
+    });
+
+    uploadForm.addEventListener('submit', function(e) {
+        if (!fileInput.files || fileInput.files.length === 0) {
+            e.preventDefault();
+            alert('Please select a file to upload.');
+            return;
+        }
+        
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Uploading...';
+    });
+});
+</script>
 {% endblock %}
