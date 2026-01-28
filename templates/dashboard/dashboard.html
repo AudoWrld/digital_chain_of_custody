@@ -147,17 +147,6 @@
       </div>
     </div>
   </div>
-
-  {% if total_evidence > 0 %}
-  <div class="stats-grid" style="margin-top: 24px;">
-    <div class="stat-card" style="grid-column: span 1;">
-      <h3 style="margin-bottom: 16px; font-size: 18px; font-weight: 600; color: #1e293b;">Evidence by Type</h3>
-      <div style="height: 300px; position: relative;">
-        <canvas id="evidenceTypeChart"></canvas>
-      </div>
-    </div>
-  </div>
-  {% endif %}
   {% endif %}
 
   {% if user_role == 'custodian' %}
@@ -443,7 +432,6 @@
 <script id="casePriorityData" type="application/json">{{ case_priority_counts|safe }}</script>
 <script id="casesByDateData" type="application/json">{{ cases_by_date|safe }}</script>
 <script id="userRoleData" type="application/json">{{ user_role_counts|safe }}</script>
-<script id="evidenceTypeData" type="application/json">{{ evidence_by_type|default:"{}" }}</script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const caseStatusCounts = JSON.parse(document.getElementById('caseStatusData').textContent);
@@ -571,40 +559,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
-
-    const evidenceTypeDataElement = document.getElementById('evidenceTypeData');
-    if (evidenceTypeDataElement) {
-        const evidenceTypeData = JSON.parse(evidenceTypeDataElement.textContent);
-        const hasEvidenceData = Object.keys(evidenceTypeData).length > 0;
-        
-        if (hasEvidenceData) {
-            const evidenceTypeLabels = ['image', 'video', 'audio', 'document', 'text', 'other'];
-            const evidenceTypeDataArray = evidenceTypeLabels.map(type => evidenceTypeData[type] || 0);
-            const evidenceTypeColors = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#6366f1'];
-
-            new Chart(document.getElementById('evidenceTypeChart'), {
-                type: 'doughnut',
-                data: {
-                    labels: ['Image', 'Video', 'Audio', 'Document', 'Text', 'Other'],
-                    datasets: [{
-                        data: evidenceTypeDataArray,
-                        backgroundColor: evidenceTypeColors,
-                        borderColor: '#ffffff',
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
-                    }
-                }
-            });
-        }
-    }
 });
 </script>
 {% endif %}
