@@ -16,5 +16,5 @@ class CaseStatusMiddleware:
         one_hour_ago = timezone.now() - timedelta(hours=1)
         Case.objects.filter(
             case_status='Open',
-            created_at__lte=one_hour_ago
+            date_created__lte=one_hour_ago
         ).update(case_status='Pending Admin Approval')

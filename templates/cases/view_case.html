@@ -1,12 +1,13 @@
 {% extends 'base.html' %}
 {% block title %}View Case{% endblock %}
 {% load static %}
+{% load case_extras %}
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/cases/view_case.css' %}?v={{ STATIC_VERSION }}" />
 
 <div class="view-case-container">
   <div class="view-case-header">
-    <h1 class="view-case-title">{{ title }}</h1>
+    <h1 class="view-case-title">{{ case.case_id }} - {{ title }}</h1>
     <div class="view-case-meta">
       <div class="view-case-meta-item">
         <span class="view-case-meta-label">Created By:</span>
@@ -74,7 +75,23 @@
           {% if case.assigned_investigators.all %}
           <div class="view-case-investigators-list">
             {% for inv in case.assigned_investigators.all %}
-            <span class="view-case-investigator-tag">{{ inv.get_full_name }}</span>
+            <div class="view-case-investigator-item">
+              <span class="view-case-investigator-tag">{{ inv.get_full_name }}</span>
+              {% if inv.id in investigator_statuses %}
+                {% with inv_status=investigator_statuses|get_item:inv.id %}
+                {% if inv_status.accepted %}
+                  <span class="view-case-investigator-status view-case-investigator-accepted">Accepted</span>
+                {% else %}
+                  <span class="view-case-investigator-status view-case-investigator-pending">Pending Acceptance</span>
+                {% endif %}
+                {% if inv_status.under_review %}
+                  <span class="view-case-investigator-status view-case-investigator-review">Under Review</span>
+                {% endif %}
+                {% endwith %}
+              {% else %}
+                <span class="view-case-investigator-status view-case-investigator-pending">Pending Acceptance</span>
+              {% endif %}
+            </div>
             {% endfor %}
           </div>
           {% else %}
@@ -167,46 +184,52 @@
     <h2 class="view-case-section-title">Actions</h2>
     <div class="view-case-actions">
       {% if is_superuser %}
-        <a href="{% url 'cases:assign_investigators' case.id %}" class="view-case-action-btn view-case-action-primary">{% if investigators %}Update Investigators{% else %}Assign Investigators{% endif %}</a>
-        <a href="{% url 'cases:close_case' case.id %}" class="view-case-action-btn view-case-action-danger">Close Case</a>
-        <a href="{% url 'cases:view_case_audit_log' case.id %}" class="view-case-action-btn view-case-action-secondary">Case Audit Log</a>
+        <a href="{% url 'cases:assign_investigators' case.case_id %}" class="view-case-action-btn view-case-action-primary">{% if investigators %}Update Investigators{% else %}Assign Investigators{% endif %}</a>
+        <a href="{% url 'cases:close_case' case.case_id %}" class="view-case-action-btn view-case-action-danger">Close Case</a>
+        <a href="{% url 'cases:view_case_audit_log' case.case_id %}" class="view-case-action-btn view-case-action-secondary">Case Audit Log</a>
         <a href="{% url 'cases:case_list' %}" class="view-case-action-btn view-case-action-secondary">Back to Cases</a>
       {% elif user.role == 'regular_user' and not is_superuser %}
         {% if case.case_status == 'Open' %}
-        <a href="{% url 'cases:edit_case' case.id %}" class="view-case-action-btn view-case-action-primary">Edit Case</a>
+        <a href="{% url 'cases:edit_case' case.case_id %}" class="view-case-action-btn view-case-action-primary">Edit Case</a>
         {% else %}
         <span class="view-case-action-disabled">Case editing disabled - case has moved past Open status</span>
         {% endif %}
         {% if not case.closure_requested %}
-        <a href="{% url 'cases:request_case_closure' case.id %}" class="view-case-action-btn view-case-action-warning">Request Closure</a>
+        <a href="{% url 'cases:request_case_closure' case.case_id %}" class="view-case-action-btn view-case-action-warning">Request Closure</a>
         {% endif %}
         <a href="{% url 'cases:case_list' %}" class="view-case-action-btn view-case-action-secondary">Back to Cases</a>
       {% elif user.role == 'investigator' %}
+        {% if not investigator_status or not investigator_status.accepted %}
+        <a href="{% url 'cases:accept_case' case.case_id %}" class="view-case-action-btn view-case-action-primary">Accept Case</a>
+        {% elif investigator_status.accepted and not investigator_status.under_review %}
+        <a href="{% url 'cases:mark_under_review' case.case_id %}" class="view-case-action-btn view-case-action-primary">Mark as Under Review</a>
+        {% elif investigator_status.under_review %}
         {% if case.case_status not in 'Closed,Archived,Withdrawn,Invalid' %}
-        <a href="{% url 'cases:upload_media' case.id %}" class="view-case-action-btn view-case-action-primary">Upload Evidence</a>
+        <a href="{% url 'cases:upload_media' case.case_id %}" class="view-case-action-btn view-case-action-primary">Upload Evidence</a>
         {% endif %}
-        {% if case.case_status == 'Open' %}
-        <a href="{% url 'cases:edit_case' case.id %}" class="view-case-action-btn view-case-action-secondary">Edit Case</a>
+        {% if not case.closure_requested %}
+        <a href="{% url 'cases:request_case_closure' case.case_id %}" class="view-case-action-btn view-case-action-warning">Request Closure</a>
+        {% endif %}
         {% endif %}
         <a href="{% url 'cases:case_list' %}" class="view-case-action-btn view-case-action-secondary">Back to Cases</a>
       {% else %}
         {% if case.case_status not in 'Closed,Archived,Withdrawn,Invalid' %}
-        <a href="{% url 'cases:upload_media' case.id %}" class="view-case-action-btn view-case-action-primary">Upload Evidence</a>
+        <a href="{% url 'cases:upload_media' case.case_id %}" class="view-case-action-btn view-case-action-primary">Upload Evidence</a>
         {% endif %}
         {% if case.case_status == 'Open' %}
-        <a href="{% url 'cases:edit_case' case.id %}" class="view-case-action-btn view-case-action-secondary">Edit Case</a>
-        <a href="{% url 'cases:assign_investigators' case.id %}" class="view-case-action-btn view-case-action-secondary">Assign Investigators</a>
+        <a href="{% url 'cases:edit_case' case.case_id %}" class="view-case-action-btn view-case-action-secondary">Edit Case</a>
+        <a href="{% url 'cases:assign_investigators' case.case_id %}" class="view-case-action-btn view-case-action-secondary">Assign Investigators</a>
         {% if not case.closure_requested %}
-        <a href="{% url 'cases:request_case_closure' case.id %}" class="view-case-action-btn view-case-action-warning">Request Closure</a>
+        <a href="{% url 'cases:request_case_closure' case.case_id %}" class="view-case-action-btn view-case-action-warning">Request Closure</a>
         {% endif %}
-        <a href="{% url 'cases:close_case' case.id %}" class="view-case-action-btn view-case-action-danger">Close Case</a>
-        <a href="{% url 'cases:withdraw_case' case.id %}" class="view-case-action-btn view-case-action-danger">Withdraw Case</a>
-        <a href="{% url 'cases:invalidate_case' case.id %}" class="view-case-action-btn view-case-action-danger">Mark Invalid</a>
+        <a href="{% url 'cases:close_case' case.case_id %}" class="view-case-action-btn view-case-action-danger">Close Case</a>
+        <a href="{% url 'cases:withdraw_case' case.case_id %}" class="view-case-action-btn view-case-action-danger">Withdraw Case</a>
+        <a href="{% url 'cases:invalidate_case' case.case_id %}" class="view-case-action-btn view-case-action-danger">Mark Invalid</a>
         {% endif %}
         {% if case.case_status == 'Closed' %}
-        <a href="{% url 'cases:archive_case' case.id %}" class="view-case-action-btn view-case-action-secondary">Archive Case</a>
+        <a href="{% url 'cases:archive_case' case.case_id %}" class="view-case-action-btn view-case-action-secondary">Archive Case</a>
         {% endif %}
-        <a href="{% url 'cases:view_case_audit_log' case.id %}" class="view-case-action-btn view-case-action-secondary">Case Audit Log</a>
+        <a href="{% url 'cases:view_case_audit_log' case.case_id %}" class="view-case-action-btn view-case-action-secondary">Case Audit Log</a>
         <a href="{% url 'cases:case_list' %}" class="view-case-action-btn view-case-action-secondary">Back to Cases</a>
       {% endif %}
     </div>

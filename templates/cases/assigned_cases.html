@@ -8,6 +8,7 @@
 <table>
     <thead>
         <tr>
+            <th>Case ID</th>
             <th>Title</th>
             <th>Created By</th>
             <th>Status</th>
@@ -18,12 +19,13 @@
     <tbody>
         {% for case in cases %}
         <tr>
+            <td>{{ case.case_id }}</td>
             <td>{{ case.get_title }}</td>
             <td>{{ case.created_by.get_full_name }}</td>
             <td>{{ case.case_status }}</td>
             <td>{{ case.get_category }}</td>
             <td>
-                <a href="{% url 'cases:view_case' case.id %}">View</a>
+                <a href="{% url 'cases:view_case' case.case_id %}">View</a>
             </td>
         </tr>
         {% endfor %}

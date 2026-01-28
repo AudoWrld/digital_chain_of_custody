@@ -20,6 +20,7 @@
   <table class="cases-data-table">
     <thead class="cases-table-head">
       <tr>
+        <th class="cases-table-header">Case ID</th>
         <th class="cases-table-header">Title</th>
         {% if is_superuser %}<th class="cases-table-header">Created By</th>{% endif %}
         <th class="cases-table-header">Status</th>
@@ -30,6 +31,7 @@
     <tbody class="cases-table-body">
       {% for case in cases %}
       <tr class="cases-table-row">
+        <td class="cases-table-cell">{{ case.case_id }}</td>
         <td class="cases-table-cell">{{ case.get_title }}</td>
         {% if is_superuser %}<td class="cases-table-cell">{{ case.created_by.get_full_name }}</td>{% endif %}
         <td class="cases-table-cell">
@@ -55,7 +57,7 @@
         </td>
         <td class="cases-table-cell">{{ case.get_category }}</td>
         <td class="cases-table-cell">
-          <a href="{% url 'cases:view_case' case.id %}" class="cases-action-link">View</a>
+          <a href="{% url 'cases:view_case' case.case_id %}" class="cases-action-link">View</a>
         </td>
       </tr>
       {% endfor %}

@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
 from django.utils import timezone
-from .models import Case, CaseAuditLog, AssignmentRequest
+from .models import Case, CaseAuditLog, AssignmentRequest, InvestigatorCaseStatus
 from evidence.models import Evidence
 from .forms import CaseForm, EditCaseForm
 from .permissions import regular_user_required, role_required
@@ -73,7 +73,7 @@ def create_case(request):
                 )
 
                 messages.success(request, "Case created successfully!")
-                return redirect("cases:view_case", case_id=case.id)
+                return redirect("cases:view_case", case_id=case.case_id)
             except Exception as e:
                 logger.error(f"Error creating case: {e}")
                 messages.error(request, "Failed to create case. Please try again.")
@@ -87,7 +87,7 @@ def create_case(request):
 
 @login_required
 def view_case(request, case_id):
-    case = get_object_or_404(Case, id=case_id)
+    case = get_object_or_404(Case, case_id=case_id)
 
     if (
         request.user != case.created_by
@@ -153,6 +153,16 @@ def view_case(request, case_id):
         user=request.user, case=case, action=f"Viewed case {case.get_title()}"
     )
 
+    investigator_status = None
+    if request.user.role == 'investigator' and request.user in case.assigned_investigators.all():
+        investigator_status = InvestigatorCaseStatus.objects.filter(
+            case=case,
+            investigator=request.user
+        ).first()
+
+    investigator_statuses = InvestigatorCaseStatus.objects.filter(case=case)
+    investigator_status_dict = {status.investigator.id: status for status in investigator_statuses}
+
     return render(
         request,
         "cases/view_case.html",
@@ -163,13 +173,15 @@ def view_case(request, case_id):
             "media_files": media_files,
             "investigators": investigators,
             "is_superuser": request.user.is_superuser,
+            "investigator_status": investigator_status,
+            "investigator_statuses": investigator_status_dict,
         },
     )
 
 
 @login_required
 def edit_case(request, case_id):
-    case = get_object_or_404(Case, id=case_id)
+    case = get_object_or_404(Case, case_id=case_id)
 
     if request.user.is_superuser:
         pass
@@ -245,7 +257,7 @@ def edit_case(request, case_id):
                                 details=f"Old: {old_value} | New: {new_value}",
                             )
 
-                return redirect("cases:view_case", case_id=case.id)
+                return redirect("cases:view_case", case_id=case.case_id)
             except Exception as e:
                 logger.error(f"Error updating case: {e}")
                 messages.error(request, "Failed to update case. Please try again.")
@@ -273,7 +285,7 @@ def edit_case(request, case_id):
 
 @login_required
 def assign_investigator(request, case_id):
-    case = get_object_or_404(Case, id=case_id)
+    case = get_object_or_404(Case, case_id=case_id)
 
     if request.method == "POST":
         action = request.POST.get("action")
@@ -362,7 +374,7 @@ def assign_investigator(request, case_id):
                 )
             except User.DoesNotExist:
                 pass
-        return redirect("cases:assign_investigators", case_id=case.id)
+        return redirect("cases:assign_investigators", case_id=case.case_id)
 
     users = User.objects.filter(role="investigator", is_active=True, verified=True).exclude(id__in=case.assigned_investigators.all())
     pending_requests = case.assignment_requests.filter(status__in=["pending_admin"])
@@ -381,7 +393,7 @@ def assign_investigator(request, case_id):
 
 @login_required
 def request_case_closure(request, case_id):
-    case = get_object_or_404(Case, id=case_id)
+    case = get_object_or_404(Case, case_id=case_id)
     if (
         request.user != case.created_by
         and request.user not in case.assigned_investigators.all()
@@ -406,14 +418,14 @@ def request_case_closure(request, case_id):
             details=reason,
         )
 
-        return redirect("view_case", case_id=case.id)
+        return redirect("view_case", case_id=case.case_id)
 
     return render(request, "cases/request_closure.html", {"case": case})
 
 
 @login_required
 def close_case(request, case_id):
-    case = get_object_or_404(Case, id=case_id)
+    case = get_object_or_404(Case, case_id=case_id)
 
     if request.user != case.created_by and not request.user.is_staff:
         return HttpResponseForbidden("you are not autorised to close this case")
@@ -431,12 +443,12 @@ def close_case(request, case_id):
         action="Closed case -metadata and content are now read only",
     )
 
-    return redirect("cases:view_case", case_id=case.id)
+    return redirect("cases:view_case", case_id=case.case_id)
 
 
 @login_required
 def approve_case_closure(request, case_id):
-    case = get_object_or_404(Case, id=case_id)
+    case = get_object_or_404(Case, case_id=case_id)
     if request.user != case.created_by and not request.user.is_staff:
         return HttpResponseForbidden(
             "Only the case creator or admins can approve closures."
@@ -481,14 +493,14 @@ def approve_case_closure(request, case_id):
             )
 
         case.save()
-        return redirect("view_case", case_id=case.id)
+        return redirect("view_case", case_id=case.case_id)
 
     return render(request, "cases/approve_closure.html", {"case": case})
 
 
 @login_required
 def archive_case(request, case_id):
-    case = get_object_or_404(Case, id=case_id)
+    case = get_object_or_404(Case, case_id=case_id)
 
     if request.user != case.created_by and not request.user.is_staff:
         return HttpResponseForbidden("You are not authorized to archive this case")
@@ -505,12 +517,12 @@ def archive_case(request, case_id):
         action=f"Archived case {case.get_title()}. Case is now read-only",
     )
 
-    return redirect("cases:view_case", case_id=case.id)
+    return redirect("cases:view_case", case_id=case.case_id)
 
 
 @login_required
 def withdraw_case(request, case_id):
-    case = get_object_or_404(Case, id=case_id)
+    case = get_object_or_404(Case, case_id=case_id)
     if request.user != case.created_by and not request.user.is_staff:
         return HttpResponseForbidden("You are not authorized to withdraw this case.")
     if case.case_status in ["Closed", "Archived"]:
@@ -521,12 +533,12 @@ def withdraw_case(request, case_id):
         user=request.user, case=case, action="Withdrawn case - case is now read-only"
     )
 
-    return redirect("cases:view_case", case_id=case.id)
+    return redirect("cases:view_case", case_id=case.case_id)
 
 
 @login_required
 def mark_invalid_case(request, case_id):
-    case = get_object_or_404(Case, id=case_id)
+    case = get_object_or_404(Case, case_id=case_id)
     if request.user != case.created_by and not request.user.is_staff:
         return HttpResponseForbidden(
             "You are not authorized to mark this case invalid."
@@ -548,12 +560,12 @@ def mark_invalid_case(request, case_id):
             user=request.user, case=case, action="Marked case invalid"
         )
 
-    return redirect("cases:view_case", case_id=case.id)
+    return redirect("cases:view_case", case_id=case.case_id)
 
 
 @login_required
 def upload_media(request, case_id):
-    case = get_object_or_404(Case, id=case_id)
+    case = get_object_or_404(Case, case_id=case_id)
     if request.user.role != 'investigator':
         return HttpResponseForbidden(
             "Only investigators can upload evidence"
@@ -591,7 +603,7 @@ def upload_media(request, case_id):
                 )
             except Exception as e:
                 logger.error(f"Failed to log media upload for case {case.id}: {e}")
-            return redirect("cases:view_case", case_id=case.id)
+            return redirect("cases:view_case", case_id=case.case_id)
 
     return render(request, "cases/upload_media.html", {"case": case})
 
@@ -645,7 +657,7 @@ def edit_media_description(request, media_id):
             action="Edited media description",
             details=f"File: {media.media.name}, Old: {old_description} | New: {new_description}",
         )
-        return redirect("cases:view_case", case_id=case.id)
+        return redirect("cases:view_case", case_id=case.case_id)
     return render(request, "cases/edit_media.html", {"media": media})
 
 
@@ -670,12 +682,12 @@ def mark_media_invalid(request, media_id):
         details=f"File: {media.media.name}",
     )
 
-    return redirect("cases:view_case", case_id=case.id)
+    return redirect("cases:view_case", case_id=case.case_id)
 
 
 @login_required
 def view_case_audit_log(request, case_id):
-    case = get_object_or_404(Case, id=case_id)
+    case = get_object_or_404(Case, case_id=case_id)
 
     if request.user != case.created_by and not request.user.is_staff:
         return HttpResponseForbidden("Not authorized to view this audit log.")
@@ -702,14 +714,14 @@ def view_case_audit_log(request, case_id):
 
 @login_required
 def download_case_audit_log(request, case_id):
-    case = get_object_or_404(Case, id=case_id)
+    case = get_object_or_404(Case, case_id=case_id)
 
     if request.user != case.created_by and not request.user.is_staff:
         return HttpResponseForbidden("Not authorized to download this audit log.")
 
     response = HttpResponse(content_type="text/csv")
     response["Content-Disposition"] = (
-        f'attachment; filename="case_{case.id}_audit_log.csv"'
+        f'attachment; filename="case_{case.case_id}_audit_log.csv"'
     )
 
     writer = csv.writer(response)
@@ -814,3 +826,77 @@ def generate_system_report(request, report_type):
         writer.writerow(row.values())
 
     return response
+
+
+@login_required
+def accept_case(request, case_id):
+    case = get_object_or_404(Case, case_id=case_id)
+    
+    if request.user.role != 'investigator':
+        return HttpResponseForbidden("Only investigators can accept cases")
+    
+    if request.user not in case.assigned_investigators.all():
+        return HttpResponseForbidden("You are not assigned to this case")
+    
+    investigator_status, created = InvestigatorCaseStatus.objects.get_or_create(
+        case=case,
+        investigator=request.user
+    )
+    
+    if investigator_status.accepted:
+        messages.warning(request, "You have already accepted this case")
+        return redirect("cases:view_case", case_id=case.case_id)
+    
+    investigator_status.accepted = True
+    investigator_status.accepted_at = timezone.now()
+    investigator_status.save()
+    
+    CaseAuditLog.log_action(
+        user=request.user,
+        case=case,
+        action="Accepted case assignment"
+    )
+    
+    messages.success(request, "You have accepted this case")
+    return redirect("cases:view_case", case_id=case.case_id)
+
+
+@login_required
+def mark_under_review(request, case_id):
+    case = get_object_or_404(Case, case_id=case_id)
+    
+    if request.user.role != 'investigator':
+        return HttpResponseForbidden("Only investigators can mark cases as under review")
+    
+    if request.user not in case.assigned_investigators.all():
+        return HttpResponseForbidden("You are not assigned to this case")
+    
+    investigator_status = get_object_or_404(
+        InvestigatorCaseStatus,
+        case=case,
+        investigator=request.user
+    )
+    
+    if not investigator_status.accepted:
+        messages.warning(request, "You must accept the case first")
+        return redirect("cases:view_case", case_id=case.case_id)
+    
+    if investigator_status.under_review:
+        messages.warning(request, "You have already marked this case as under review")
+        return redirect("cases:view_case", case_id=case.case_id)
+    
+    investigator_status.under_review = True
+    investigator_status.under_review_at = timezone.now()
+    investigator_status.save()
+    
+    case.case_status = "Under Review"
+    case.save()
+    
+    CaseAuditLog.log_action(
+        user=request.user,
+        case=case,
+        action="Marked case as under review"
+    )
+    
+    messages.success(request, "Case marked as under review")
+    return redirect("cases:view_case", case_id=case.case_id)
