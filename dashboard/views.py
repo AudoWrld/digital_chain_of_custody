@@ -39,12 +39,10 @@ def dashboard(request):
         
         user_role_counts = dict(User.objects.values('role').annotate(count=Count('id')).values_list('role', 'count'))
         
-        evidence_by_type = {}
         if EVIDENCE_AVAILABLE:
             total_evidence = Evidence.objects.count()
             valid_evidence = Evidence.objects.filter(media_status='Valid').count()
             invalid_evidence = Evidence.objects.filter(media_status='Invalid').count()
-            evidence_by_type = dict(Evidence.objects.values('media_type').annotate(count=Count('id')).values_list('media_type', 'count'))
             
             context.update({
                 'total_evidence': total_evidence,
@@ -118,7 +116,6 @@ def dashboard(request):
             'case_priority_counts': json.dumps(case_priority_counts),
             'cases_by_date': json.dumps(cases_by_date_dict),
             'user_role_counts': json.dumps(user_role_counts),
-            'evidence_by_type': json.dumps(evidence_by_type),
             'pending_approval_cases': pending_approval_cases,
             'cases_without_investigators': cases_without_investigators,
             'unverified_users': unverified_users,
