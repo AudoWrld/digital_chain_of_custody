@@ -38,23 +38,4 @@ urlpatterns = [
     ),
     # --- AUDIT LOGS ---
     path("<str:case_id>/audit/", views.view_case_audit_log, name="view_case_audit_log"),
-    # --- MEDIA ---
-    path("<str:case_id>/upload-media/", views.upload_media, name="upload_media"),
-    path("media/<int:media_id>/", views.view_media, name="view_media"),
-    path(
-        "media/<int:media_id>/edit-description/",
-        views.edit_media_description,
-        name="edit_media_description",
-    ),
-    path(
-        "media/<int:media_id>/invalidate/",
-        views.mark_media_invalid,
-        name="mark_media_invalid",
-    ),
-    # media audit log
-    path(
-        "media/<int:media_id>/audit/",
-        views.view_media_audit_log,
-        name="view_media_audit_log",
-    ),
 ]

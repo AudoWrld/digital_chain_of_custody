@@ -367,7 +367,7 @@
               <span class="date">{{ evidence.uploaded_at|date:"M d, Y" }}</span>
             </div>
           </div>
-          <a href="{% url 'evidence:view_media' evidence.id %}" class="recent-item-action">
+          <a href="{% url 'evidence:view' evidence.id %}" class="recent-item-action">
             <i class='bx bx-right-arrow-alt'></i>
           </a>
         </div>

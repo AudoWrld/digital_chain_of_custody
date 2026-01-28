@@ -564,143 +564,13 @@ def mark_invalid_case(request, case_id):
 
 
 @login_required
-def upload_media(request, case_id):
-    case = get_object_or_404(Case, case_id=case_id)
-    if request.user.role != 'investigator':
-        return HttpResponseForbidden(
-            "Only investigators can upload evidence"
-        )
-    if request.user not in case.assigned_investigators.all():
-        return HttpResponseForbidden(
-            "You are not assigned to this case"
-        )
-
-    if case.case_status in ["Closed", "Archived", "Invalid"]:
-        return HttpResponseForbidden(
-            f"Cannot upload media to a {case.case_status} case."
-        )
-
-    if request.method == "POST":
-        media_file = request.FILES.get("media")
-        description = request.POST.get("description")
-        media_type = request.POST.get("media_type")
-
-        if media_file and description and media_type:
-            evidence = Evidence.objects.create(
-                case=case,
-                media=media_file,
-                description=description,
-                media_type=media_type,
-                uploaded_by=request.user,
-            )
-
-            try:
-                CaseAuditLog.log_action(
-                    user=request.user,
-                    case=case,
-                    action="Uploaded media",
-                    details=f"File: {evidence.media.name}, Type: {evidence.media_type}, Description: {evidence.description}",
-                )
-            except Exception as e:
-                logger.error(f"Failed to log media upload for case {case.id}: {e}")
-            return redirect("cases:view_case", case_id=case.case_id)
-
-    return render(request, "cases/upload_media.html", {"case": case})
-
-
-@login_required
-def view_media(request, media_id):
-    media = get_object_or_404(Evidence, id=media_id)
-    case = media.case
-
-    if request.user != case.created_by and request.user not in case.assigned_investigators.all() and not request.user.is_staff:
-        return HttpResponseForbidden("Your are not authorized to access this evidence")
-
-    try:
-        CaseAuditLog.log_action(
-            user=request.user,
-            case=case,
-            action="Viewed media",
-            details=f"File: {media.media.name}",
-        )
-    except Exception as e:
-        logger.error(f"Failed to log media view for case {case.id}: {e}")
-
-    decrypted_file = media.get_decrypted_file()
-    response = FileResponse(decrypted_file, content_type="application/octet-stream")
-    response["Content-Disposition"] = f'inline; filename="{decrypted_file.name}"'
-    return response
-
-
-@login_required
-def edit_media_description(request, media_id):
-    media = get_object_or_404(Evidence, id=media_id)
-    case = media.case
-
-    if case.case_status in ["Closed", "Archived", "Withdrawn", "Invalid"]:
-        return HttpResponseForbidden("Cannot edit media in a read-only case.")
-
-    if request.user != case.created_by and request.user not in case.assigned_investigators.all():
-        return HttpResponseForbidden("Not authorized to edit case media")
-
-    old_description = media.description
-
-    if request.method == "POST":
-        new_description = request.POST.get("description")
-        if new_description:
-            media.description = new_description
-            media.save()
-
-        CaseAuditLog.log_action(
-            user=request.user,
-            case=case,
-            action="Edited media description",
-            details=f"File: {media.media.name}, Old: {old_description} | New: {new_description}",
-        )
-        return redirect("cases:view_case", case_id=case.case_id)
-    return render(request, "cases/edit_media.html", {"media": media})
-
-
-@login_required
-def mark_media_invalid(request, media_id):
-    media = get_object_or_404(Evidence, id=media_id)
-    case = media.case
-    if request.user != case.created_by and request.user not in case.assigned_investigators.all() and not request.user.is_staff:
-        return HttpResponseForbidden("Not authorized to mark this media invalid.")
-    if case.case_status in ["Closed", "Archived"]:
-        return HttpResponseForbidden(
-            "Cannot mark media invalid in a closed or archived case."
-        )
-
-    media.media_status = "Invalid"
-    media.save()
-
-    CaseAuditLog.log_action(
-        user=request.user,
-        case=case,
-        action="Marked media invalid",
-        details=f"File: {media.media.name}",
-    )
-
-    return redirect("cases:view_case", case_id=case.case_id)
-
-
-@login_required
 def view_case_audit_log(request, case_id):
     case = get_object_or_404(Case, case_id=case_id)
 
     if request.user != case.created_by and not request.user.is_staff:
         return HttpResponseForbidden("Not authorized to view this audit log.")
 
-    media_actions = [
-        "Uploaded media",
-        "Viewed media",
-        "Edited media description",
-        "Marked media invalid",
-    ]
-    audit_logs = case.audit_logs.exclude(action__in=media_actions).order_by(
-        "-timestamp"
-    )
+    audit_logs = case.audit_logs.order_by("-timestamp")
 
     return render(
         request,
@@ -727,67 +597,7 @@ def download_case_audit_log(request, case_id):
     writer = csv.writer(response)
     writer.writerow(["Timestamp", "User", "Action", "Details"])
 
-    media_actions = [
-        "Uploaded media",
-        "Viewed media",
-        "Edited media description",
-        "Marked media invalid",
-    ]
-    audit_logs = case.audit_logs.exclude(action__in=media_actions).order_by("timestamp")
-    for log in audit_logs:
-        writer.writerow(
-            [
-                log.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
-                log.user.username if log.user else "System",
-                log.action,
-                log.details or "-",
-            ]
-        )
-
-    return response
-
-
-@login_required
-def view_media_audit_log(request, media_id):
-    media = get_object_or_404(Evidence, id=media_id)
-    case = media.case
-
-    if request.user != case.created_by and request.user not in case.assigned_investigators.all() and not request.user.is_staff:
-        return HttpResponseForbidden("Not authorized to view this media audit log.")
-    audit_logs = case.audit_logs.filter(
-        Q(action__icontains=media.media.name) | Q(details__icontains=media.media.name)
-    ).order_by("-timestamp")
-
-    return render(
-        request,
-        "cases/media_audit_log.html",
-        {
-            "media": media,
-            "case": case,
-            "audit_logs": audit_logs,
-        },
-    )
-
-
-@login_required
-def download_media_audit_log(request, media_id):
-    media = get_object_or_404(Evidence, id=media_id)
-    case = media.case
-
-    if request.user != case.created_by and request.user not in case.assigned_investigators.all() and not request.user.is_staff:
-        return HttpResponseForbidden("Not authorized to download this media audit log.")
-
-    response = HttpResponse(content_type="text/csv")
-    response["Content-Disposition"] = (
-        f'attachment; filename="media_{media.id}_audit_log.csv"'
-    )
-
-    writer = csv.writer(response)
-    writer.writerow(["Timestamp", "User", "Action", "Details"])
-    audit_logs = case.audit_logs.filter(
-        Q(action__icontains=media.media.name) | Q(details__icontains=media.media.name)
-    ).order_by("timestamp")
-
+    audit_logs = case.audit_logs.order_by("timestamp")
     for log in audit_logs:
         writer.writerow(
             [

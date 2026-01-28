@@ -14,7 +14,7 @@ import json
 @login_required
 @role_required('investigator')
 def upload_evidence(request, case_id):
-    case = get_object_or_404(Case, id=case_id)
+    case = get_object_or_404(Case, case_id=case_id)
     
     if request.method == 'POST':
         form = EvidenceUploadForm(request.POST, request.FILES)
@@ -37,7 +37,7 @@ def upload_evidence(request, case_id):
             else:
                 messages.success(request, 'Evidence uploaded successfully with valid metadata')
             
-            return redirect('view_case', case_id=case.id)
+            return redirect('cases:view_case', case_id=case.case_id)
     else:
         form = EvidenceUploadForm()
     
@@ -98,7 +98,7 @@ def evidence_metadata_api(request, evidence_id):
 @require_http_methods(['GET'])
 @role_required('investigator', 'analyst', 'admin', 'auditor')
 def case_evidence_list_api(request, case_id):
-    case = get_object_or_404(Case, id=case_id)
+    case = get_object_or_404(Case, case_id=case_id)
     
     evidence_list = Evidence.objects.filter(case=case).order_by('-date_uploaded')
     
@@ -136,7 +136,7 @@ def analyze_evidence(request, evidence_id):
         )
         
         messages.success(request, 'Evidence analysis logged')
-        return redirect('view_evidence', evidence_id=evidence.id)
+        return redirect('evidence:view', evidence_id=evidence.id)
     
     return render(request, 'evidence/analyze_evidence.html', {
         'evidence': evidence
@@ -164,7 +164,7 @@ def verify_evidence_integrity(request, evidence_id):
         else:
             messages.warning(request, 'Evidence integrity verification failed')
         
-        return redirect('view_evidence', evidence_id=evidence.id)
+        return redirect('evidence:view', evidence_id=evidence.id)
     
     return render(request, 'evidence/verify_evidence.html', {
         'evidence': evidence
