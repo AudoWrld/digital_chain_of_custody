@@ -46,7 +46,6 @@ class UserProfileManager(BaseUserManager):
 
 class User(AbstractUser, PermissionsMixin):
     ROLE = [
-        ("superuser", "Superuser"),
         ("regular_user", "Regular User"),
         ("investigator", "Investigator"),
         ("analyst", "Analyst"),
