@@ -3,4 +3,12 @@ from . import views
 
 app_name = "evidence"
 
-urlpatterns = []
+urlpatterns = [
+    path('upload/<int:case_id>/', views.upload_evidence, name='upload'),
+    path('view/<int:evidence_id>/', views.view_evidence, name='view'),
+    path('audit/<int:evidence_id>/', views.audit_evidence, name='audit'),
+    path('analyze/<int:evidence_id>/', views.analyze_evidence, name='analyze'),
+    path('verify/<int:evidence_id>/', views.verify_evidence_integrity, name='verify'),
+    path('api/metadata/<int:evidence_id>/', views.evidence_metadata_api, name='metadata_api'),
+    path('api/case/<int:case_id>/', views.case_evidence_list_api, name='case_list_api'),
+]

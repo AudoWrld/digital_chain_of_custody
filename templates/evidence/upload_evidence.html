@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload Evidence - {{ case.case_number }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Upload Evidence for Case {{ case.case_number }}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <strong>Important:</strong> Evidence will be encrypted using the case encryption key. 
+                        SHA-256 hash will be computed before encryption. Original evidence is immutable.
+                    </div>
+                    
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="form-group mb-3">
+                            <label for="{{ form.media.id_for_label }}">Evidence File</label>
+                            {{ form.media }}
+                            {% if form.media.errors %}
+                                <div class="text-danger">{{ form.media.errors }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted">Supported formats: Images, Videos, Audio, Documents. Max size: 50MB</small>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="{{ form.description.id_for_label }}">Description</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <div class="text-danger">{{ form.description.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="{{ form.media_type.id_for_label }}">Media Type</label>
+                            {{ form.media_type }}
+                            {% if form.media_type.errors %}
+                                <div class="text-danger">{{ form.media_type.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Upload Evidence</button>
+                            <a href="{% url 'view_case' case.id %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

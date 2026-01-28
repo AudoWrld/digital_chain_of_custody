@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Analyze Evidence - {{ evidence.description }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'view_case' evidence.case.id %}">Case {{ evidence.case.case_number }}</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'evidence:view' evidence.id %}">Evidence #{{ evidence.id }}</a></li>
+                    <li class="breadcrumb-item active">Analyze</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Analyze Evidence #{{ evidence.id }}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <strong>Analyst View:</strong> Analyze evidence, add findings, and verify integrity.
+                    </div>
+                    
+                    <h5>Evidence Summary</h5>
+                    <table class="table table-bordered">
+                        <tr>
+                            <th width="30%">Description</th>
+                            <td>{{ evidence.description }}</td>
+                        </tr>
+                        <tr>
+                            <th>Original Filename</th>
+                            <td>{{ evidence.original_filename }}</td>
+                        </tr>
+                        <tr>
+                            <th>SHA-256 Hash</th>
+                            <td><code>{{ evidence.sha256_hash }}</code></td>
+                        </tr>
+                        <tr>
+                            <th>Media Type</th>
+                            <td>{{ evidence.get_media_type_display }}</td>
+                        </tr>
+                    </table>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="form-group mb-3">
+                            <label for="notes">Analysis Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="5" placeholder="Enter your analysis notes..."></textarea>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="findings">Findings</label>
+                            <textarea class="form-control" id="findings" name="findings" rows="5" placeholder="Enter your findings..."></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Submit Analysis</button>
+                            <a href="{% url 'evidence:view' evidence.id %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

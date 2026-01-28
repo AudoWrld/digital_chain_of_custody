@@ -42,3 +42,59 @@ def investigator_or_regular_user_required(view_func):
         
         return view_func(request, *args, **kwargs)
     return _wrapped_view
+
+
+def investigator_required(view_func):
+    @wraps(view_func)
+    @login_required
+    def _wrapped_view(request, *args, **kwargs):
+        if request.user.is_superuser:
+            return view_func(request, *args, **kwargs)
+        
+        if request.user.role != 'investigator':
+            return HttpResponseForbidden("Only investigators can access this page.")
+        
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view
+
+
+def analyst_required(view_func):
+    @wraps(view_func)
+    @login_required
+    def _wrapped_view(request, *args, **kwargs):
+        if request.user.is_superuser:
+            return view_func(request, *args, **kwargs)
+        
+        if request.user.role != 'analyst':
+            return HttpResponseForbidden("Only analysts can access this page.")
+        
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view
+
+
+def admin_required(view_func):
+    @wraps(view_func)
+    @login_required
+    def _wrapped_view(request, *args, **kwargs):
+        if request.user.is_superuser:
+            return view_func(request, *args, **kwargs)
+        
+        if request.user.role != 'admin':
+            return HttpResponseForbidden("Only admins can access this page.")
+        
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view
+
+
+def auditor_required(view_func):
+    @wraps(view_func)
+    @login_required
+    def _wrapped_view(request, *args, **kwargs):
+        if request.user.is_superuser:
+            return view_func(request, *args, **kwargs)
+        
+        if request.user.role != 'auditor':
+            return HttpResponseForbidden("Only auditors can access this page.")
+        
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view

@@ -4,9 +4,11 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.backends import default_backend
 from django.core.files.base import ContentFile
+from django.core.exceptions import ValidationError
 import base64
 import os
 import hashlib
+import json
 
 
 class Evidence(models.Model):
@@ -34,6 +36,11 @@ class Evidence(models.Model):
     uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='uploaded_evidence')
     sha256_hash = models.CharField(max_length=64, editable=False, null=True)
     is_immutable = models.BooleanField(default=True, editable=False)
+    metadata = models.JSONField(default=dict, editable=False)
+    original_filename = models.CharField(max_length=255, editable=False, null=True)
+    md5_hash = models.CharField(max_length=32, editable=False, null=True)
+    metadata_valid = models.BooleanField(default=True, editable=False)
+    metadata_issues = models.JSONField(default=list, editable=False)
 
     def __str__(self):
         return f"Evidence for Case {self.case.id} - {self.description}"
@@ -71,8 +78,25 @@ class Evidence(models.Model):
 
     def save(self, *args, **kwargs):
         if self.media and not self.pk:
+            from .metadata_extractor import MetadataExtractor
+            
             file_obj = self.media
             self.sha256_hash = self.compute_sha256(file_obj)
+            
+            file_obj.seek(0)
+            file_content = file_obj.read()
+            self.md5_hash = hashlib.md5(file_content).hexdigest()
+            file_obj.seek(0)
+            
+            metadata = MetadataExtractor.extract_all_metadata(file_obj, self.original_filename)
+            self.metadata = metadata
+            
+            is_valid, issues = MetadataExtractor.validate_metadata_integrity(metadata)
+            self.metadata_valid = is_valid
+            self.metadata_issues = issues
+            
+            if not is_valid:
+                self.media_status = 'Invalid'
             
             cipher = self.case.encryption_key.get_cipher()
             encrypted_data = self.encrypt_file(file_obj, cipher)
