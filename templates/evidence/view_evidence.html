@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+
+{% block title %}View Evidence - {{ evidence.description }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'view_case' evidence.case.id %}">Case {{ evidence.case.case_number }}</a></li>
+                    <li class="breadcrumb-item active">Evidence #{{ evidence.id }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4>Evidence Details</h4>
+                    <span class="badge {% if evidence.media_status == 'Valid' %}badge-success{% elif evidence.media_status == 'Invalid' %}badge-danger{% else %}badge-secondary{% endif %}">
+                        {{ evidence.media_status }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <tr>
+                            <th width="30%">Description</th>
+                            <td>{{ evidence.description }}</td>
+                        </tr>
+                        <tr>
+                            <th>Original Filename</th>
+                            <td>{{ evidence.original_filename }}</td>
+                        </tr>
+                        <tr>
+                            <th>Media Type</th>
+                            <td>{{ evidence.get_media_type_display }}</td>
+                        </tr>
+                        <tr>
+                            <th>SHA-256 Hash</th>
+                            <td><code>{{ evidence.sha256_hash }}</code></td>
+                        </tr>
+                        <tr>
+                            <th>MD5 Hash</th>
+                            <td><code>{{ evidence.md5_hash }}</code></td>
+                        </tr>
+                        <tr>
+                            <th>Date Uploaded</th>
+                            <td>{{ evidence.date_uploaded|date:"F d, Y H:i" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Uploaded By</th>
+                            <td>{{ evidence.uploaded_by.username|default:"N/A" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Immutable</th>
+                            <td>{% if evidence.is_immutable %}Yes{% else %}No{% endif %}</td>
+                        </tr>
+                    </table>
+                    
+                    <div class="mt-3">
+                        <h5>Metadata Validation</h5>
+                        {% if evidence.metadata_valid %}
+                            <div class="alert alert-success">
+                                <strong>Valid:</strong> Metadata integrity verified
+                            </div>
+                        {% else %}
+                            <div class="alert alert-warning">
+                                <strong>Issues Detected:</strong>
+                                <ul>
+                                    {% for issue in evidence.metadata_issues %}
+                                        <li>{{ issue }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mt-3">
+                        <h5>File-Level Metadata</h5>
+                        {% if evidence.metadata.file_level %}
+                            <table class="table table-sm">
+                                <tr>
+                                    <th width="30%">File Format</th>
+                                    <td>{{ evidence.metadata.file_level.file_format }}</td>
+                                </tr>
+                                <tr>
+                                    <th>File Size</th>
+                                    <td>{{ evidence.metadata.file_level.file_size_human }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <td>{{ evidence.metadata.file_level.timestamp }}</td>
+                                </tr>
+                            </table>
+                        {% endif %}
+                    </div>
+                    
+                    {% if evidence.metadata.exif.camera %}
+                    <div class="mt-3">
+                        <h5>Camera Information</h5>
+                        <table class="table table-sm">
+                            {% if evidence.metadata.exif.camera.make %}
+                            <tr>
+                                <th width="30%">Make</th>
+                                <td>{{ evidence.metadata.exif.camera.make }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if evidence.metadata.exif.camera.model %}
+                            <tr>
+                                <th>Model</th>
+                                <td>{{ evidence.metadata.exif.camera.model }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if evidence.metadata.exif.camera.serial_number %}
+                            <tr>
+                                <th>Serial Number</th>
+                                <td>{{ evidence.metadata.exif.camera.serial_number }}</td>
+                            </tr>
+                            {% endif %}
+                        </table>
+                    </div>
+                    {% endif %}
+                    
+                    {% if evidence.metadata.exif.gps %}
+                    <div class="mt-3">
+                        <h5>GPS Information</h5>
+                        <table class="table table-sm">
+                            {% if evidence.metadata.exif.gps.latitude %}
+                            <tr>
+                                <th width="30%">Latitude</th>
+                                <td>{{ evidence.metadata.exif.gps.latitude }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if evidence.metadata.exif.gps.longitude %}
+                            <tr>
+                                <th>Longitude</th>
+                                <td>{{ evidence.metadata.exif.gps.longitude }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if evidence.metadata.exif.gps.altitude %}
+                            <tr>
+                                <th>Altitude</th>
+                                <td>{{ evidence.metadata.exif.gps.altitude }}m</td>
+                            </tr>
+                            {% endif %}
+                        </table>
+                    </div>
+                    {% endif %}
+                    
+                    {% if evidence.metadata.authenticity %}
+                    <div class="mt-3">
+                        <h5>Authenticity Indicators</h5>
+                        <table class="table table-sm">
+                            <tr>
+                                <th width="30%">Status</th>
+                                <td>
+                                    <span class="badge {% if evidence.metadata.authenticity.status == 'Likely Authentic' %}badge-success{% else %}badge-warning{% endif %}">
+                                        {{ evidence.metadata.authenticity.status }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% if evidence.metadata.authenticity.signs_of_editing %}
+                            <tr>
+                                <th>Signs of Editing</th>
+                                <td>
+                                    <ul class="mb-0">
+                                        {% for sign in evidence.metadata.authenticity.signs_of_editing %}
+                                            <li>{{ sign }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% if evidence.metadata.authenticity.missing_exif %}
+                            <tr>
+                                <th>Missing EXIF</th>
+                                <td>
+                                    <ul class="mb-0">
+                                        {% for missing in evidence.metadata.authenticity.missing_exif %}
+                                            <li>{{ missing }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </td>
+                            </tr>
+                            {% endif %}
+                        </table>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Actions</h5>
+                </div>
+                <div class="card-body">
+                    {% if user.role == 'analyst' %}
+                        <a href="{% url 'evidence:analyze' evidence.id %}" class="btn btn-primary btn-block mb-2">Analyze Evidence</a>
+                    {% endif %}
+                    {% if user.role == 'admin' %}
+                        <a href="{% url 'evidence:verify' evidence.id %}" class="btn btn-warning btn-block mb-2">Verify Integrity</a>
+                    {% endif %}
+                    {% if user.role == 'auditor' %}
+                        <a href="{% url 'evidence:audit' evidence.id %}" class="btn btn-info btn-block mb-2">Audit Evidence</a>
+                    {% endif %}
+                    <a href="{% url 'view_case' evidence.case.id %}" class="btn btn-secondary btn-block">Back to Case</a>
+                </div>
+            </div>
+            
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5>Audit Log</h5>
+                </div>
+                <div class="card-body">
+                    {% if audit_logs %}
+                        <div class="list-group">
+                            {% for log in audit_logs %}
+                                <div class="list-group-item">
+                                    <small class="text-muted">{{ log.timestamp|date:"Y-m-d H:i" }}</small><br>
+                                    <strong>{{ log.user.username|default:"System" }}</strong>: {{ log.action }}
+                                    {% if log.details %}
+                                        <br><small>{{ log.details }}</small>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No audit logs yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

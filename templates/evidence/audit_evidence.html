@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block title %}Audit Evidence - {{ evidence.description }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'view_case' evidence.case.id %}">Case {{ evidence.case.case_number }}</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'evidence:view' evidence.id %}">Evidence #{{ evidence.id }}</a></li>
+                    <li class="breadcrumb-item active">Audit</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Audit Evidence #{{ evidence.id }}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <strong>Auditor View:</strong> Review custody logs, verify hashes, and check assignment history. No changes are permitted.
+                    </div>
+                    
+                    <h5>Evidence Summary</h5>
+                    <table class="table table-bordered">
+                        <tr>
+                            <th width="30%">Description</th>
+                            <td>{{ evidence.description }}</td>
+                        </tr>
+                        <tr>
+                            <th>Original Filename</th>
+                            <td>{{ evidence.original_filename }}</td>
+                        </tr>
+                        <tr>
+                            <th>SHA-256 Hash</th>
+                            <td><code>{{ evidence.sha256_hash }}</code></td>
+                        </tr>
+                        <tr>
+                            <th>MD5 Hash</th>
+                            <td><code>{{ evidence.md5_hash }}</code></td>
+                        </tr>
+                        <tr>
+                            <th>Date Uploaded</th>
+                            <td>{{ evidence.date_uploaded|date:"F d, Y H:i" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Uploaded By</th>
+                            <td>{{ evidence.uploaded_by.username|default:"N/A" }}</td>
+                        </tr>
+                        <tr>
+                            <th>Metadata Valid</th>
+                            <td>
+                                {% if evidence.metadata_valid %}
+                                    <span class="badge badge-success">Yes</span>
+                                {% else %}
+                                    <span class="badge badge-danger">No</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                    
+                    <h5 class="mt-4">Hash Verification</h5>
+                    <table class="table table-bordered">
+                        <tr>
+                            <th width="30%">SHA-256 Hash</th>
+                            <td><code>{{ evidence.sha256_hash }}</code></td>
+                        </tr>
+                        <tr>
+                            <th>MD5 Hash</th>
+                            <td><code>{{ evidence.md5_hash }}</code></td>
+                        </tr>
+                        <tr>
+                            <th>File Format</th>
+                            <td>{{ evidence.metadata.file_level.file_format|default:"Unknown" }}</td>
+                        </tr>
+                        <tr>
+                            <th>File Size</th>
+                            <td>{{ evidence.metadata.file_level.file_size_human|default:"Unknown" }}</td>
+                        </tr>
+                    </table>
+                    
+                    <h5 class="mt-4">Custody Log</h5>
+                    {% if audit_logs %}
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>User</th>
+                                    <th>Action</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in audit_logs %}
+                                    <tr>
+                                        <td>{{ log.timestamp|date:"Y-m-d H:i:s" }}</td>
+                                        <td>{{ log.user.username|default:"System" }}</td>
+                                        <td>{{ log.action }}</td>
+                                        <td>{{ log.details|default:"-" }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p class="text-muted">No custody logs found.</p>
+                    {% endif %}
+                    
+                    <h5 class="mt-4">Assignment History</h5>
+                    <table class="table table-bordered">
+                        <tr>
+                            <th width="30%">Case</th>
+                            <td>{{ evidence.case.case_number }}</td>
+                        </tr>
+                        <tr>
+                            <th>Case Status</th>
+                            <td>{{ evidence.case.case_status }}</td>
+                        </tr>
+                        <tr>
+                            <th>Case Priority</th>
+                            <td>{{ evidence.case.case_priority }}</td>
+                        </tr>
+                        <tr>
+                            <th>Assigned Investigators</th>
+                            <td>
+                                {% for investigator in evidence.case.assigned_investigators.all %}
+                                    {{ investigator.username }}{% if not forloop.last %}, {% endif %}
+                                {% empty %}
+                                    None
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Assigned Analysts</th>
+                            <td>
+                                {% for analyst in evidence.case.assigned_analysts.all %}
+                                    {{ analyst.username }}{% if not forloop.last %}, {% endif %}
+                                {% empty %}
+                                    None
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    </table>
+                    
+                    <div class="mt-4">
+                        <a href="{% url 'evidence:view' evidence.id %}" class="btn btn-secondary">Back to Evidence</a>
+                        <a href="{% url 'view_case' evidence.case.id %}" class="btn btn-secondary">Back to Case</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
