@@ -1,37 +1,51 @@
 {% extends 'base.html' %}
 {% block title %}Assigned Cases{% endblock %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/cases/case_list.css' %}">
+{% endblock %}
 
 {% block content %}
-<h1>Assigned Cases</h1>
+<div class="cases-page-header">
+  <div class="cases-page-title">
+    <h1>Assigned Cases</h1>
+  </div>
+</div>
 
 {% if cases %}
-<table>
-    <thead>
-        <tr>
-            <th>Case ID</th>
-            <th>Title</th>
-            <th>Created By</th>
-            <th>Status</th>
-            <th>Category</th>
-            <th>Actions</th>
-        </tr>
+<div class="cases-table-wrapper">
+  <table class="cases-data-table">
+    <thead class="cases-table-head">
+      <tr>
+        <th class="cases-table-header">Case ID</th>
+        <th class="cases-table-header">Title</th>
+        <th class="cases-table-header">Created By</th>
+        <th class="cases-table-header">Status</th>
+        <th class="cases-table-header">Category</th>
+        <th class="cases-table-header">Actions</th>
+      </tr>
     </thead>
     <tbody>
-        {% for case in cases %}
-        <tr>
-            <td>{{ case.case_id }}</td>
-            <td>{{ case.get_title }}</td>
-            <td>{{ case.created_by.get_full_name }}</td>
-            <td>{{ case.case_status }}</td>
-            <td>{{ case.get_category }}</td>
-            <td>
-                <a href="{% url 'cases:view_case' case.case_id %}">View</a>
-            </td>
-        </tr>
-        {% endfor %}
+      {% for case in cases %}
+      <tr class="cases-table-row">
+        <td class="cases-table-cell">{{ case.case_id }}</td>
+        <td class="cases-table-cell">{{ case.get_title }}</td>
+        <td class="cases-table-cell">{{ case.created_by.get_full_name }}</td>
+        <td class="cases-table-cell">
+          <span class="cases-status-badge cases-status-{{ case.case_status|lower }}">{{ case.case_status }}</span>
+        </td>
+        <td class="cases-table-cell">{{ case.get_category }}</td> 
+        <td class="cases-table-cell">
+          <a href="{% url 'cases:view_case' case.case_id %}" class="cases-action-link">View</a>
+        </td>
+      </tr>
+      {% endfor %}
     </tbody>
-</table>
+  </table>
+</div>
 {% else %}
-<p>No cases assigned to you.</p>
+<div class="cases-empty-state">
+  <p>No cases assigned to you.</p>
+</div>
 {% endif %}
 {% endblock %}
