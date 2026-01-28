@@ -8,6 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist
 import base64
 import os
 import hashlib
+from datetime import datetime
 
 
 class EncryptionKey(models.Model):
@@ -31,7 +32,7 @@ class EncryptionKey(models.Model):
         return cipher
 
     def __str__(self):
-        return f"AES-256 encryption key for Case ID: {self.case.id}"
+        return f"AES-256 encryption key for Case ID: {self.case.case_id}"
 
 
 class Case(models.Model):
@@ -70,6 +71,7 @@ class Case(models.Model):
         ("Terrorism and National Security", "Terrorism and National Security"),
     ]
 
+    case_id = models.CharField(max_length=20, unique=True, editable=False, null=True, blank=True)
     case_title = models.TextField()
     case_description = models.TextField()
     case_category = models.CharField(max_length=50, choices=CASE_CATEGORIES)
@@ -101,7 +103,12 @@ class Case(models.Model):
             if self.case_title and len(self.case_title) > 30
             else self.case_title
         )
-        return f"Case (Encrypted: {title_preview or 'N/A'}) - {self.case_status}"
+        return f"{self.case_id} - {title_preview or 'N/A'} - {self.case_status}"
+
+    def generate_case_id(self):
+        date_str = self.date_created.strftime("%Y%m%d")
+        year_count = Case.objects.filter(date_created__year=self.date_created.year).count()
+        return f"CASE{date_str}{year_count + 1:04d}"
 
     def _pad_data(self, data):
         padder = padding.PKCS7(128).padder()
@@ -188,6 +195,8 @@ class Case(models.Model):
                     setattr(self, field_name, encrypted)
 
     def save(self, *args, **kwargs):
+        if not self.case_id:
+            self.case_id = self.generate_case_id()
         self.encrypt_fields()
         super().save(*args, **kwargs)
         if hasattr(self, "_temp_key"):
@@ -249,6 +258,24 @@ class AssignmentRequest(models.Model):
         return f"{self.request_type} for Case (Encrypted: {title_preview or 'N/A'}) by {self.requested_by}"
 
 
+class InvestigatorCaseStatus(models.Model):
+    case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name="investigator_statuses")
+    investigator = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="case_statuses"
+    )
+    accepted = models.BooleanField(default=False)
+    accepted_at = models.DateTimeField(null=True, blank=True)
+    under_review = models.BooleanField(default=False)
+    under_review_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['case', 'investigator']
+
+    def __str__(self):
+        return f"{self.investigator} - {self.case.get_title()} (Accepted: {self.accepted}, Under Review: {self.under_review})"
+
+
 class CaseAuditLog(models.Model):
     case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name="audit_logs")
     user = models.ForeignKey(
@@ -263,4 +290,4 @@ class CaseAuditLog(models.Model):
         cls.objects.create(user=user, case=case, action=action, details=details)
 
     def __str__(self):
-        return f"[{self.timestamp}] {self.user} - {self.action} on case {self.case.id}"
+        return f"[{self.timestamp}] {self.user} - {self.action} on case {self.case.case_id}"

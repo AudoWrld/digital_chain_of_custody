@@ -169,8 +169,15 @@
 
 .view-case-investigators-list {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 8px;
+}
+
+.view-case-investigator-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .view-case-investigator-tag {
@@ -180,6 +187,29 @@
   border-radius: 20px;
   font-size: 13px;
   font-weight: 500;
+}
+
+.view-case-investigator-status {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.view-case-investigator-accepted {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.view-case-investigator-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.view-case-investigator-review {
+  background: #dbeafe;
+  color: #1e40af;
 }
 
 .view-case-actions {
