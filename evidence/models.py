@@ -73,7 +73,8 @@ class Evidence(models.Model):
 
     def decrypt_file(self, encrypted_file, cipher):
         decryptor = cipher.decryptor()
-        decrypted_data = decryptor.read()
+        encrypted_data = encrypted_file.read()
+        decrypted_data = decryptor.update(encrypted_data) + decryptor.finalize()
         return self._unpad_data(decrypted_data)
 
     def save(self, *args, **kwargs):

@@ -1,241 +1,163 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block title %}View Evidence - {{ evidence.description }}{% endblock %}
-
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-12">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{% url 'dashboard:dashboard' %}">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'cases:view_case' evidence.case.case_id %}">Case {{ evidence.case.case_number }}</a></li>
-                    <li class="breadcrumb-item active">Evidence #{{ evidence.id }}</li>
-                </ol>
-            </nav>
-        </div>
+<link rel="stylesheet" href="{% static 'css/evidence/view_evidence.css' %}?v={{ STATIC_VERSION }}" />
+
+<div class="view-case-container">
+  <div class="view-case-header">
+    <h1 class="view-case-title">{{ evidence.description }}</h1>
+    <div class="view-case-meta">
+      <div class="view-case-meta-item">
+        <span class="view-case-meta-label">Case:</span>
+        <span class="view-case-meta-value">{{ evidence.case.case_id }}</span>
+      </div>
+      <div class="view-case-meta-item">
+        <span class="view-case-meta-label">Uploaded By:</span>
+        <span class="view-case-meta-value">{% if evidence.uploaded_by %}{{ evidence.uploaded_by.get_full_name }}{% else %}N/A{% endif %}</span>
+      </div>
+      <div class="view-case-meta-item">
+        <span class="view-case-meta-label">Date Uploaded:</span>
+        <span class="view-case-meta-value">{{ evidence.date_uploaded|date:"F d, Y g:i A" }}</span>
+      </div>
     </div>
-    
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4>Evidence Details</h4>
-                    <span class="badge {% if evidence.media_status == 'Valid' %}badge-success{% elif evidence.media_status == 'Invalid' %}badge-danger{% else %}badge-secondary{% endif %}">
-                        {{ evidence.media_status }}
-                    </span>
-                </div>
-                <div class="card-body">
-                    <table class="table table-bordered">
-                        <tr>
-                            <th width="30%">Description</th>
-                            <td>{{ evidence.description }}</td>
-                        </tr>
-                        <tr>
-                            <th>Original Filename</th>
-                            <td>{{ evidence.original_filename }}</td>
-                        </tr>
-                        <tr>
-                            <th>Media Type</th>
-                            <td>{{ evidence.get_media_type_display }}</td>
-                        </tr>
-                        <tr>
-                            <th>SHA-256 Hash</th>
-                            <td><code>{{ evidence.sha256_hash }}</code></td>
-                        </tr>
-                        <tr>
-                            <th>MD5 Hash</th>
-                            <td><code>{{ evidence.md5_hash }}</code></td>
-                        </tr>
-                        <tr>
-                            <th>Date Uploaded</th>
-                            <td>{{ evidence.date_uploaded|date:"F d, Y H:i" }}</td>
-                        </tr>
-                        <tr>
-                            <th>Uploaded By</th>
-                            <td>{{ evidence.uploaded_by.username|default:"N/A" }}</td>
-                        </tr>
-                        <tr>
-                            <th>Immutable</th>
-                            <td>{% if evidence.is_immutable %}Yes{% else %}No{% endif %}</td>
-                        </tr>
-                    </table>
-                    
-                    <div class="mt-3">
-                        <h5>Metadata Validation</h5>
-                        {% if evidence.metadata_valid %}
-                            <div class="alert alert-success">
-                                <strong>Valid:</strong> Metadata integrity verified
-                            </div>
-                        {% else %}
-                            <div class="alert alert-warning">
-                                <strong>Issues Detected:</strong>
-                                <ul>
-                                    {% for issue in evidence.metadata_issues %}
-                                        <li>{{ issue }}</li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="mt-3">
-                        <h5>File-Level Metadata</h5>
-                        {% if evidence.metadata.file_level %}
-                            <table class="table table-sm">
-                                <tr>
-                                    <th width="30%">File Format</th>
-                                    <td>{{ evidence.metadata.file_level.file_format }}</td>
-                                </tr>
-                                <tr>
-                                    <th>File Size</th>
-                                    <td>{{ evidence.metadata.file_level.file_size_human }}</td>
-                                </tr>
-                                <tr>
-                                    <th>Timestamp</th>
-                                    <td>{{ evidence.metadata.file_level.timestamp }}</td>
-                                </tr>
-                            </table>
-                        {% endif %}
-                    </div>
-                    
-                    {% if evidence.metadata.exif.camera %}
-                    <div class="mt-3">
-                        <h5>Camera Information</h5>
-                        <table class="table table-sm">
-                            {% if evidence.metadata.exif.camera.make %}
-                            <tr>
-                                <th width="30%">Make</th>
-                                <td>{{ evidence.metadata.exif.camera.make }}</td>
-                            </tr>
-                            {% endif %}
-                            {% if evidence.metadata.exif.camera.model %}
-                            <tr>
-                                <th>Model</th>
-                                <td>{{ evidence.metadata.exif.camera.model }}</td>
-                            </tr>
-                            {% endif %}
-                            {% if evidence.metadata.exif.camera.serial_number %}
-                            <tr>
-                                <th>Serial Number</th>
-                                <td>{{ evidence.metadata.exif.camera.serial_number }}</td>
-                            </tr>
-                            {% endif %}
-                        </table>
-                    </div>
-                    {% endif %}
-                    
-                    {% if evidence.metadata.exif.gps %}
-                    <div class="mt-3">
-                        <h5>GPS Information</h5>
-                        <table class="table table-sm">
-                            {% if evidence.metadata.exif.gps.latitude %}
-                            <tr>
-                                <th width="30%">Latitude</th>
-                                <td>{{ evidence.metadata.exif.gps.latitude }}</td>
-                            </tr>
-                            {% endif %}
-                            {% if evidence.metadata.exif.gps.longitude %}
-                            <tr>
-                                <th>Longitude</th>
-                                <td>{{ evidence.metadata.exif.gps.longitude }}</td>
-                            </tr>
-                            {% endif %}
-                            {% if evidence.metadata.exif.gps.altitude %}
-                            <tr>
-                                <th>Altitude</th>
-                                <td>{{ evidence.metadata.exif.gps.altitude }}m</td>
-                            </tr>
-                            {% endif %}
-                        </table>
-                    </div>
-                    {% endif %}
-                    
-                    {% if evidence.metadata.authenticity %}
-                    <div class="mt-3">
-                        <h5>Authenticity Indicators</h5>
-                        <table class="table table-sm">
-                            <tr>
-                                <th width="30%">Status</th>
-                                <td>
-                                    <span class="badge {% if evidence.metadata.authenticity.status == 'Likely Authentic' %}badge-success{% else %}badge-warning{% endif %}">
-                                        {{ evidence.metadata.authenticity.status }}
-                                    </span>
-                                </td>
-                            </tr>
-                            {% if evidence.metadata.authenticity.signs_of_editing %}
-                            <tr>
-                                <th>Signs of Editing</th>
-                                <td>
-                                    <ul class="mb-0">
-                                        {% for sign in evidence.metadata.authenticity.signs_of_editing %}
-                                            <li>{{ sign }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                </td>
-                            </tr>
-                            {% endif %}
-                            {% if evidence.metadata.authenticity.missing_exif %}
-                            <tr>
-                                <th>Missing EXIF</th>
-                                <td>
-                                    <ul class="mb-0">
-                                        {% for missing in evidence.metadata.authenticity.missing_exif %}
-                                            <li>{{ missing }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                </td>
-                            </tr>
-                            {% endif %}
-                        </table>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5>Actions</h5>
-                </div>
-                <div class="card-body">
-                    {% if user.role == 'analyst' %}
-                        <a href="{% url 'evidence:analyze' evidence.id %}" class="btn btn-primary btn-block mb-2">Analyze Evidence</a>
-                    {% endif %}
-                    {% if user.role == 'admin' %}
-                        <a href="{% url 'evidence:verify' evidence.id %}" class="btn btn-warning btn-block mb-2">Verify Integrity</a>
-                    {% endif %}
-                    {% if user.role == 'auditor' %}
-                        <a href="{% url 'evidence:audit' evidence.id %}" class="btn btn-info btn-block mb-2">Audit Evidence</a>
-                    {% endif %}
-                    <a href="{% url 'cases:view_case' evidence.case.case_id %}" class="btn btn-secondary btn-block">Back to Case</a>
-                </div>
-            </div>
-            
-            <div class="card mt-3">
-                <div class="card-header">
-                    <h5>Audit Log</h5>
-                </div>
-                <div class="card-body">
-                    {% if audit_logs %}
-                        <div class="list-group">
-                            {% for log in audit_logs %}
-                                <div class="list-group-item">
-                                    <small class="text-muted">{{ log.timestamp|date:"Y-m-d H:i" }}</small><br>
-                                    <strong>{{ log.user.username|default:"System" }}</strong>: {{ log.action }}
-                                    {% if log.details %}
-                                        <br><small>{{ log.details }}</small>
-                                    {% endif %}
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <p class="text-muted">No audit logs yet.</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+  </div>
+
+  <div class="view-case-section">
+    <h2 class="view-case-section-title">Evidence Preview</h2>
+    <div class="view-case-preview-container">
+      {% if evidence.media_type == 'image' %}
+      <img src="{% url 'evidence:view_file' evidence.id %}" alt="{{ evidence.description }}" class="view-case-preview-image" />
+      {% elif evidence.media_type == 'video' %}
+      <video controls class="view-case-preview-video">
+        <source src="{% url 'evidence:view_file' evidence.id %}" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+      {% elif evidence.media_type == 'audio' %}
+      <audio controls class="view-case-preview-audio">
+        <source src="{% url 'evidence:view_file' evidence.id %}" type="audio/mpeg">
+        Your browser does not support the audio tag.
+      </audio>
+      {% else %}
+      <div class="view-case-preview-placeholder">
+        <div class="view-case-preview-icon">📄</div>
+        <div class="view-case-preview-text">Document Preview</div>
+        <a href="{% url 'evidence:download_file' evidence.id %}" class="view-case-action-btn view-case-action-primary" download>Download File</a>
+      </div>
+      {% endif %}
     </div>
+  </div>
+
+  <div class="view-case-section">
+    <h2 class="view-case-section-title">Evidence Details</h2>
+    <div class="view-case-details-grid">
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">Status</span>
+        <span class="view-case-detail-value">
+          {% if evidence.media_status == 'Valid' %}
+          <span class="view-case-status-badge view-case-status-open">{{ evidence.media_status }}</span>
+          {% elif evidence.media_status == 'Invalid' %}
+          <span class="view-case-status-badge view-case-status-invalid">{{ evidence.media_status }}</span>
+          {% else %}
+          <span class="view-case-status-badge view-case-status-archived">{{ evidence.media_status }}</span>
+          {% endif %}
+        </span>
+      </div>
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">Media Type</span>
+        <span class="view-case-detail-value">{{ evidence.get_media_type_display }}</span>
+      </div>
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">Original Filename</span>
+        <span class="view-case-detail-value">{{ evidence.original_filename }}</span>
+      </div>
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">Immutable</span>
+        <span class="view-case-detail-value">
+          {% if evidence.is_immutable %}
+          <span class="view-case-status-badge view-case-status-closed">Yes</span>
+          {% else %}
+          <span class="view-case-status-badge view-case-status-withdrawn">No</span>
+          {% endif %}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="view-case-section">
+    <h2 class="view-case-section-title">Hash Information</h2>
+    <div class="view-case-details-grid">
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">SHA-256 Hash</span>
+        <span class="view-case-detail-value" style="font-family: monospace; font-size: 13px; word-break: break-all;">{{ evidence.sha256_hash }}</span>
+      </div>
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">MD5 Hash</span>
+        <span class="view-case-detail-value" style="font-family: monospace; font-size: 13px; word-break: break-all;">{{ evidence.md5_hash }}</span>
+      </div>
+    </div>
+  </div>
+
+  {% if evidence.file_format or evidence.file_size or evidence.timestamp %}
+  <div class="view-case-section">
+    <h2 class="view-case-section-title">File-Level Metadata</h2>
+    <div class="view-case-details-grid">
+      {% if evidence.file_format %}
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">File Format</span>
+        <span class="view-case-detail-value">{{ evidence.file_format }}</span>
+      </div>
+      {% endif %}
+      {% if evidence.file_size %}
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">File Size</span>
+        <span class="view-case-detail-value">{{ evidence.file_size }}</span>
+      </div>
+      {% endif %}
+      {% if evidence.timestamp %}
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">Timestamp</span>
+        <span class="view-case-detail-value">{{ evidence.timestamp }}</span>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if evidence.exif_data %}
+  <div class="view-case-section">
+    <h2 class="view-case-section-title">EXIF Data</h2>
+    <div style="background: #f8fafc; padding: 16px; border-radius: 8px; font-family: monospace; font-size: 13px; color: #475569; white-space: pre-wrap; word-wrap: break-word;">{{ evidence.exif_data }}</div>
+  </div>
+  {% endif %}
+
+  {% if evidence.authenticity_indicators %}
+  <div class="view-case-section">
+    <h2 class="view-case-section-title">Authenticity Indicators</h2>
+    <div class="view-case-details-grid">
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">Status</span>
+        <span class="view-case-detail-value">{{ evidence.authenticity_indicators }}</span>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="view-case-section">
+    <h2 class="view-case-section-title">Actions</h2>
+    <div class="view-case-actions">
+      <a href="{% url 'cases:view_case' evidence.case.case_id %}" class="view-case-action-btn view-case-action-secondary">Back to Case</a>
+      <a href="{% url 'evidence:download_file' evidence.id %}" class="view-case-action-btn view-case-action-secondary">Download</a>
+      {% if user.is_staff %}
+      <a href="{% url 'evidence:audit' evidence.id %}" class="view-case-action-btn view-case-action-secondary">Audit Log</a>
+      {% endif %}
+      {% if user.role == 'analyst' %}
+      <a href="{% url 'evidence:analyze' evidence.id %}" class="view-case-action-btn view-case-action-primary">Analyze</a>
+      {% endif %}
+      {% if user.is_staff %}
+      <a href="{% url 'evidence:verify' evidence.id %}" class="view-case-action-btn view-case-action-primary">Verify Integrity</a>
+      {% endif %}
+    </div>
+  </div>
 </div>
 {% endblock %}

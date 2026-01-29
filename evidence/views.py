@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, FileResponse
 from django.views.decorators.http import require_http_methods
 from django.db.models import Q
 from cases.permissions import role_required
@@ -9,6 +9,7 @@ from cases.models import Case
 from .models import Evidence, EvidenceAuditLog
 from .forms import EvidenceUploadForm
 import json
+import mimetypes
 
 
 @login_required
@@ -23,6 +24,7 @@ def upload_evidence(request, case_id):
             evidence.case = case
             evidence.uploaded_by = request.user
             evidence.original_filename = form.cleaned_data['media'].name
+            evidence.media_type = form.cleaned_data.get('media_type', 'other')
             evidence.save()
             
             EvidenceAuditLog.log_action(
@@ -169,3 +171,67 @@ def verify_evidence_integrity(request, evidence_id):
     return render(request, 'evidence/verify_evidence.html', {
         'evidence': evidence
     })
+
+
+@login_required
+@role_required('investigator', 'analyst', 'admin', 'auditor')
+def view_evidence_file(request, evidence_id):
+    evidence = get_object_or_404(Evidence, id=evidence_id)
+    
+    try:
+        decrypted_file = evidence.get_decrypted_file()
+        
+        content_type, _ = mimetypes.guess_type(evidence.original_filename)
+        if content_type is None:
+            content_type = 'application/octet-stream'
+        
+        response = FileResponse(
+            decrypted_file,
+            content_type=content_type
+        )
+        
+        response['Content-Disposition'] = f'inline; filename="{evidence.original_filename}"'
+        
+        EvidenceAuditLog.log_action(
+            user=request.user,
+            evidence=evidence,
+            action='Evidence Viewed',
+            details=f'File: {evidence.original_filename}'
+        )
+        
+        return response
+    except Exception as e:
+        messages.error(request, f'Error viewing evidence: {str(e)}')
+        return redirect('evidence:view', evidence_id=evidence.id)
+
+
+@login_required
+@role_required('investigator', 'analyst', 'admin', 'auditor')
+def download_evidence_file(request, evidence_id):
+    evidence = get_object_or_404(Evidence, id=evidence_id)
+    
+    try:
+        decrypted_file = evidence.get_decrypted_file()
+        
+        content_type, _ = mimetypes.guess_type(evidence.original_filename)
+        if content_type is None:
+            content_type = 'application/octet-stream'
+        
+        response = FileResponse(
+            decrypted_file,
+            content_type=content_type
+        )
+        
+        response['Content-Disposition'] = f'attachment; filename="{evidence.original_filename}"'
+        
+        EvidenceAuditLog.log_action(
+            user=request.user,
+            evidence=evidence,
+            action='Evidence Downloaded',
+            details=f'File: {evidence.original_filename}'
+        )
+        
+        return response
+    except Exception as e:
+        messages.error(request, f'Error downloading evidence: {str(e)}')
+        return redirect('evidence:view', evidence_id=evidence.id)
