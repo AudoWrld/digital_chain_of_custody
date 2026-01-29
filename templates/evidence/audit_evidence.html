@@ -1,160 +1,219 @@
 {% extends 'base.html' %}
 
 {% block title %}Audit Evidence - {{ evidence.description }}{% endblock %}
+{% load static %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-12">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{% url 'dashboard:dashboard' %}">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'cases:view_case' evidence.case.case_id %}">Case {{ evidence.case.case_number }}</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'evidence:view' evidence.id %}">Evidence #{{ evidence.id }}</a></li>
-                    <li class="breadcrumb-item active">Audit</li>
-                </ol>
-            </nav>
-        </div>
+<link rel="stylesheet" href="{% static 'css/evidence/audit.css' %}?v={{ STATIC_VERSION }}" />
+
+<div class="view-case-container">
+  <div class="view-case-header">
+    <h1 class="view-case-title">Audit Evidence #{{ evidence.id }}</h1>
+    <div class="view-case-meta">
+      <div class="view-case-meta-item">
+        <span class="view-case-meta-label">Case:</span>
+        <span class="view-case-meta-value">{{ evidence.case.case_id }}</span>
+      </div>
+      <div class="view-case-meta-item">
+        <span class="view-case-meta-label">Uploaded By:</span>
+        <span class="view-case-meta-value">{{ evidence.uploaded_by.get_full_name|default:"N/A" }}</span>
+      </div>
+      <div class="view-case-meta-item">
+        <span class="view-case-meta-label">Date Uploaded:</span>
+        <span class="view-case-meta-value">{{ evidence.date_uploaded|date:"F d, Y g:i A" }}</span>
+      </div>
     </div>
-    
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <h4>Audit Evidence #{{ evidence.id }}</h4>
-                </div>
-                <div class="card-body">
-                    <div class="alert alert-info">
-                        <strong>Auditor View:</strong> Review custody logs, verify hashes, and check assignment history. No changes are permitted.
-                    </div>
-                    
-                    <h5>Evidence Summary</h5>
-                    <table class="table table-bordered">
-                        <tr>
-                            <th width="30%">Description</th>
-                            <td>{{ evidence.description }}</td>
-                        </tr>
-                        <tr>
-                            <th>Original Filename</th>
-                            <td>{{ evidence.original_filename }}</td>
-                        </tr>
-                        <tr>
-                            <th>SHA-256 Hash</th>
-                            <td><code>{{ evidence.sha256_hash }}</code></td>
-                        </tr>
-                        <tr>
-                            <th>MD5 Hash</th>
-                            <td><code>{{ evidence.md5_hash }}</code></td>
-                        </tr>
-                        <tr>
-                            <th>Date Uploaded</th>
-                            <td>{{ evidence.date_uploaded|date:"F d, Y H:i" }}</td>
-                        </tr>
-                        <tr>
-                            <th>Uploaded By</th>
-                            <td>{{ evidence.uploaded_by.username|default:"N/A" }}</td>
-                        </tr>
-                        <tr>
-                            <th>Metadata Valid</th>
-                            <td>
-                                {% if evidence.metadata_valid %}
-                                    <span class="badge badge-success">Yes</span>
-                                {% else %}
-                                    <span class="badge badge-danger">No</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                    </table>
-                    
-                    <h5 class="mt-4">Hash Verification</h5>
-                    <table class="table table-bordered">
-                        <tr>
-                            <th width="30%">SHA-256 Hash</th>
-                            <td><code>{{ evidence.sha256_hash }}</code></td>
-                        </tr>
-                        <tr>
-                            <th>MD5 Hash</th>
-                            <td><code>{{ evidence.md5_hash }}</code></td>
-                        </tr>
-                        <tr>
-                            <th>File Format</th>
-                            <td>{{ evidence.metadata.file_level.file_format|default:"Unknown" }}</td>
-                        </tr>
-                        <tr>
-                            <th>File Size</th>
-                            <td>{{ evidence.metadata.file_level.file_size_human|default:"Unknown" }}</td>
-                        </tr>
-                    </table>
-                    
-                    <h5 class="mt-4">Custody Log</h5>
-                    {% if audit_logs %}
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Timestamp</th>
-                                    <th>User</th>
-                                    <th>Action</th>
-                                    <th>Details</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for log in audit_logs %}
-                                    <tr>
-                                        <td>{{ log.timestamp|date:"Y-m-d H:i:s" }}</td>
-                                        <td>{{ log.user.username|default:"System" }}</td>
-                                        <td>{{ log.action }}</td>
-                                        <td>{{ log.details|default:"-" }}</td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    {% else %}
-                        <p class="text-muted">No custody logs found.</p>
-                    {% endif %}
-                    
-                    <h5 class="mt-4">Assignment History</h5>
-                    <table class="table table-bordered">
-                        <tr>
-                            <th width="30%">Case</th>
-                            <td>{{ evidence.case.case_number }}</td>
-                        </tr>
-                        <tr>
-                            <th>Case Status</th>
-                            <td>{{ evidence.case.case_status }}</td>
-                        </tr>
-                        <tr>
-                            <th>Case Priority</th>
-                            <td>{{ evidence.case.case_priority }}</td>
-                        </tr>
-                        <tr>
-                            <th>Assigned Investigators</th>
-                            <td>
-                                {% for investigator in evidence.case.assigned_investigators.all %}
-                                    {{ investigator.username }}{% if not forloop.last %}, {% endif %}
-                                {% empty %}
-                                    None
-                                {% endfor %}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Assigned Analysts</th>
-                            <td>
-                                {% for analyst in evidence.case.assigned_analysts.all %}
-                                    {{ analyst.username }}{% if not forloop.last %}, {% endif %}
-                                {% empty %}
-                                    None
-                                {% endfor %}
-                            </td>
-                        </tr>
-                    </table>
-                    
-                    <div class="mt-4">
-                        <a href="{% url 'evidence:view' evidence.id %}" class="btn btn-secondary">Back to Evidence</a>
-                        <a href="{% url 'cases:view_case' evidence.case.case_id %}" class="btn btn-secondary">Back to Case</a>
-                    </div>
-                </div>
+  </div>
+
+  <div class="view-case-section">
+    <h2 class="view-case-section-title">Auditor View</h2>
+    <div class="view-case-description">Review custody logs, verify hashes, and check assignment history. No changes are permitted.</div>
+  </div>
+
+  <div class="view-case-section">
+    <h2 class="view-case-section-title">Evidence Summary</h2>
+    <div class="view-case-details-row">
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">Description</span>
+        <span class="view-case-detail-value">{{ evidence.description }}</span>
+      </div>
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">Original Filename</span>
+        <span class="view-case-detail-value">{{ evidence.original_filename }}</span>
+      </div>
+    </div>
+    <div class="view-case-details-row">
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">SHA-256 Hash</span>
+        <span class="view-case-detail-value"><code style="background: #f1f5f9; padding: 4px 8px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 13px;">{{ evidence.sha256_hash }}</code></span>
+      </div>
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">MD5 Hash</span>
+        <span class="view-case-detail-value"><code style="background: #f1f5f9; padding: 4px 8px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 13px;">{{ evidence.md5_hash }}</code></span>
+      </div>
+    </div>
+    <div class="view-case-details-row">
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">Metadata Valid</span>
+        <span class="view-case-detail-value">
+          {% if evidence.metadata_valid %}
+          <span class="view-case-status-badge view-case-status-closed">Yes</span>
+          {% else %}
+          <span class="view-case-status-badge view-case-status-invalid">No</span>
+          {% endif %}
+        </span>
+      </div>
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">Immutable</span>
+        <span class="view-case-detail-value">
+          {% if evidence.is_immutable %}
+          <span class="view-case-status-badge view-case-status-closed">Yes</span>
+          {% else %}
+          <span class="view-case-status-badge view-case-status-withdrawn">No</span>
+          {% endif %}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="view-case-section">
+    <h2 class="view-case-section-title">Hash Verification</h2>
+    <div class="view-case-details-row">
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">SHA-256 Hash</span>
+        <span class="view-case-detail-value"><code style="background: #f1f5f9; padding: 4px 8px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 13px;">{{ evidence.sha256_hash }}</code></span>
+      </div>
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">MD5 Hash</span>
+        <span class="view-case-detail-value"><code style="background: #f1f5f9; padding: 4px 8px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 13px;">{{ evidence.md5_hash }}</code></span>
+      </div>
+    </div>
+    <div class="view-case-details-row">
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">File Format</span>
+        <span class="view-case-detail-value">{{ evidence.metadata.file_level.file_format|default:"Unknown" }}</span>
+      </div>
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">File Size</span>
+        <span class="view-case-detail-value">{{ evidence.metadata.file_level.file_size_human|default:"Unknown" }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="view-case-section">
+    <h2 class="view-case-section-title">Custody Log</h2>
+    {% if audit_logs %}
+    <table class="view-case-table">
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>User</th>
+          <th>Action</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for log in audit_logs %}
+        <tr>
+          <td>{{ log.timestamp|date:"Y-m-d H:i:s" }}</td>
+          <td>{{ log.user.get_full_name|default:"System" }}</td>
+          <td>{{ log.action }}</td>
+          <td>{{ log.details|default:"-" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="view-case-empty-media">No custody logs found.</div>
+    {% endif %}
+  </div>
+
+  <div class="view-case-section">
+    <h2 class="view-case-section-title">Assignment History</h2>
+    <div class="view-case-details-row">
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">Case</span>
+        <span class="view-case-detail-value">{{ evidence.case.case_id }}</span>
+      </div>
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">Case Status</span>
+        <span class="view-case-detail-value">
+          {% if evidence.case.case_status == 'Open' %}
+          <span class="view-case-status-badge view-case-status-open">{{ evidence.case.case_status }}</span>
+          {% elif evidence.case.case_status == 'Pending Admin Approval' %}
+          <span class="view-case-status-badge view-case-status-pending">{{ evidence.case.case_status }}</span>
+          {% elif evidence.case.case_status == 'Approved & Assigned' %}
+          <span class="view-case-status-badge view-case-status-approved">{{ evidence.case.case_status }}</span>
+          {% elif evidence.case.case_status == 'Under Review' %}
+          <span class="view-case-status-badge view-case-status-under">{{ evidence.case.case_status }}</span>
+          {% elif evidence.case.case_status == 'Closed' %}
+          <span class="view-case-status-badge view-case-status-closed">{{ evidence.case.case_status }}</span>
+          {% elif evidence.case.case_status == 'Archived' %}
+          <span class="view-case-status-badge view-case-status-archived">{{ evidence.case.case_status }}</span>
+          {% elif evidence.case.case_status == 'Invalid' %}
+          <span class="view-case-status-badge view-case-status-invalid">{{ evidence.case.case_status }}</span>
+          {% elif evidence.case.case_status == 'Withdrawn' %}
+          <span class="view-case-status-badge view-case-status-withdrawn">{{ evidence.case.case_status }}</span>
+          {% else %}
+          <span class="view-case-status-badge">{{ evidence.case.case_status }}</span>
+          {% endif %}
+        </span>
+      </div>
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">Case Priority</span>
+        <span class="view-case-detail-value">
+          {% if evidence.case.case_priority == 'low' %}
+          <span class="view-case-priority-badge view-case-priority-low">{{ evidence.case.get_case_priority_display }}</span>
+          {% elif evidence.case.case_priority == 'medium' %}
+          <span class="view-case-priority-badge view-case-priority-medium">{{ evidence.case.get_case_priority_display }}</span>
+          {% elif evidence.case.case_priority == 'high' %}
+          <span class="view-case-priority-badge view-case-priority-high">{{ evidence.case.get_case_priority_display }}</span>
+          {% elif evidence.case.case_priority == 'critical' %}
+          <span class="view-case-priority-badge view-case-priority-critical">{{ evidence.case.get_case_priority_display }}</span>
+          {% endif %}
+        </span>
+      </div>
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">Assigned Investigators</span>
+        <span class="view-case-detail-value">
+          {% if evidence.case.assigned_investigators.all %}
+          <div class="view-case-investigators-list">
+            {% for investigator in evidence.case.assigned_investigators.all %}
+            <div class="view-case-investigator-item">
+              <span class="view-case-investigator-tag">{{ investigator.get_full_name }}</span>
             </div>
-        </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <span style="color: #94a3b8;">None assigned</span>
+          {% endif %}
+        </span>
+      </div>
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">Assigned Analysts</span>
+        <span class="view-case-detail-value">
+          {% if evidence.case.assigned_analysts.all %}
+          <div class="view-case-investigators-list">
+            {% for analyst in evidence.case.assigned_analysts.all %}
+            <div class="view-case-investigator-item">
+              <span class="view-case-investigator-tag">{{ analyst.get_full_name }}</span>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <span style="color: #94a3b8;">None assigned</span>
+          {% endif %}
+        </span>
+      </div>
     </div>
+  </div>
+
+  <div class="view-case-section">
+    <h2 class="view-case-section-title">Actions</h2>
+    <div class="view-case-actions">
+      <a href="{% url 'evidence:view' evidence.id %}" class="view-case-action-btn view-case-action-secondary">Back to Evidence</a>
+      <a href="{% url 'cases:view_case' evidence.case.case_id %}" class="view-case-action-btn view-case-action-secondary">Back to Case</a>
+    </div>
+  </div>
 </div>
 {% endblock %}
