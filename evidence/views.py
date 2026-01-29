@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.http import JsonResponse, HttpResponse, FileResponse
 from django.views.decorators.http import require_http_methods
 from django.db.models import Q
-from cases.permissions import role_required
+from cases.permissions import role_required, can_upload_evidence
 from cases.models import Case
 from .models import Evidence, EvidenceAuditLog
 from .forms import EvidenceUploadForm
@@ -13,7 +13,7 @@ import mimetypes
 
 
 @login_required
-@role_required('investigator')
+@can_upload_evidence
 def upload_evidence(request, case_id):
     case = get_object_or_404(Case, case_id=case_id)
     
