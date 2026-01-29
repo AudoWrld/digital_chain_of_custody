@@ -1,110 +1,83 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block title %}Verify Evidence Integrity - {{ evidence.description }}{% endblock %}
-
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-12">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{% url 'dashboard:dashboard' %}">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'cases:view_case' evidence.case.case_id %}">Case {{ evidence.case.case_number }}</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'evidence:view' evidence.id %}">Evidence #{{ evidence.id }}</a></li>
-                    <li class="breadcrumb-item active">Verify Integrity</li>
-                </ol>
-            </nav>
-        </div>
+<link rel="stylesheet" href="{% static 'css/evidence/verify_evidence.css' %}?v={{ STATIC_VERSION }}" />
+
+<div class="view-case-container">
+  <div class="view-case-header">
+    <h1 class="view-case-title">Verify Evidence Integrity</h1>
+    <div class="view-case-meta">
+      <div class="view-case-meta-item">
+        <span class="view-case-meta-label">Case:</span>
+        <span class="view-case-meta-value">{{ evidence.case.case_id }}</span>
+      </div>
+      <div class="view-case-meta-item">
+        <span class="view-case-meta-label">Evidence:</span>
+        <span class="view-case-meta-value">{{ evidence.description }}</span>
+      </div>
     </div>
-    
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <div class="card">
-                <div class="card-header">
-                    <h4>Verify Evidence Integrity #{{ evidence.id }}</h4>
-                </div>
-                <div class="card-body">
-                    <div class="alert alert-info">
-                        <strong>Admin View:</strong> Verify evidence integrity and hash consistency.
-                    </div>
-                    
-                    <h5>Evidence Summary</h5>
-                    <table class="table table-bordered">
-                        <tr>
-                            <th width="30%">Description</th>
-                            <td>{{ evidence.description }}</td>
-                        </tr>
-                        <tr>
-                            <th>Original Filename</th>
-                            <td>{{ evidence.original_filename }}</td>
-                        </tr>
-                        <tr>
-                            <th>SHA-256 Hash</th>
-                            <td><code>{{ evidence.sha256_hash }}</code></td>
-                        </tr>
-                        <tr>
-                            <th>MD5 Hash</th>
-                            <td><code>{{ evidence.md5_hash }}</code></td>
-                        </tr>
-                        <tr>
-                            <th>Metadata Valid</th>
-                            <td>
-                                {% if evidence.metadata_valid %}
-                                    <span class="badge badge-success">Yes</span>
-                                {% else %}
-                                    <span class="badge badge-danger">No</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Immutable</th>
-                            <td>{% if evidence.is_immutable %}Yes{% else %}No{% endif %}</td>
-                        </tr>
-                    </table>
-                    
-                    {% if not evidence.metadata_valid %}
-                    <div class="alert alert-warning">
-                        <strong>Metadata Issues:</strong>
-                        <ul>
-                            {% for issue in evidence.metadata_issues %}
-                                <li>{{ issue }}</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    {% endif %}
-                    
-                    <form method="post">
-                        {% csrf_token %}
-                        
-                        <div class="form-group mb-3">
-                            <label>Integrity Verification</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="verified" id="verified_true" value="true" required>
-                                <label class="form-check-label" for="verified_true">
-                                    Verified - Evidence integrity is intact
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="verified" id="verified_false" value="false" required>
-                                <label class="form-check-label" for="verified_false">
-                                    Not Verified - Evidence integrity issues detected
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group mb-3">
-                            <label for="notes">Verification Notes</label>
-                            <textarea class="form-control" id="notes" name="notes" rows="5" placeholder="Enter verification notes..."></textarea>
-                        </div>
-                        
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-primary">Submit Verification</button>
-                            <a href="{% url 'evidence:view' evidence.id %}" class="btn btn-secondary">Cancel</a>
-                        </div>
-                    </form>
-                </div>
-            </div>
+  </div>
+
+  <div class="view-case-section">
+    <h2 class="view-case-section-title">Evidence Summary</h2>
+    <div class="verify-evidence-summary">
+      <div class="verify-evidence-row">
+        <span class="verify-evidence-label">Description:</span>
+        <span class="verify-evidence-description">{{ evidence.description }}</span>
+      </div>
+      <div class="verify-evidence-row">
+        <span class="verify-evidence-label">Original filename:</span>
+        <span class="verify-evidence-name">{{ evidence.original_filename }}</span>
+      </div>
+      <div class="verify-evidence-row verify-evidence-row-side">
+        <div class="verify-evidence-hash">
+          <span class="verify-evidence-hash-label">MD5</span>
+          <span class="verify-evidence-hash-value">{{ evidence.md5_hash }}</span>
         </div>
+        <div class="verify-evidence-hash">
+          <span class="verify-evidence-hash-label">SHA-256</span>
+          <span class="verify-evidence-hash-value">{{ evidence.sha256_hash }}</span>
+        </div>
+      </div>
+      <div class="verify-evidence-row verify-evidence-row-side">
+        <div class="verify-evidence-badge">
+          <span class="verify-evidence-badge-label">Metadata Valid</span>
+          {% if evidence.metadata_valid %}
+          <span class="view-case-status-badge view-case-status-closed">Yes</span>
+          {% else %}
+          <span class="view-case-status-badge view-case-status-invalid">No</span>
+          {% endif %}
+        </div>
+        <div class="verify-evidence-badge">
+          <span class="verify-evidence-badge-label">Immutable</span>
+          {% if evidence.is_immutable %}
+          <span class="view-case-status-badge view-case-status-closed">Yes</span>
+          {% else %}
+          <span class="view-case-status-badge view-case-status-withdrawn">No</span>
+          {% endif %}
+        </div>
+      </div>
     </div>
+  </div>
+
+  {% if not evidence.metadata_valid %}
+  <div class="view-case-section" style="background: #fef3c7; border-left: 4px solid #f59e0b;">
+    <h2 class="view-case-section-title" style="color: #92400e;">Metadata Issues</h2>
+    <ul style="color: #78350f; margin: 0; padding-left: 20px;">
+      {% for issue in evidence.metadata_issues %}
+      <li>{{ issue }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  <div class="view-case-section">
+    <h2 class="view-case-section-title">Actions</h2>
+    <div class="view-case-actions">
+      <a href="{% url 'evidence:view' evidence.id %}" class="view-case-action-btn view-case-action-secondary">Back to Evidence</a>
+      <a href="{% url 'cases:view_case' evidence.case.case_id %}" class="view-case-action-btn view-case-action-secondary">Back to Case</a>
+    </div>
+  </div>
 </div>
 {% endblock %}

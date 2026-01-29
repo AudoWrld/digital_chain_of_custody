@@ -150,24 +150,6 @@ def analyze_evidence(request, evidence_id):
 def verify_evidence_integrity(request, evidence_id):
     evidence = get_object_or_404(Evidence, id=evidence_id)
     
-    if request.method == 'POST':
-        verified = request.POST.get('verified') == 'true'
-        notes = request.POST.get('notes', '')
-        
-        EvidenceAuditLog.log_action(
-            user=request.user,
-            evidence=evidence,
-            action='Integrity Verification',
-            details=f'Verified: {verified}, Notes: {notes}'
-        )
-        
-        if verified:
-            messages.success(request, 'Evidence integrity verified')
-        else:
-            messages.warning(request, 'Evidence integrity verification failed')
-        
-        return redirect('evidence:view', evidence_id=evidence.id)
-    
     return render(request, 'evidence/verify_evidence.html', {
         'evidence': evidence
     })
