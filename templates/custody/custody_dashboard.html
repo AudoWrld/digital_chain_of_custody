@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/cases/view_case.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="view-case-container">
+  <div class="view-case-header">
+    <h1>Custody Dashboard</h1>
+  </div>
+
+  <div class="view-case-section">
+    <h2>Pending Transfers</h2>
+    {% if pending_transfers %}
+      <div class="view-case-details-grid">
+        {% for transfer in pending_transfers %}
+          <div class="view-case-card">
+            <div class="view-case-details-row">
+              <div class="view-case-detail-item">
+                <span class="view-case-detail-label">Evidence:</span>
+                <span class="view-case-detail-value">{{ transfer.evidence.description }}</span>
+              </div>
+              <div class="view-case-detail-item">
+                <span class="view-case-detail-label">From:</span>
+                <span class="view-case-detail-value">{{ transfer.from_user.get_full_name|default:transfer.from_user.username }}</span>
+              </div>
+              <div class="view-case-detail-item">
+                <span class="view-case-detail-label">To:</span>
+                <span class="view-case-detail-value">{{ transfer.to_user.get_full_name|default:transfer.to_user.username }}</span>
+              </div>
+              <div class="view-case-detail-item">
+                <span class="view-case-detail-label">Reason:</span>
+                <span class="view-case-detail-value">{{ transfer.reason }}</span>
+              </div>
+              <div class="view-case-detail-item">
+                <span class="view-case-detail-label">Requested:</span>
+                <span class="view-case-detail-value">{{ transfer.created_at|date:"M d, Y H:i" }}</span>
+              </div>
+            </div>
+            <div class="view-case-actions">
+              <a href="{% url 'custody:approve_transfer' transfer.id %}" class="view-case-btn view-case-btn-primary">Review Transfer</a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="view-case-empty-state">
+        <p>No pending transfers</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="view-case-section">
+    <h2>My Transfers</h2>
+    {% if my_transfers %}
+      <div class="view-case-details-grid">
+        {% for transfer in my_transfers %}
+          <div class="view-case-card">
+            <div class="view-case-details-row">
+              <div class="view-case-detail-item">
+                <span class="view-case-detail-label">Evidence:</span>
+                <span class="view-case-detail-value">{{ transfer.evidence.description }}</span>
+              </div>
+              <div class="view-case-detail-item">
+                <span class="view-case-detail-label">From:</span>
+                <span class="view-case-detail-value">{{ transfer.from_user.get_full_name|default:transfer.from_user.username }}</span>
+              </div>
+              <div class="view-case-detail-item">
+                <span class="view-case-detail-label">To:</span>
+                <span class="view-case-detail-value">{{ transfer.to_user.get_full_name|default:transfer.to_user.username }}</span>
+              </div>
+              <div class="view-case-detail-item">
+                <span class="view-case-detail-label">Status:</span>
+                <span class="view-case-badge view-case-badge-{{ transfer.status }}">{{ transfer.status|title }}</span>
+              </div>
+              <div class="view-case-detail-item">
+                <span class="view-case-detail-label">Created:</span>
+                <span class="view-case-detail-value">{{ transfer.created_at|date:"M d, Y H:i" }}</span>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="view-case-empty-state">
+        <p>No transfers found</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="view-case-section">
+    <h2>Storage Locations</h2>
+    {% if storage_locations %}
+      <div class="view-case-details-grid">
+        {% for location in storage_locations %}
+          <div class="view-case-card">
+            <div class="view-case-details-row">
+              <div class="view-case-detail-item">
+                <span class="view-case-detail-label">Name:</span>
+                <span class="view-case-detail-value">{{ location.name }}</span>
+              </div>
+              <div class="view-case-detail-item">
+                <span class="view-case-detail-label">Type:</span>
+                <span class="view-case-detail-value">{{ location.get_location_type_display }}</span>
+              </div>
+              <div class="view-case-detail-item">
+                <span class="view-case-detail-label">Capacity:</span>
+                <span class="view-case-detail-value">
+                  {% if location.capacity %}
+                    {{ location.capacity|filesizeformat }}
+                  {% else %}
+                    Unlimited
+                  {% endif %}
+                </span>
+              </div>
+              <div class="view-case-detail-item">
+                <span class="view-case-detail-label">Used:</span>
+                <span class="view-case-detail-value">{{ location.used_space|filesizeformat }}</span>
+              </div>
+              <div class="view-case-detail-item">
+                <span class="view-case-detail-label">Usage:</span>
+                <span class="view-case-detail-value">
+                  {% if location.usage_percentage %}
+                    {{ location.usage_percentage|floatformat:1 }}%
+                  {% else %}
+                    N/A
+                  {% endif %}
+                </span>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="view-case-empty-state">
+        <p>No storage locations found</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
