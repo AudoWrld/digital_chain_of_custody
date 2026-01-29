@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/cases/create_case.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="create-case-container">
+    <div class="create-case-header">
+        <h1>Edit Analysis Report</h1>
+        <p>Edit the analysis report</p>
+    </div>
+
+    <div class="create-case-form-container">
+        <form method="post" enctype="multipart/form-data" class="create-case-form">
+            {% csrf_token %}
+
+            <div class="form-section">
+                <h2>Report Information</h2>
+
+                <div class="form-group">
+                    <label for="{{ form.case.id_for_label }}">Case</label>
+                    <input type="text" id="{{ form.case.id_for_label }}" value="{{ report.case.case_id }}" readonly class="form-input readonly">
+                </div>
+
+                {% if report.evidence %}
+                <div class="form-group">
+                    <label for="{{ form.evidence.id_for_label }}">Evidence</label>
+                    <input type="text" id="{{ form.evidence.id_for_label }}" value="{{ report.evidence.description|default:report.evidence.original_filename }}" readonly class="form-input readonly">
+                </div>
+                {% endif %}
+
+                <div class="form-group">
+                    <label for="{{ form.title.id_for_label }}">Title</label>
+                    {{ form.title }}
+                    {% if form.title.errors %}
+                    <div class="error-message">{{ form.title.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.content.id_for_label }}">Content</label>
+                    {{ form.content }}
+                    {% if form.content.errors %}
+                    <div class="error-message">{{ form.content.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.findings.id_for_label }}">Findings</label>
+                    {{ form.findings }}
+                    {% if form.findings.errors %}
+                    <div class="error-message">{{ form.findings.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.recommendations.id_for_label }}">Recommendations</label>
+                    {{ form.recommendations }}
+                    {% if form.recommendations.errors %}
+                    <div class="error-message">{{ form.recommendations.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a href="{% url 'reports:view' report.id %}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

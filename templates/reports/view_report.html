@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/cases/view_case.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="view-case-container">
+    <div class="view-case-header">
+        <div class="view-case-title">
+            <h1>Analysis Report</h1>
+            <p>{{ report.title }}</p>
+        </div>
+        <div class="view-case-actions">
+            <a href="{% if report.evidence %}{% url 'evidence:view_evidence' report.evidence.id %}{% else %}{% url 'cases:view_case' report.case.case_id %}{% endif %}" class="btn btn-secondary">Back</a>
+            {% if report.created_by == user or user.is_staff %}
+            <a href="{% url 'reports:edit' report.id %}" class="btn btn-primary">Edit</a>
+            {% endif %}
+            {% if report.status == 'draft' and report.created_by == user %}
+            <a href="{% url 'reports:submit' report.id %}" class="btn btn-success">Submit</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="view-case-content">
+        <div class="view-case-section">
+            <h2>Report Information</h2>
+            <div class="view-case-details-grid">
+                <div class="view-case-detail-item">
+                    <span class="detail-label">Case</span>
+                    <span class="detail-value">
+                        <a href="{% url 'cases:view_case' report.case.case_id %}">{{ report.case.case_id }}</a>
+                    </span>
+                </div>
+                {% if report.evidence %}
+                <div class="view-case-detail-item">
+                    <span class="detail-label">Evidence</span>
+                    <span class="detail-value">
+                        <a href="{% url 'evidence:view_evidence' report.evidence.id %}">{{ report.evidence.description|default:report.evidence.original_filename }}</a>
+                    </span>
+                </div>
+                {% endif %}
+                <div class="view-case-detail-item">
+                    <span class="detail-label">Created By</span>
+                    <span class="detail-value">{{ report.created_by.get_full_name|default:report.created_by.username }}</span>
+                </div>
+                <div class="view-case-detail-item">
+                    <span class="detail-label">Created At</span>
+                    <span class="detail-value">{{ report.created_at|date:"F d, Y H:i" }}</span>
+                </div>
+                <div class="view-case-detail-item">
+                    <span class="detail-label">Status</span>
+                    <span class="detail-value">
+                        <span class="status-badge status-{{ report.status }}">{{ report.status|title }}</span>
+                    </span>
+                </div>
+                {% if report.reviewed_by %}
+                <div class="view-case-detail-item">
+                    <span class="detail-label">Reviewed By</span>
+                    <span class="detail-value">{{ report.reviewed_by.get_full_name|default:report.reviewed_by.username }}</span>
+                </div>
+                <div class="view-case-detail-item">
+                    <span class="detail-label">Reviewed At</span>
+                    <span class="detail-value">{{ report.reviewed_at|date:"F d, Y H:i" }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="view-case-section">
+            <h2>Content</h2>
+            <div class="view-case-description">
+                {{ report.content|linebreaks }}
+            </div>
+        </div>
+
+        {% if report.findings %}
+        <div class="view-case-section">
+            <h2>Findings</h2>
+            <div class="view-case-description">
+                {{ report.findings|linebreaks }}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if report.recommendations %}
+        <div class="view-case-section">
+            <h2>Recommendations</h2>
+            <div class="view-case-description">
+                {{ report.recommendations|linebreaks }}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

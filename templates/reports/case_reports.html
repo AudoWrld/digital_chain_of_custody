@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/cases/case_list.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="case-list-container">
+    <div class="case-list-header">
+        <div class="case-list-title">
+            <h1>Analysis Reports</h1>
+            <p>Case: {{ case.case_id }}</p>
+        </div>
+        <div class="case-list-actions">
+            <a href="{% url 'cases:view_case' case.case_id %}" class="btn btn-secondary">Back to Case</a>
+            {% if user.role == 'analyst' or user.is_staff %}
+            <a href="{% url 'reports:create' case.case_id %}" class="btn btn-primary">Create Report</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="case-list-content">
+        {% if reports %}
+        <div class="case-list">
+            {% for report in reports %}
+            <div class="case-card">
+                <div class="case-card-header">
+                    <h3>{{ report.title }}</h3>
+                    <span class="status-badge status-{{ report.status }}">{{ report.status|title }}</span>
+                </div>
+                <div class="case-card-body">
+                    <div class="case-card-info">
+                        <div class="case-card-info-item">
+                            <span class="info-label">Created By</span>
+                            <span class="info-value">{{ report.created_by.get_full_name|default:report.created_by.username }}</span>
+                        </div>
+                        <div class="case-card-info-item">
+                            <span class="info-label">Created At</span>
+                            <span class="info-value">{{ report.created_at|date:"F d, Y H:i" }}</span>
+                        </div>
+                        {% if report.evidence %}
+                        <div class="case-card-info-item">
+                            <span class="info-label">Evidence</span>
+                            <span class="info-value">
+                                <a href="{% url 'evidence:view_evidence' report.evidence.id %}">{{ report.evidence.description|default:report.evidence.original_filename }}</a>
+                            </span>
+                        </div>
+                        {% endif %}
+                        {% if report.reviewed_by %}
+                        <div class="case-card-info-item">
+                            <span class="info-label">Reviewed By</span>
+                            <span class="info-value">{{ report.reviewed_by.get_full_name|default:report.reviewed_by.username }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="case-card-description">
+                        {{ report.content|truncatewords:30 }}
+                    </div>
+                </div>
+                <div class="case-card-footer">
+                    <a href="{% url 'reports:view' report.id %}" class="btn btn-secondary btn-sm">View</a>
+                    {% if report.created_by == user or user.is_staff %}
+                    <a href="{% url 'reports:edit' report.id %}" class="btn btn-primary btn-sm">Edit</a>
+                    {% endif %}
+                    {% if report.status == 'draft' and report.created_by == user %}
+                    <a href="{% url 'reports:submit' report.id %}" class="btn btn-success btn-sm">Submit</a>
+                    {% endif %}
+                    {% if report.status == 'submitted' and user.is_staff %}
+                    <a href="{% url 'reports:review' report.id %}" class="btn btn-warning btn-sm">Review</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+            </div>
+            <h3>No Analysis Reports</h3>
+            <p>There are no analysis reports for this case yet.</p>
+            {% if user.role == 'analyst' or user.is_staff %}
+            <a href="{% url 'reports:create' case.case_id %}" class="btn btn-primary">Create First Report</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

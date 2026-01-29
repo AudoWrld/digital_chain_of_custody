@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/cases/view_case.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="view-case-container">
+  <div class="view-case-header">
+    <h1>Evidence Custody Log</h1>
+    <a href="{% url 'evidence:view_evidence' evidence.id %}" class="view-case-btn view-case-btn-secondary">Back to Evidence</a>
+  </div>
+
+  <div class="view-case-section">
+    <h2>Evidence Information</h2>
+    <div class="view-case-details-grid">
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">Description:</span>
+        <span class="view-case-detail-value">{{ evidence.description }}</span>
+      </div>
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">Case:</span>
+        <span class="view-case-detail-value">{{ evidence.case.case_id }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="view-case-section">
+    <h2>Custody History</h2>
+    {% if logs %}
+      <table class="view-case-table">
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>Action</th>
+            <th>User</th>
+            <th>Details</th>
+            <th>From Location</th>
+            <th>To Location</th>
+            <th>To User</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in logs %}
+            <tr>
+              <td>{{ log.timestamp|date:"M d, Y H:i" }}</td>
+              <td>{{ log.get_action_display }}</td>
+              <td>
+                {% if log.user %}
+                  {{ log.user.get_full_name|default:log.user.username }}
+                {% else %}
+                  N/A
+                {% endif %}
+              </td>
+              <td>{{ log.details }}</td>
+              <td>
+                {% if log.from_location %}
+                  {{ log.from_location.name }}
+                {% else %}
+                  N/A
+                {% endif %}
+              </td>
+              <td>
+                {% if log.to_location %}
+                  {{ log.to_location.name }}
+                {% else %}
+                  N/A
+                {% endif %}
+              </td>
+              <td>
+                {% if log.to_user %}
+                  {{ log.to_user.get_full_name|default:log.to_user.username }}
+                {% else %}
+                  N/A
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div class="view-case-empty-state">
+        <p>No custody logs found for this evidence</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
