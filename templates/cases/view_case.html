@@ -139,37 +139,35 @@
   <div class="view-case-section">
     <h2 class="view-case-section-title">Evidence</h2>
     {% if media_files %}
-    <div class="view-case-media-list">
+    <div class="evidence-grid">
       {% for media in media_files %}
-      <div class="view-case-media-item">
-        <div class="view-case-media-info">
-          <div class="view-case-media-description">{{ media.description }}</div>
-          <div class="view-case-media-type">{{ media.get_media_type_display }}</div>
-          <div class="view-case-media-hash" style="font-size: 12px; color: #64748b; margin-top: 4px; word-break: break-all;">
-            SHA-256: {{ media.sha256_hash }}
-          </div>
-          <div class="view-case-media-status" style="font-size: 12px; margin-top: 4px;">
-            Status:
-            {% if media.media_status == 'Valid' %}
-              <span style="color: #10b981;">{{ media.media_status }}</span>
-            {% elif media.media_status == 'Invalid' %}
-              <span style="color: #ef4444;">{{ media.media_status }}</span>
-            {% else %}
-              <span>{{ media.media_status }}</span>
-            {% endif %}
-            {% if media.is_immutable %}
-              <span style="color: #64748b; margin-left: 8px;">(Immutable)</span>
-            {% endif %}
+      <div class="evidence-card">
+        <div class="evidence-card-header">
+          <div class="evidence-type-badge">{{ media.get_media_type_display }}</div>
+          <div class="evidence-status-badge {% if media.media_status == 'Valid' %}evidence-status-valid{% elif media.media_status == 'Invalid' %}evidence-status-invalid{% endif %}">
+            {{ media.media_status }}
           </div>
         </div>
-        <div class="view-case-media-actions">
-          <a href="{% url 'evidence:view' media.id %}" class="view-case-media-link view-case-media-link-primary">View</a>
-          <a href="{% url 'evidence:audit' media.id %}" class="view-case-media-link view-case-media-link-secondary">Audit Log</a>
+        <div class="evidence-card-body">
+          <div class="evidence-description">{{ media.description }}</div>
+          <div class="evidence-hash">
+            <span class="evidence-hash-label">SHA-256:</span>
+            <span class="evidence-hash-value">{{ media.sha256_hash }}</span>
+          </div>
+          {% if media.is_immutable %}
+          <div class="evidence-immutable-badge">Immutable</div>
+          {% endif %}
+        </div>
+        <div class="evidence-card-footer">
+          <a href="{% url 'evidence:view' media.id %}" class="evidence-btn evidence-btn-primary">View</a>
+          {% if user.is_staff %}
+          <a href="{% url 'evidence:audit' media.id %}" class="evidence-btn evidence-btn-secondary">Audit Log</a>
+          {% endif %}
           {% if user.role == 'analyst' %}
-          <a href="{% url 'evidence:analyze' media.id %}" class="view-case-media-link view-case-media-link-secondary">Analyze</a>
+          <a href="{% url 'evidence:analyze' media.id %}" class="evidence-btn evidence-btn-secondary">Analyze</a>
           {% endif %}
           {% if user.is_staff %}
-          <a href="{% url 'evidence:verify' media.id %}" class="view-case-media-link view-case-media-link-secondary">Verify Integrity</a>
+          <a href="{% url 'evidence:verify' media.id %}" class="evidence-btn evidence-btn-secondary">Verify Integrity</a>
           {% endif %}
         </div>
       </div>
