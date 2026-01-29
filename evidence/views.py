@@ -146,7 +146,7 @@ def analyze_evidence(request, evidence_id):
 
 
 @login_required
-@role_required('admin')
+@role_required('analyst', 'admin')
 def verify_evidence_integrity(request, evidence_id):
     evidence = get_object_or_404(Evidence, id=evidence_id)
     
