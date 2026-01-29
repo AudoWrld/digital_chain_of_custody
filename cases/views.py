@@ -7,7 +7,7 @@ from django.utils import timezone
 from .models import Case, CaseAuditLog, AssignmentRequest, InvestigatorCaseStatus
 from evidence.models import Evidence
 from .forms import CaseForm, EditCaseForm
-from .permissions import regular_user_required, role_required
+from .permissions import regular_user_required, role_required, can_create_case, can_close_case
 import csv
 from django.contrib.auth import get_user_model
 import logging
@@ -59,7 +59,7 @@ def assigned_cases(request):
     )
 
 
-@regular_user_required
+@can_create_case
 def create_case(request):
     if request.method == "POST":
         form = CaseForm(request.POST)
@@ -392,6 +392,7 @@ def assign_investigator(request, case_id):
 
 
 @login_required
+@can_close_case
 def request_case_closure(request, case_id):
     case = get_object_or_404(Case, case_id=case_id)
     if (
@@ -424,6 +425,7 @@ def request_case_closure(request, case_id):
 
 
 @login_required
+@can_close_case
 def close_case(request, case_id):
     case = get_object_or_404(Case, case_id=case_id)
 
@@ -447,6 +449,7 @@ def close_case(request, case_id):
 
 
 @login_required
+@can_close_case
 def approve_case_closure(request, case_id):
     case = get_object_or_404(Case, case_id=case_id)
     if request.user != case.created_by and not request.user.is_staff:
