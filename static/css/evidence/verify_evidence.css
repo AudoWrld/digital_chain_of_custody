@@ -1,0 +1,91 @@
+@import url("../cases/view_case.css");
+
+.verify-evidence-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.verify-evidence-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.verify-evidence-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.verify-evidence-description {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.4;
+}
+
+.verify-evidence-name {
+  font-size: 15px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.verify-evidence-row-side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.verify-evidence-hash {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.verify-evidence-hash-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.verify-evidence-hash-value {
+  font-size: 13px;
+  color: #334155;
+  font-family: "Courier New", monospace;
+  word-break: break-all;
+  line-height: 1.5;
+}
+
+.verify-evidence-badge {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.verify-evidence-badge-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+@media (min-width: 1024px) {
+  .verify-evidence-row-side {
+    flex-direction: row;
+    gap: 24px;
+  }
+
+  .verify-evidence-hash {
+    flex: 1;
+  }
+
+  .verify-evidence-badge {
+    flex: 1;
+  }
+}
