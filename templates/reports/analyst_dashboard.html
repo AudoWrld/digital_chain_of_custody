@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+{% block title %}Analyst Dashboard{% endblock %}
+
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard/dashboard.css' %}?v={{ STATIC_VERSION }}" />
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1>Welcome back, {{ user.first_name }}!</h1>
+    <p class="dashboard-subtitle">Evidence Analyst Dashboard</p>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card stat-primary">
+      <div class="stat-icon">
+        <i class='bx bx-file-blank'></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ my_reports|length }}</div>
+        <div class="stat-label">My Reports</div>
+      </div>
+    </div>
+
+    <div class="stat-card stat-warning">
+      <div class="stat-icon">
+        <i class='bx bx-edit'></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ draft_reports|length }}</div>
+        <div class="stat-label">Draft Reports</div>
+      </div>
+    </div>
+
+    <div class="stat-card stat-info">
+      <div class="stat-icon">
+        <i class='bx bx-send'></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ submitted_reports|length }}</div>
+        <div class="stat-label">Submitted Reports</div>
+      </div>
+    </div>
+
+    <div class="stat-card stat-success">
+      <div class="stat-icon">
+        <i class='bx bx-time-five'></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ pending_review|length }}</div>
+        <div class="stat-label">Pending Review</div>
+      </div>
+    </div>
+
+    <div class="stat-card stat-secondary">
+      <div class="stat-icon">
+        <i class='bx bx-briefcase'></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ cases_in_analysis|length }}</div>
+        <div class="stat-label">Cases in Analysis</div>
+      </div>
+    </div>
+
+    <div class="stat-card stat-purple">
+      <div class="stat-icon">
+        <i class='bx bx-archive'></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ recent_evidence|length }}</div>
+        <div class="stat-label">Recent Evidence</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-content" style="margin-top: 24px;">
+    <div class="dashboard-section">
+      <div class="section-header">
+        <h2>My Recent Reports</h2>
+        <a href="#" class="view-all-link">View All</a>
+      </div>
+      {% if my_reports %}
+      <div class="recent-list">
+        {% for report in my_reports %}
+        <div class="recent-item">
+          <div class="recent-item-icon">
+            <i class='bx bx-file-blank'></i>
+          </div>
+          <div class="recent-item-content">
+            <div class="recent-item-title">{{ report.title }}</div>
+            <div class="recent-item-meta">
+              <span class="status-badge status-{{ report.status }}">{{ report.get_status_display }}</span>
+              <span class="date">{{ report.created_at|date:"M d, Y" }}</span>
+            </div>
+          </div>
+          <a href="{% url 'reports:view' report.id %}" class="recent-item-action">
+            <i class='bx bx-right-arrow-alt'></i>
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <div class="empty-state-icon">
+          <i class='bx bx-file-blank'></i>
+        </div>
+        <div class="empty-state-title">No Reports Yet</div>
+        <div class="empty-state-description">You haven't created any analysis reports yet.</div>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="dashboard-section">
+      <div class="section-header">
+        <h2>Cases in Analysis</h2>
+        <a href="{% url 'cases:case_list' %}" class="view-all-link">View All</a>
+      </div>
+      {% if cases_in_analysis %}
+      <div class="recent-list">
+        {% for case in cases_in_analysis %}
+        <div class="recent-item">
+          <div class="recent-item-icon">
+            <i class='bx bx-briefcase'></i>
+          </div>
+          <div class="recent-item-content">
+            <div class="recent-item-title">{{ case.get_title }}</div>
+            <div class="recent-item-meta">
+              <span class="status-badge status-{{ case.stage }}">{{ case.get_stage_display }}</span>
+              <span class="date">{{ case.created_at|date:"M d, Y" }}</span>
+            </div>
+          </div>
+          <a href="{% url 'cases:view_case' case.case_id %}" class="recent-item-action">
+            <i class='bx bx-right-arrow-alt'></i>
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <div class="empty-state-icon">
+          <i class='bx bx-briefcase'></i>
+        </div>
+        <div class="empty-state-title">No Cases in Analysis</div>
+        <div class="empty-state-description">There are no cases currently in the analysis stage.</div>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="dashboard-section">
+      <div class="section-header">
+        <h2>Recent Evidence</h2>
+        <a href="#" class="view-all-link">View All</a>
+      </div>
+      {% if recent_evidence %}
+      <div class="recent-list">
+        {% for evidence in recent_evidence %}
+        <div class="recent-item">
+          <div class="recent-item-icon">
+            <i class='bx bx-archive'></i>
+          </div>
+          <div class="recent-item-content">
+            <div class="recent-item-title">{{ evidence.get_filename }}</div>
+            <div class="recent-item-meta">
+              <span class="status-badge status-{{ evidence.status|lower }}">{{ evidence.status }}</span>
+              <span class="date">{{ evidence.date_uploaded|date:"M d, Y" }}</span>
+            </div>
+          </div>
+          <a href="{% url 'evidence:view_evidence' evidence.id %}" class="recent-item-action">
+            <i class='bx bx-right-arrow-alt'></i>
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <div class="empty-state-icon">
+          <i class='bx bx-archive'></i>
+        </div>
+        <div class="empty-state-title">No Evidence Yet</div>
+        <div class="empty-state-description">No evidence has been uploaded for analysis yet.</div>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="dashboard-section">
+      <div class="section-header">
+        <h2>Quick Actions</h2>
+      </div>
+      <div class="quick-actions">
+        <a href="{% url 'cases:case_list' %}" class="quick-action-card">
+          <div class="quick-action-icon">
+            <i class='bx bx-briefcase'></i>
+          </div>
+          <div class="quick-action-title">View Cases</div>
+          <div class="quick-action-description">Browse all cases</div>
+        </a>
+        <a href="#" class="quick-action-card">
+          <div class="quick-action-icon">
+            <i class='bx bx-file-blank'></i>
+          </div>
+          <div class="quick-action-title">View Reports</div>
+          <div class="quick-action-description">Browse all analysis reports</div>
+        </a>
+        <a href="#" class="quick-action-card">
+          <div class="quick-action-icon">
+            <i class='bx bx-check-shield'></i>
+          </div>
+          <div class="quick-action-title">Verify Evidence</div>
+          <div class="quick-action-description">Verify evidence integrity</div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
