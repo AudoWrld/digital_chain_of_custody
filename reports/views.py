@@ -156,3 +156,29 @@ def evidence_reports_list(request, evidence_id):
         'reports': reports
     }
     return render(request, 'reports/evidence_reports.html', context)
+
+
+@login_required
+@role_required('analyst', 'admin')
+def analyst_dashboard(request):
+    my_reports = AnalysisReport.objects.filter(created_by=request.user).order_by('-created_at')
+    draft_reports = my_reports.filter(status='draft')
+    submitted_reports = my_reports.filter(status='submitted')
+    
+    pending_review = AnalysisReport.objects.filter(status='submitted').order_by('-created_at')
+    
+    cases_in_analysis = Case.objects.filter(stage='analysis').order_by('-created_at')
+    
+    recent_evidence = Evidence.objects.filter(
+        case__stage='analysis'
+    ).select_related('case', 'uploaded_by').order_by('-date_uploaded')[:10]
+    
+    context = {
+        'my_reports': my_reports[:10],
+        'draft_reports': draft_reports,
+        'submitted_reports': submitted_reports,
+        'pending_review': pending_review[:10],
+        'cases_in_analysis': cases_in_analysis[:10],
+        'recent_evidence': recent_evidence,
+    }
+    return render(request, 'reports/analyst_dashboard.html', context)
