@@ -61,9 +61,11 @@
             </div>
             <div class="view-case-detail-item">
               <span class="view-case-detail-label">Status:</span>
-              <span class="view-case-badge view-case-badge-{{ 'active' if location.is_active else 'inactive' }}">
-                {{ 'Active' if location.is_active else 'Inactive' }}
-              </span>
+              {% if location.is_active %}
+                <span class="view-case-badge view-case-badge-active">Active</span>
+              {% else %}
+                <span class="view-case-badge view-case-badge-inactive">Inactive</span>
+              {% endif %}
             </div>
             <div class="view-case-detail-item">
               <span class="view-case-detail-label">Managed By:</span>
