@@ -248,8 +248,15 @@ def second_authentication(request):
                     )
                     return redirect("recovery_codes_view")
                 
+                # Role-based redirection after login
                 if request.user.is_superuser:
                     return redirect("/admin/")
+                elif request.user.role == 'analyst':
+                    return redirect("reports:dashboard")
+                elif request.user.role == 'custodian':
+                    return redirect("custody:dashboard")
+                elif request.user.role == 'investigator':
+                    return redirect("cases:case_list")
                 else:
                     return redirect("dashboard:dashboard")
             else:
