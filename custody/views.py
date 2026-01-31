@@ -20,10 +20,27 @@ def custody_dashboard(request):
     
     storage_locations = StorageLocation.objects.filter(is_active=True)
     
+    my_storage_locations = StorageLocation.objects.filter(managed_by=request.user, is_active=True)
+    
+    evidence_in_custody = EvidenceStorage.objects.select_related('evidence', 'storage_location')
+    
+    recent_custody_logs = CustodyLog.objects.select_related('evidence', 'case', 'user').order_by('-timestamp')[:10]
+    
+    total_evidence = Evidence.objects.count()
+    evidence_with_storage = EvidenceStorage.objects.count()
+    
     context = {
-        'pending_transfers': pending_transfers,
-        'my_transfers': my_transfers,
-        'storage_locations': storage_locations,
+        'pending_transfers': pending_transfers[:10],
+        'my_transfers': my_transfers[:10],
+        'storage_locations': storage_locations[:10],
+        'my_storage_locations': my_storage_locations,
+        'evidence_in_custody': evidence_in_custody[:10],
+        'recent_custody_logs': recent_custody_logs,
+        'total_evidence': total_evidence,
+        'evidence_with_storage': evidence_with_storage,
+        'pending_transfers_count': pending_transfers.count(),
+        'my_transfers_count': my_transfers.count(),
+        'storage_locations_count': storage_locations.count(),
     }
     return render(request, 'custody/custody_dashboard.html', context)
 
