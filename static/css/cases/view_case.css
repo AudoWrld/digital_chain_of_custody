@@ -348,6 +348,9 @@
   color: #1e293b;
   margin-bottom: 12px;
   line-height: 1.5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .evidence-hash {
