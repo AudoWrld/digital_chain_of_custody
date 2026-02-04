@@ -30,7 +30,7 @@
       <div class="stat-content">
         <div class="stat-value">{{ my_transfers_count }}</div>
         <div class="stat-label">My Transfers</div>
-      </div>
+      </div>`
     </div>
 
     <div class="stat-card stat-info">
@@ -137,7 +137,7 @@
               <div class="recent-item-title">{{ storage.storage_name }}</div>
               <div class="recent-item-meta">
                 <span class="user">Case: {{ storage.case.case_id }}</span>
-                <span class="status-badge status-{{ 'locked' if storage.is_locked else 'unlocked' }}">{{ 'Locked' if storage.is_locked else 'Unlocked' }}</span>
+                <span class="status-badge status-{% if storage.is_locked %}locked{% else %}unlocked{% endif %}">{% if storage.is_locked %}Locked{% else %}Unlocked{% endif %}</span>
                 <span class="date">{{ storage.created_at|date:"M d, Y" }}</span>
               </div>
             </div>
@@ -246,7 +246,7 @@
           <div class="quick-action-description">View analysis cases</div>
         </a>
 
-        <a href="{% url 'custody:case_custody_log' %}" class="quick-action-card">
+        <a href="{% url 'custody:case_storages' %}" class="quick-action-card">
           <div class="quick-action-icon">
             <i class='bx bx-list-check'></i>
           </div>
