@@ -41,10 +41,9 @@ class CustodyTransferApprovalForm(forms.ModelForm):
 class StorageLocationForm(forms.ModelForm):
     class Meta:
         model = StorageLocation
-        fields = ['name', 'description', 'location_type', 'capacity', 'is_active', 'managed_by']
+        fields = ['name', 'location_type', 'capacity', 'is_active', 'managed_by']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'location_type': forms.Select(attrs={'class': 'form-control'}),
             'capacity': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Capacity in bytes'}),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
@@ -61,10 +60,9 @@ class StorageLocationForm(forms.ModelForm):
 class EvidenceStorageForm(forms.ModelForm):
     class Meta:
         model = EvidenceStorage
-        fields = ['storage_location', 'notes']
+        fields = ['storage_location']
         widgets = {
             'storage_location': forms.Select(attrs={'class': 'form-control'}),
-            'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
     
     def __init__(self, *args, **kwargs):
