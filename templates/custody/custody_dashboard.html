@@ -38,8 +38,8 @@
         <i class='bx bx-hdd'></i>
       </div>
       <div class="stat-content">
-        <div class="stat-value">{{ storage_locations_count }}</div>
-        <div class="stat-label">Storage Locations</div>
+        <div class="stat-value">{{ my_case_storages_count }}</div>
+        <div class="stat-label">My Case Storages</div>
       </div>
     </div>
 
@@ -58,7 +58,7 @@
     <div class="dashboard-section">
       <div class="section-header">
         <h2>Pending Transfers</h2>
-        <a href="{% url 'custody:storage_locations' %}" class="view-all-link">View All</a>
+        <a href="{% url 'custody:case_storages' %}" class="view-all-link">View All</a>
       </div>
       <div class="recent-list">
         {% if pending_transfers %}
@@ -92,7 +92,7 @@
     <div class="dashboard-section">
       <div class="section-header">
         <h2>My Transfers</h2>
-        <a href="{% url 'custody:storage_locations' %}" class="view-all-link">View All</a>
+        <a href="{% url 'custody:case_storages' %}" class="view-all-link">View All</a>
       </div>
       <div class="recent-list">
         {% if my_transfers %}
@@ -123,36 +123,33 @@
 
     <div class="dashboard-section">
       <div class="section-header">
-        <h2>Storage Locations</h2>
-        <a href="{% url 'custody:storage_locations' %}" class="view-all-link">View All</a>
+        <h2>My Case Storages</h2>
+        <a href="{% url 'custody:case_storages' %}" class="view-all-link">View All</a>
       </div>
       <div class="recent-list">
-        {% if storage_locations %}
-          {% for location in storage_locations %}
+        {% if my_case_storages %}
+          {% for storage in my_case_storages %}
           <div class="recent-item">
             <div class="recent-item-icon">
               <i class='bx bx-hard-drive'></i>
             </div>
             <div class="recent-item-content">
-              <div class="recent-item-title">{{ location.name }}</div>
+              <div class="recent-item-title">{{ storage.storage_name }}</div>
               <div class="recent-item-meta">
-                <span class="user">{{ location.get_location_type_display }}</span>
-                {% if location.capacity %}
-                  <span class="date">{{ location.used_space|filesizeformat }} / {{ location.capacity|filesizeformat }}</span>
-                {% else %}
-                  <span class="date">{{ location.used_space|filesizeformat }} used</span>
-                {% endif %}
-                {% if location.usage_percentage %}
-                  <span class="status-badge status-info">{{ location.usage_percentage|floatformat:1 }}% used</span>
-                {% endif %}
+                <span class="user">Case: {{ storage.case.case_id }}</span>
+                <span class="status-badge status-{{ 'locked' if storage.is_locked else 'unlocked' }}">{{ 'Locked' if storage.is_locked else 'Unlocked' }}</span>
+                <span class="date">{{ storage.created_at|date:"M d, Y" }}</span>
               </div>
             </div>
+            <a href="{% url 'custody:view_case_storage' storage.case.case_id %}" class="recent-item-action">
+              <i class='bx bx-right-arrow-alt'></i>
+            </a>
           </div>
           {% endfor %}
         {% else %}
           <div class="empty-state">
             <i class='bx bx-hard-drive'></i>
-            <p>No storage locations found</p>
+            <p>No case storages assigned</p>
           </div>
         {% endif %}
       </div>
@@ -161,7 +158,7 @@
     <div class="dashboard-section">
       <div class="section-header">
         <h2>Evidence in Custody</h2>
-        <a href="{% url 'custody:storage_locations' %}" class="view-all-link">View All</a>
+        <a href="{% url 'custody:case_storages' %}" class="view-all-link">View All</a>
       </div>
       <div class="recent-list">
         {% if evidence_in_custody %}
@@ -174,7 +171,7 @@
               <div class="recent-item-title">{{ storage.evidence.description }}</div>
               <div class="recent-item-meta">
                 <span class="user">Case: {{ storage.evidence.case.case_id }}</span>
-                <span class="user">{{ storage.storage_location.name }}</span>
+                <span class="user">{{ storage.case_storage.storage_name }}</span>
                 <span class="date">{{ storage.stored_at|date:"M d, Y" }}</span>
               </div>
             </div>
@@ -225,20 +222,12 @@
         <h2>Quick Actions</h2>
       </div>
       <div class="quick-actions">
-        <a href="{% url 'custody:create_storage_location' %}" class="quick-action-card">
-          <div class="quick-action-icon">
-            <i class='bx bx-plus'></i>
-          </div>
-          <div class="quick-action-title">Create Storage Location</div>
-          <div class="quick-action-description">Add new storage location</div>
-        </a>
-
-        <a href="{% url 'custody:storage_locations' %}" class="quick-action-card">
+        <a href="{% url 'custody:case_storages' %}" class="quick-action-card">
           <div class="quick-action-icon">
             <i class='bx bx-hdd'></i>
           </div>
-          <div class="quick-action-title">Manage Storage</div>
-          <div class="quick-action-description">View and edit locations</div>
+          <div class="quick-action-title">Manage Case Storages</div>
+          <div class="quick-action-description">View assigned case storages</div>
         </a>
 
         <a href="{% url 'cases:case_list' %}" class="quick-action-card">
@@ -255,6 +244,14 @@
           </div>
           <div class="quick-action-title">Cases in Analysis</div>
           <div class="quick-action-description">View analysis cases</div>
+        </a>
+
+        <a href="{% url 'custody:case_custody_log' %}" class="quick-action-card">
+          <div class="quick-action-icon">
+            <i class='bx bx-list-check'></i>
+          </div>
+          <div class="quick-action-title">Custody Logs</div>
+          <div class="quick-action-description">View all custody logs</div>
         </a>
       </div>
     </div>
