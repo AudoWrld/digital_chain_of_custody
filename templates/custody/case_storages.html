@@ -1,1 +1,83 @@
-[{"base.html": ""}, {"href=": "static 'css/dashboard/dashboard.css' %"}, {"style=": "argin-top: 24px;", "class=\"recent-section": "h2>My Case Storages</h2>\n      {% if my_case_storages %"}, {"class=\"user": "Case: {{ storage.case.case_id"}, {}, ">{{ 'Locked' if storage.is_locked else 'Unlocked' }}</span>\n              </div>\n              <div class=\"recent-item-meta\">\n                <span class=\"date", {"storage.created_at|date": "M d, Y"}, "href=", {"custody:view_case_storage": "torage.case.case_id %"}, " class=\"recent-item-action", {"class=\"empty-state": "i class='bx bx-hard-drive'></i>\n          <p>No case storages assigned to you</p>\n        </div>\n      {% endif %"}, "class=\"recent-section", {"class=\"recent-list": {"class=\"user": "Case: {{ storage.case.case_id"}}, "class=", "locked' if storage.is_locked else 'unlocked", ">{{ 'Locked' if storage.is_locked else 'Unlocked' }}</span>\n              </div>\n              <div class=\"recent-item-meta\">\n                <span class=\"date", {"storage.created_at|date": "M d, Y"}, "href=", {"custody:view_case_storage": "torage.case.case_id %"}, " class=\"recent-item-action", {"class=\"empty-state": "i class='bx bx-hdd'></i>\n          <p>No case storages found</p>\n        </div>\n      {% endif %"}, {}]
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard/dashboard.css' %}?v={{ STATIC_VERSION }}" />
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1>Case Storages</h1>
+    <p class="dashboard-subtitle">Manage evidence storage locations</p>
+  </div>
+
+  <div class="dashboard-content" style="margin-top: 24px;">
+    <div class="dashboard-section">
+      <div class="section-header">
+        <h2>My Case Storages</h2>
+      </div>
+      <div class="recent-list">
+        {% if my_case_storages %}
+          {% for storage in my_case_storages %}
+          <div class="recent-item">
+            <div class="recent-item-icon">
+              <i class='bx bx-hard-drive'></i>
+            </div>
+            <div class="recent-item-content">
+              <div class="recent-item-title">{{ storage.storage_name }}</div>
+              <div class="recent-item-meta">
+                <span class="user">Case: {{ storage.case.case_id }}</span>
+                <span class="status-badge status-{% if storage.is_locked %}locked{% else %}unlocked{% endif %}">{% if storage.is_locked %}Locked{% else %}Unlocked{% endif %}</span>
+                <span class="date">{{ storage.created_at|date:"M d, Y" }}</span>
+              </div>
+            </div>
+            <a href="{% url 'custody:view_case_storage' storage.case.case_id %}" class="recent-item-action">
+              <i class='bx bx-right-arrow-alt'></i>
+            </a>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty-state">
+            <i class='bx bx-hard-drive'></i>
+            <p>No case storages assigned to you</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="dashboard-section">
+      <div class="section-header">
+        <h2>All Case Storages</h2>
+      </div>
+      <div class="recent-list">
+        {% if case_storages %}
+          {% for storage in case_storages %}
+          <div class="recent-item">
+            <div class="recent-item-icon">
+              <i class='bx bx-hdd'></i>
+            </div>
+            <div class="recent-item-content">
+              <div class="recent-item-title">{{ storage.storage_name }}</div>
+              <div class="recent-item-meta">
+                <span class="user">Case: {{ storage.case.case_id }}</span>
+                <span class="status-badge status-{% if storage.is_locked %}locked{% else %}unlocked{% endif %}">{% if storage.is_locked %}Locked{% else %}Unlocked{% endif %}</span>
+                <span class="date">{{ storage.created_at|date:"M d, Y" }}</span>
+              </div>
+            </div>
+            <a href="{% url 'custody:view_case_storage' storage.case.case_id %}" class="recent-item-action">
+              <i class='bx bx-right-arrow-alt'></i>
+            </a>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty-state">
+            <i class='bx bx-hdd'></i>
+            <p>No case storages found</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
