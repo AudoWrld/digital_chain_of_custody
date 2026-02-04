@@ -56,14 +56,6 @@
         {% endif %}
       </div>
 
-      <div class="create-case-form-group">
-        <label for="{{ form.is_active.id_for_label }}" class="create-case-form-label">Active:</label>
-        {{ form.is_active }}
-        {% if form.is_active.errors %}
-          <div class="create-case-error">{{ form.is_active.errors }}</div>
-        {% endif %}
-      </div>
-
       <div class="create-case-actions">
         <button type="submit" class="create-case-btn create-case-btn-primary">Update Storage Location</button>
         <a href="{% url 'custody:storage_locations' %}" class="create-case-btn create-case-btn-secondary">Cancel</a>
