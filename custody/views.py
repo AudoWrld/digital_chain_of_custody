@@ -6,7 +6,7 @@ from django.db.models import Q
 from cases.permissions import custodian_required, can_modify_custody
 from cases.models import Case
 from evidence.models import Evidence
-from .models import CustodyTransfer, StorageLocation, EvidenceStorage, CustodyLog
+from .models import CustodyTransfer, StorageLocation, EvidenceStorage, CustodyLog, CaseStorage, CustodianAssignment
 from .forms import CustodyTransferRequestForm, CustodyTransferApprovalForm, StorageLocationForm, EvidenceStorageForm
 
 
@@ -18,9 +18,11 @@ def custody_dashboard(request):
         Q(from_user=request.user) | Q(to_user=request.user)
     ).select_related('evidence', 'from_user', 'to_user')
     
-    storage_locations = StorageLocation.objects.filter(is_active=True)
-    
-    my_storage_locations = StorageLocation.objects.filter(managed_by=request.user, is_active=True)
+    my_case_storages = CaseStorage.objects.filter(
+        custodian_assignments__custodian=request.user,
+        custodian_assignments__is_active=True,
+        is_active=True
+    ).select_related('case')
     
     evidence_in_custody = EvidenceStorage.objects.select_related('evidence', 'storage_location')
     
@@ -29,18 +31,23 @@ def custody_dashboard(request):
     total_evidence = Evidence.objects.count()
     evidence_with_storage = EvidenceStorage.objects.count()
     
+    my_active_assignments = CustodianAssignment.objects.filter(
+        custodian=request.user,
+        is_active=True
+    ).select_related('case_storage', 'case_storage__case')
+    
     context = {
         'pending_transfers': pending_transfers[:10],
         'my_transfers': my_transfers[:10],
-        'storage_locations': storage_locations[:10],
-        'my_storage_locations': my_storage_locations,
+        'my_case_storages': my_case_storages,
         'evidence_in_custody': evidence_in_custody[:10],
         'recent_custody_logs': recent_custody_logs,
         'total_evidence': total_evidence,
         'evidence_with_storage': evidence_with_storage,
         'pending_transfers_count': pending_transfers.count(),
         'my_transfers_count': my_transfers.count(),
-        'storage_locations_count': storage_locations.count(),
+        'my_case_storages_count': my_case_storages.count(),
+        'my_active_assignments': my_active_assignments,
     }
     return render(request, 'custody/custody_dashboard.html', context)
 
@@ -137,93 +144,43 @@ def approve_custody_transfer(request, transfer_id):
 
 @login_required
 @custodian_required
-def storage_locations_list(request):
-    locations = StorageLocation.objects.all()
+def case_storages_list(request):
+    case_storages = CaseStorage.objects.filter(is_active=True).select_related('case')
+    
+    my_case_storages = CaseStorage.objects.filter(
+        custodian_assignments__custodian=request.user,
+        custodian_assignments__is_active=True,
+        is_active=True
+    ).select_related('case')
     
     context = {
-        'locations': locations,
+        'case_storages': case_storages,
+        'my_case_storages': my_case_storages,
     }
-    return render(request, 'custody/storage_locations.html', context)
+    return render(request, 'custody/case_storages.html', context)
 
 
 @login_required
 @custodian_required
-def create_storage_location(request):
-    if request.method == 'POST':
-        form = StorageLocationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Storage location created successfully.')
-            return redirect('custody:storage_locations')
-    else:
-        form = StorageLocationForm()
+def view_case_storage(request, case_id):
+    case = get_object_or_404(Case, case_id=case_id)
+    case_storage = get_object_or_404(CaseStorage, case=case)
+    
+    evidence_in_storage = EvidenceStorage.objects.filter(
+        storage_location__case_storage=case_storage
+    ).select_related('evidence', 'storage_location')
+    
+    current_custodian = case_storage.current_custodian
+    assignment_history = case_storage.custodian_assignments.all().select_related('custodian', 'assigned_by', 'deactivated_by')
     
     context = {
-        'form': form,
-    }
-    return render(request, 'custody/create_storage_location.html', context)
-
-
-@login_required
-@custodian_required
-def edit_storage_location(request, location_id):
-    location = get_object_or_404(StorageLocation, id=location_id)
-    
-    if request.method == 'POST':
-        form = StorageLocationForm(request.POST, instance=location)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Storage location updated successfully.')
-            return redirect('custody:storage_locations')
-    else:
-        form = StorageLocationForm(instance=location)
-    
-    context = {
-        'form': form,
-        'location': location,
-    }
-    return render(request, 'custody/edit_storage_location.html', context)
-
-
-@login_required
-@custodian_required
-def assign_evidence_storage(request, evidence_id):
-    evidence = get_object_or_404(Evidence, id=evidence_id)
-    case = evidence.case
-    
-    storage_info, created = EvidenceStorage.objects.get_or_create(
-        evidence=evidence,
-        defaults={'stored_by': request.user}
-    )
-    
-    if request.method == 'POST':
-        form = EvidenceStorageForm(request.POST, instance=storage_info)
-        if form.is_valid():
-            storage_info = form.save(commit=False)
-            storage_info.stored_by = request.user
-            storage_info.save()
-            
-            CustodyLog.log_action(
-                evidence=evidence,
-                case=case,
-                user=request.user,
-                action='stored',
-                details=f'Evidence stored at {storage_info.storage_location.name}',
-                to_location=storage_info.storage_location
-            )
-            
-            messages.success(request, 'Evidence storage assigned successfully.')
-            return redirect('cases:view_case', case_id=case.case_id)
-    else:
-        form = EvidenceStorageForm(instance=storage_info)
-    
-    context = {
-        'form': form,
-        'evidence': evidence,
         'case': case,
-        'storage_info': storage_info,
+        'case_storage': case_storage,
+        'evidence_in_storage': evidence_in_storage,
+        'current_custodian': current_custodian,
+        'assignment_history': assignment_history,
     }
-    return render(request, 'custody/assign_storage.html', context)
+    return render(request, 'custody/view_case_storage.html', context)
 
 
 @login_required
