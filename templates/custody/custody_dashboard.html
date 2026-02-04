@@ -35,7 +35,7 @@
 
     <div class="stat-card stat-info">
       <div class="stat-icon">
-        <i class='bx bx-hard-drive'></i>
+        <i class='bx bx-hdd'></i>
       </div>
       <div class="stat-content">
         <div class="stat-value">{{ storage_locations_count }}</div>
@@ -54,35 +54,34 @@
     </div>
   </div>
 
-  <div class="dashboard-grid">
-    <div class="dashboard-card">
-      <div class="dashboard-card-header">
+  <div class="dashboard-content" style="margin-top: 24px;">
+    <div class="dashboard-section">
+      <div class="section-header">
         <h2>Pending Transfers</h2>
-        <a href="{% url 'custody:storage_locations' %}" class="dashboard-link">View All</a>
+        <a href="{% url 'custody:storage_locations' %}" class="view-all-link">View All</a>
       </div>
-      <div class="dashboard-card-body">
+      <div class="recent-list">
         {% if pending_transfers %}
-          <div class="dashboard-list">
-            {% for transfer in pending_transfers %}
-              <div class="dashboard-list-item">
-                <div class="dashboard-list-item-content">
-                  <div class="dashboard-list-item-title">{{ transfer.evidence.description }}</div>
-                  <div class="dashboard-list-item-subtitle">
-                    From: {{ transfer.from_user.get_full_name|default:transfer.from_user.username }} → 
-                    To: {{ transfer.to_user.get_full_name|default:transfer.to_user.username }}
-                  </div>
-                  <div class="dashboard-list-item-meta">
-                    <span class="dashboard-list-item-date">{{ transfer.created_at|date:"M d, Y H:i" }}</span>
-                  </div>
-                </div>
-                <div class="dashboard-list-item-actions">
-                  <a href="{% url 'custody:approve_transfer' transfer.id %}" class="dashboard-btn dashboard-btn-primary">Review</a>
-                </div>
+          {% for transfer in pending_transfers %}
+          <div class="recent-item">
+            <div class="recent-item-icon">
+              <i class='bx bx-transfer'></i>
+            </div>
+            <div class="recent-item-content">
+              <div class="recent-item-title">{{ transfer.evidence.description }}</div>
+              <div class="recent-item-meta">
+                <span class="user">From: {{ transfer.from_user.get_full_name|default:transfer.from_user.username }}</span>
+                <span class="user">To: {{ transfer.to_user.get_full_name|default:transfer.to_user.username }}</span>
+                <span class="date">{{ transfer.created_at|date:"M d, Y H:i" }}</span>
               </div>
-            {% endfor %}
+            </div>
+            <a href="{% url 'custody:approve_transfer' transfer.id %}" class="recent-item-action">
+              <i class='bx bx-right-arrow-alt'></i>
+            </a>
           </div>
+          {% endfor %}
         {% else %}
-          <div class="dashboard-empty-state">
+          <div class="empty-state">
             <i class='bx bx-check-circle'></i>
             <p>No pending transfers</p>
           </div>
@@ -90,32 +89,31 @@
       </div>
     </div>
 
-    <div class="dashboard-card">
-      <div class="dashboard-card-header">
+    <div class="dashboard-section">
+      <div class="section-header">
         <h2>My Transfers</h2>
-        <a href="{% url 'custody:storage_locations' %}" class="dashboard-link">View All</a>
+        <a href="{% url 'custody:storage_locations' %}" class="view-all-link">View All</a>
       </div>
-      <div class="dashboard-card-body">
+      <div class="recent-list">
         {% if my_transfers %}
-          <div class="dashboard-list">
-            {% for transfer in my_transfers %}
-              <div class="dashboard-list-item">
-                <div class="dashboard-list-item-content">
-                  <div class="dashboard-list-item-title">{{ transfer.evidence.description }}</div>
-                  <div class="dashboard-list-item-subtitle">
-                    From: {{ transfer.from_user.get_full_name|default:transfer.from_user.username }} → 
-                    To: {{ transfer.to_user.get_full_name|default:transfer.to_user.username }}
-                  </div>
-                  <div class="dashboard-list-item-meta">
-                    <span class="dashboard-list-item-date">{{ transfer.created_at|date:"M d, Y H:i" }}</span>
-                    <span class="dashboard-badge dashboard-badge-{{ transfer.status }}">{{ transfer.status|title }}</span>
-                  </div>
-                </div>
+          {% for transfer in my_transfers %}
+          <div class="recent-item">
+            <div class="recent-item-icon">
+              <i class='bx bx-history'></i>
+            </div>
+            <div class="recent-item-content">
+              <div class="recent-item-title">{{ transfer.evidence.description }}</div>
+              <div class="recent-item-meta">
+                <span class="user">From: {{ transfer.from_user.get_full_name|default:transfer.from_user.username }}</span>
+                <span class="user">To: {{ transfer.to_user.get_full_name|default:transfer.to_user.username }}</span>
+                <span class="status-badge status-{{ transfer.status }}">{{ transfer.status|title }}</span>
+                <span class="date">{{ transfer.created_at|date:"M d, Y H:i" }}</span>
               </div>
-            {% endfor %}
+            </div>
           </div>
+          {% endfor %}
         {% else %}
-          <div class="dashboard-empty-state">
+          <div class="empty-state">
             <i class='bx bx-history'></i>
             <p>No transfers found</p>
           </div>
@@ -123,37 +121,36 @@
       </div>
     </div>
 
-    <div class="dashboard-card">
-      <div class="dashboard-card-header">
+    <div class="dashboard-section">
+      <div class="section-header">
         <h2>Storage Locations</h2>
-        <a href="{% url 'custody:storage_locations' %}" class="dashboard-link">View All</a>
+        <a href="{% url 'custody:storage_locations' %}" class="view-all-link">View All</a>
       </div>
-      <div class="dashboard-card-body">
+      <div class="recent-list">
         {% if storage_locations %}
-          <div class="dashboard-list">
-            {% for location in storage_locations %}
-              <div class="dashboard-list-item">
-                <div class="dashboard-list-item-content">
-                  <div class="dashboard-list-item-title">{{ location.name }}</div>
-                  <div class="dashboard-list-item-subtitle">{{ location.get_location_type_display }}</div>
-                  <div class="dashboard-list-item-meta">
-                    <span class="dashboard-list-item-date">
-                      {% if location.capacity %}
-                        {{ location.used_space|filesizeformat }} / {{ location.capacity|filesizeformat }}
-                      {% else %}
-                        {{ location.used_space|filesizeformat }} used
-                      {% endif %}
-                    </span>
-                    {% if location.usage_percentage %}
-                      <span class="dashboard-badge">{{ location.usage_percentage|floatformat:1 }}% used</span>
-                    {% endif %}
-                  </div>
-                </div>
+          {% for location in storage_locations %}
+          <div class="recent-item">
+            <div class="recent-item-icon">
+              <i class='bx bx-hard-drive'></i>
+            </div>
+            <div class="recent-item-content">
+              <div class="recent-item-title">{{ location.name }}</div>
+              <div class="recent-item-meta">
+                <span class="user">{{ location.get_location_type_display }}</span>
+                {% if location.capacity %}
+                  <span class="date">{{ location.used_space|filesizeformat }} / {{ location.capacity|filesizeformat }}</span>
+                {% else %}
+                  <span class="date">{{ location.used_space|filesizeformat }} used</span>
+                {% endif %}
+                {% if location.usage_percentage %}
+                  <span class="status-badge status-info">{{ location.usage_percentage|floatformat:1 }}% used</span>
+                {% endif %}
               </div>
-            {% endfor %}
+            </div>
           </div>
+          {% endfor %}
         {% else %}
-          <div class="dashboard-empty-state">
+          <div class="empty-state">
             <i class='bx bx-hard-drive'></i>
             <p>No storage locations found</p>
           </div>
@@ -161,31 +158,30 @@
       </div>
     </div>
 
-    <div class="dashboard-card">
-      <div class="dashboard-card-header">
+    <div class="dashboard-section">
+      <div class="section-header">
         <h2>Evidence in Custody</h2>
-        <a href="{% url 'custody:storage_locations' %}" class="dashboard-link">View All</a>
+        <a href="{% url 'custody:storage_locations' %}" class="view-all-link">View All</a>
       </div>
-      <div class="dashboard-card-body">
+      <div class="recent-list">
         {% if evidence_in_custody %}
-          <div class="dashboard-list">
-            {% for storage in evidence_in_custody %}
-              <div class="dashboard-list-item">
-                <div class="dashboard-list-item-content">
-                  <div class="dashboard-list-item-title">{{ storage.evidence.description }}</div>
-                  <div class="dashboard-list-item-subtitle">
-                    Case: {{ storage.evidence.case.case_id }}
-                  </div>
-                  <div class="dashboard-list-item-meta">
-                    <span class="dashboard-list-item-date">{{ storage.storage_location.name }}</span>
-                    <span class="dashboard-list-item-date">{{ storage.stored_at|date:"M d, Y" }}</span>
-                  </div>
-                </div>
+          {% for storage in evidence_in_custody %}
+          <div class="recent-item">
+            <div class="recent-item-icon">
+              <i class='bx bx-file'></i>
+            </div>
+            <div class="recent-item-content">
+              <div class="recent-item-title">{{ storage.evidence.description }}</div>
+              <div class="recent-item-meta">
+                <span class="user">Case: {{ storage.evidence.case.case_id }}</span>
+                <span class="user">{{ storage.storage_location.name }}</span>
+                <span class="date">{{ storage.stored_at|date:"M d, Y" }}</span>
               </div>
-            {% endfor %}
+            </div>
           </div>
+          {% endfor %}
         {% else %}
-          <div class="dashboard-empty-state">
+          <div class="empty-state">
             <i class='bx bx-file'></i>
             <p>No evidence in custody</p>
           </div>
@@ -193,31 +189,30 @@
       </div>
     </div>
 
-    <div class="dashboard-card">
-      <div class="dashboard-card-header">
+    <div class="dashboard-section">
+      <div class="section-header">
         <h2>Recent Custody Logs</h2>
-        <a href="{% url 'cases:case_list' %}" class="dashboard-link">View Cases</a>
+        <a href="{% url 'cases:case_list' %}" class="view-all-link">View Cases</a>
       </div>
-      <div class="dashboard-card-body">
+      <div class="recent-list">
         {% if recent_custody_logs %}
-          <div class="dashboard-list">
-            {% for log in recent_custody_logs %}
-              <div class="dashboard-list-item">
-                <div class="dashboard-list-item-content">
-                  <div class="dashboard-list-item-title">{{ log.get_action_display }}</div>
-                  <div class="dashboard-list-item-subtitle">
-                    Evidence: {{ log.evidence.description }}
-                  </div>
-                  <div class="dashboard-list-item-meta">
-                    <span class="dashboard-list-item-date">{{ log.timestamp|date:"M d, Y H:i" }}</span>
-                    <span class="dashboard-list-item-user">{{ log.user.get_full_name|default:log.user.username }}</span>
-                  </div>
-                </div>
+          {% for log in recent_custody_logs %}
+          <div class="recent-item">
+            <div class="recent-item-icon">
+              <i class='bx bx-list-ul'></i>
+            </div>
+            <div class="recent-item-content">
+              <div class="recent-item-title">{{ log.get_action_display }}</div>
+              <div class="recent-item-meta">
+                <span class="user">Evidence: {{ log.evidence.description }}</span>
+                <span class="user">{{ log.user.get_full_name|default:log.user.username }}</span>
+                <span class="date">{{ log.timestamp|date:"M d, Y H:i" }}</span>
               </div>
-            {% endfor %}
+            </div>
           </div>
+          {% endfor %}
         {% else %}
-          <div class="dashboard-empty-state">
+          <div class="empty-state">
             <i class='bx bx-list-ul'></i>
             <p>No custody logs found</p>
           </div>
@@ -225,52 +220,42 @@
       </div>
     </div>
 
-    <div class="dashboard-card">
-      <div class="dashboard-card-header">
+    <div class="dashboard-section">
+      <div class="section-header">
         <h2>Quick Actions</h2>
       </div>
-      <div class="dashboard-card-body">
-        <div class="dashboard-actions">
-          <a href="{% url 'custody:create_storage_location' %}" class="dashboard-action-card">
-            <div class="dashboard-action-icon">
-              <i class='bx bx-plus'></i>
-            </div>
-            <div class="dashboard-action-content">
-              <div class="dashboard-action-title">Create Storage Location</div>
-              <div class="dashboard-action-subtitle">Add new storage location</div>
-            </div>
-          </a>
+      <div class="quick-actions">
+        <a href="{% url 'custody:create_storage_location' %}" class="quick-action-card">
+          <div class="quick-action-icon">
+            <i class='bx bx-plus'></i>
+          </div>
+          <div class="quick-action-title">Create Storage Location</div>
+          <div class="quick-action-description">Add new storage location</div>
+        </a>
 
-          <a href="{% url 'custody:storage_locations' %}" class="dashboard-action-card">
-            <div class="dashboard-action-icon">
-              <i class='bx bx-hard-drive'></i>
-            </div>
-            <div class="dashboard-action-content">
-              <div class="dashboard-action-title">Manage Storage</div>
-              <div class="dashboard-action-subtitle">View and edit locations</div>
-            </div>
-          </a>
+        <a href="{% url 'custody:storage_locations' %}" class="quick-action-card">
+          <div class="quick-action-icon">
+            <i class='bx bx-hdd'></i>
+          </div>
+          <div class="quick-action-title">Manage Storage</div>
+          <div class="quick-action-description">View and edit locations</div>
+        </a>
 
-          <a href="{% url 'cases:case_list' %}" class="dashboard-action-card">
-            <div class="dashboard-action-icon">
-              <i class='bx bx-folder'></i>
-            </div>
-            <div class="dashboard-action-content">
-              <div class="dashboard-action-title">View Cases</div>
-              <div class="dashboard-action-subtitle">Browse all cases</div>
-            </div>
-          </a>
+        <a href="{% url 'cases:case_list' %}" class="quick-action-card">
+          <div class="quick-action-icon">
+            <i class='bx bx-folder'></i>
+          </div>
+          <div class="quick-action-title">View Cases</div>
+          <div class="quick-action-description">Browse all cases</div>
+        </a>
 
-          <a href="{% url 'cases:case_list' %}?stage=analysis" class="dashboard-action-card">
-            <div class="dashboard-action-icon">
-              <i class='bx bx-search'></i>
-            </div>
-            <div class="dashboard-action-content">
-              <div class="dashboard-action-title">Cases in Analysis</div>
-              <div class="dashboard-action-subtitle">View analysis cases</div>
-            </div>
-          </a>
-        </div>
+        <a href="{% url 'cases:case_list' %}?stage=analysis" class="quick-action-card">
+          <div class="quick-action-icon">
+            <i class='bx bx-search'></i>
+          </div>
+          <div class="quick-action-title">Cases in Analysis</div>
+          <div class="quick-action-description">View analysis cases</div>
+        </a>
       </div>
     </div>
   </div>
