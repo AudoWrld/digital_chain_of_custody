@@ -8,6 +8,7 @@ from cases.permissions import role_required, can_upload_evidence
 from cases.models import Case
 from .models import Evidence, EvidenceAuditLog
 from .forms import EvidenceUploadForm
+from custody.models import CaseStorage, EvidenceStorage, CustodyLog
 import json
 import mimetypes
 
@@ -33,6 +34,31 @@ def upload_evidence(request, case_id):
                 action='Evidence Uploaded',
                 details=f'File: {evidence.original_filename}, SHA256: {evidence.sha256_hash}'
             )
+            
+            case_storage = getattr(case, 'storage', None)
+            if case_storage:
+                storage_location = case_storage.storage_locations.first()
+                if storage_location:
+                    EvidenceStorage.objects.create(
+                        evidence=evidence,
+                        storage_location=storage_location
+                    )
+                    
+                    from custody.models import StorageLog
+                    StorageLog.log_action(
+                        case_storage,
+                        request.user,
+                        'upload',
+                        f'Evidence {evidence.original_filename} uploaded to {case_storage.storage_name}'
+                    )
+                    
+                    CustodyLog.log_action(
+                        case=case,
+                        evidence=evidence,
+                        user=request.user,
+                        action='stored',
+                        details=f'Evidence {evidence.original_filename} stored in {case_storage.storage_name}'
+                    )
             
             if not evidence.metadata_valid:
                 messages.warning(request, f'Evidence uploaded but metadata validation failed: {", ".join(evidence.metadata_issues)}')
@@ -181,6 +207,10 @@ def view_evidence_file(request, evidence_id):
             details=f'File: {evidence.original_filename}'
         )
         
+        evidence_storage = getattr(evidence, 'storage', None)
+        if evidence_storage:
+            evidence_storage.record_access(request.user)
+        
         return response
     except Exception as e:
         messages.error(request, f'Error viewing evidence: {str(e)}')
@@ -212,6 +242,10 @@ def download_evidence_file(request, evidence_id):
             action='Evidence Downloaded',
             details=f'File: {evidence.original_filename}'
         )
+        
+        evidence_storage = getattr(evidence, 'storage', None)
+        if evidence_storage:
+            evidence_storage.record_access(request.user)
         
         return response
     except Exception as e:
