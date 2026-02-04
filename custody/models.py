@@ -344,7 +344,9 @@ class StorageLog(models.Model):
 
 
 def get_least_loaded_custodian():
-    custodians = settings.AUTH_USER_MODEL.objects.filter(role='custodian', is_active=True)
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    custodians = User.objects.filter(role='custodian', is_active=True)
     if not custodians.exists():
         return None
 
