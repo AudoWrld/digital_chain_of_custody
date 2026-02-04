@@ -131,7 +131,7 @@
           {% for storage in my_case_storages %}
           <div class="recent-item">
             <div class="recent-item-icon">
-              <i class='bx bx-hard-drive'></i>
+              <i class='bx bx-hdd'></i>
             </div>
             <div class="recent-item-content">
               <div class="recent-item-title">{{ storage.storage_name }}</div>
@@ -189,7 +189,6 @@
     <div class="dashboard-section">
       <div class="section-header">
         <h2>Recent Custody Logs</h2>
-        <a href="{% url 'cases:case_list' %}" class="view-all-link">View Cases</a>
       </div>
       <div class="recent-list">
         {% if recent_custody_logs %}

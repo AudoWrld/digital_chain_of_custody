@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard/dashboard.css' %}?v={{ STATIC_VERSION }}" />
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1>Case Storage: {{ case_storage.storage_name }}</h1>
+    <p class="dashboard-subtitle">Case: {{ case.case_id }}</p>
+  </div>
+
+  <div class="stats-grid" style="margin-top: 24px;">
+    <div class="stat-card stat-primary">
+      <div class="stat-icon">
+        <i class='bx bx-box'></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ case_storage.evidence_count }}</div>
+        <div class="stat-label">Evidence Items</div>
+      </div>
+    </div>
+
+    <div class="stat-card {% if case_storage.is_locked %}stat-warning{% else %}stat-success{% endif %}">
+      <div class="stat-icon">
+        <i class='{% if case_storage.is_locked %}bx-lock-alt{% else %}bx-lock-open{% endif %}'></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{% if case_storage.is_locked %}Locked{% else %}Unlocked{% endif %}</div>
+        <div class="stat-label">Storage Status</div>
+      </div>
+    </div>
+
+    <div class="stat-card stat-info">
+      <div class="stat-icon">
+        <i class='bx bx-user'></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ current_custodian.first_name|default:"N/A" }}</div>
+        <div class="stat-label">Current Custodian</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-content" style="margin-top: 24px;">
+    <div class="dashboard-section">
+      <div class="section-header">
+        <h2>Evidence in Storage</h2>
+      </div>
+      <div class="recent-list">
+        {% if evidence_in_storage %}
+          {% for storage in evidence_in_storage %}
+          <div class="recent-item">
+            <div class="recent-item-icon">
+              <i class='bx bx-file'></i>
+            </div>
+            <div class="recent-item-content">
+              <div class="recent-item-title">{{ storage.evidence.description }}</div>
+              <div class="recent-item-meta">
+                <span class="user">Stored: {{ storage.stored_at|date:"M d, Y H:i" }}</span>
+                <span class="date">Accessed: {{ storage.last_accessed|date:"M d, Y H:i" }}</span>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty-state">
+            <i class='bx bx-file'></i>
+            <p>No evidence in this storage</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="dashboard-section">
+      <div class="section-header">
+        <h2>Custodian Assignment History</h2>
+      </div>
+      <div class="recent-list">
+        {% if assignment_history %}
+          {% for assignment in assignment_history %}
+          <div class="recent-item">
+            <div class="recent-item-icon">
+              <i class='bx bx-user-plus'></i>
+            </div>
+            <div class="recent-item-content">
+              <div class="recent-item-title">{{ assignment.custodian.get_full_name }}</div>
+              <div class="recent-item-meta">
+                <span class="user">Assigned: {{ assignment.assigned_at|date:"M d, Y H:i" }}</span>
+                <span class="status-badge status-{% if assignment.is_active %}active{% else %}inactive{% endif %}">{% if assignment.is_active %}Active{% else %}Inactive{% endif %}</span>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty-state">
+            <i class='bx bx-users'></i>
+            <p>No assignment history</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

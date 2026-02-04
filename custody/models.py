@@ -13,7 +13,7 @@ import os
 
 class CaseStorage(models.Model):
     case = models.OneToOneField(
-        'cases.Case', on_delete=models.CASCADE, related_name='storage'
+        "cases.Case", on_delete=models.CASCADE, related_name="storage"
     )
     storage_name = models.CharField(max_length=200, unique=True)
     storage_path = models.CharField(max_length=500)
@@ -25,9 +25,9 @@ class CaseStorage(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['-created_at']
-        verbose_name = 'Case Storage'
-        verbose_name_plural = 'Case Storages'
+        ordering = ["-created_at"]
+        verbose_name = "Case Storage"
+        verbose_name_plural = "Case Storages"
 
     def __str__(self):
         return f'{self.storage_name} - {"Locked" if self.is_locked else "Unlocked"}'
@@ -42,12 +42,12 @@ class CaseStorage(models.Model):
         cipher = Cipher(
             algorithms.AES(self.encryption_key),
             modes.CBC(self.encryption_iv),
-            backend=default_backend()
+            backend=default_backend(),
         )
         return cipher
 
     def _pad_data(self, data):
-        data = data.encode('utf-8')
+        data = data.encode("utf-8")
         padder = padding.PKCS7(128).padder()
         padded_data = padder.update(data) + padder.finalize()
         return padded_data
@@ -70,7 +70,7 @@ class CaseStorage(models.Model):
         encrypted_bytes = base64.b64decode(encrypted_data)
         padded_data = decryptor.update(encrypted_bytes) + decryptor.finalize()
         data = self._unpad_data(padded_data)
-        return data.decode('utf-8')
+        return data.decode("utf-8")
 
     @property
     def evidence_count(self):
@@ -102,18 +102,18 @@ class CaseStorage(models.Model):
 
     def unlock(self, user):
         if not self.can_unlock(user):
-            raise PermissionError('User does not have permission to unlock this storage')
+            raise PermissionError(
+                "User does not have permission to unlock this storage"
+            )
         self.is_locked = False
         self.save()
-        StorageLog.log_action(
-            self, user, 'unlock', 'Storage unlocked for operations'
-        )
+        StorageLog.log_action(self, user, "unlock", "Storage unlocked for operations")
 
     def lock(self, user):
         self.is_locked = True
         self.save()
         StorageLog.log_action(
-            self, user, 'lock', 'Storage locked to prevent modifications'
+            self, user, "lock", "Storage locked to prevent modifications"
         )
 
     def can_upload(self, user):
@@ -134,93 +134,134 @@ class CaseStorage(models.Model):
 
 class CustodianAssignment(models.Model):
     case_storage = models.ForeignKey(
-        CaseStorage, on_delete=models.CASCADE, related_name='custodian_assignments'
+        CaseStorage, on_delete=models.CASCADE, related_name="custodian_assignments"
     )
     custodian = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='custodian_assignments'
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="custodian_assignments",
     )
     assigned_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
-        related_name='custodian_assignments_made'
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="custodian_assignments_made",
     )
     assigned_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
     deactivated_at = models.DateTimeField(null=True, blank=True)
     deactivated_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
-        related_name='custodian_assignments_deactivated'
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="custodian_assignments_deactivated",
     )
     deactivation_reason = models.TextField(blank=True)
     assignment_reason = models.TextField(blank=True)
 
     class Meta:
-        ordering = ['-assigned_at']
-        verbose_name = 'Custodian Assignment'
-        verbose_name_plural = 'Custodian Assignments'
+        ordering = ["-assigned_at"]
+        verbose_name = "Custodian Assignment"
+        verbose_name_plural = "Custodian Assignments"
 
     def __str__(self):
-        status = 'Active' if self.is_active else 'Inactive'
-        return f'{self.custodian} - {self.case_storage.storage_name} ({status})'
+        status = "Active" if self.is_active else "Inactive"
+        return f"{self.custodian} - {self.case_storage.storage_name} ({status})"
 
-    def deactivate(self, user, reason=''):
+    def deactivate(self, user, reason=""):
         self.is_active = False
         self.deactivated_at = timezone.now()
         self.deactivated_by = user
         self.deactivation_reason = reason
         self.save()
         StorageLog.log_action(
-            self.case_storage, user, 'custodian_change',
-            f'Custodian {self.custodian} deactivated. Reason: {reason}'
+            self.case_storage,
+            user,
+            "custodian_change",
+            f"Custodian {self.custodian} deactivated. Reason: {reason}",
         )
 
 
 class CustodyTransfer(models.Model):
     STATUS_CHOICES = [
-        ('pending', 'Pending'),
-        ('approved', 'Approved'),
-        ('rejected', 'Rejected'),
-        ('completed', 'Completed'),
+        ("pending", "Pending"),
+        ("approved", "Approved"),
+        ("rejected", "Rejected"),
+        ("completed", "Completed"),
     ]
 
-    evidence = models.ForeignKey('evidence.Evidence', on_delete=models.CASCADE, related_name='custody_transfers')
-    from_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='custody_transfers_from')
-    to_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='custody_transfers_to')
-    requested_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='custody_transfer_requests')
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    evidence = models.ForeignKey(
+        "evidence.Evidence", on_delete=models.CASCADE, related_name="custody_transfers"
+    )
+    from_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="custody_transfers_from",
+    )
+    to_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="custody_transfers_to",
+    )
+    requested_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="custody_transfer_requests",
+    )
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
     reason = models.TextField()
-    approved_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='approved_custody_transfers')
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="approved_custody_transfers",
+    )
     approved_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ["-created_at"]
 
     def __str__(self):
-        return f'Custody Transfer: {self.evidence.description} from {self.from_user} to {self.to_user}'
+        return f"Custody Transfer: {self.evidence.description} from {self.from_user} to {self.to_user}"
 
 
 class StorageLocation(models.Model):
     LOCATION_TYPE_CHOICES = [
-        ('physical', 'Physical Storage'),
-        ('digital', 'Digital Storage'),
-        ('cloud', 'Cloud Storage'),
+        ("physical", "Physical Storage"),
+        ("digital", "Digital Storage"),
+        ("cloud", "Cloud Storage"),
     ]
 
     name = models.CharField(max_length=200)
     location_type = models.CharField(max_length=20, choices=LOCATION_TYPE_CHOICES)
-    capacity = models.BigIntegerField(help_text='Capacity in bytes', null=True, blank=True)
-    used_space = models.BigIntegerField(default=0, help_text='Used space in bytes')
+    capacity = models.BigIntegerField(
+        help_text="Capacity in bytes", null=True, blank=True
+    )
+    used_space = models.BigIntegerField(default=0, help_text="Used space in bytes")
     is_active = models.BooleanField(default=True)
-    managed_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='managed_storage_locations')
+    managed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="managed_storage_locations",
+    )
     case_storage = models.ForeignKey(
-        CaseStorage, on_delete=models.SET_NULL, null=True, blank=True,
-        related_name='storage_locations', help_text='Link to case-specific storage'
+        CaseStorage,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="storage_locations",
+        help_text="Link to case-specific storage",
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
 
     def __str__(self):
         return self.name
@@ -239,22 +280,28 @@ class StorageLocation(models.Model):
 
 
 class EvidenceStorage(models.Model):
-    evidence = models.OneToOneField('evidence.Evidence', on_delete=models.CASCADE, related_name='storage')
-    storage_location = models.ForeignKey(StorageLocation, on_delete=models.CASCADE, related_name='evidence_items')
+    evidence = models.OneToOneField(
+        "evidence.Evidence", on_delete=models.CASCADE, related_name="storage"
+    )
+    storage_location = models.ForeignKey(
+        StorageLocation, on_delete=models.CASCADE, related_name="evidence_items"
+    )
     stored_at = models.DateTimeField(auto_now_add=True)
     last_accessed = models.DateTimeField(auto_now=True)
     access_count = models.IntegerField(default=0)
     is_immutable = models.BooleanField(default=True, editable=False)
 
     class Meta:
-        ordering = ['-stored_at']
+        ordering = ["-stored_at"]
 
     def __str__(self):
-        return f'Storage: {self.evidence.description} at {self.storage_location.name}'
+        return f"Storage: {self.evidence.description} at {self.storage_location.name}"
 
     def delete(self, *args, **kwargs):
         if self.evidence.is_immutable:
-            raise ValidationError('Original evidence cannot be deleted. It is immutable.')
+            raise ValidationError(
+                "Original evidence cannot be deleted. It is immutable."
+            )
         return super().delete(*args, **kwargs)
 
     def record_access(self, user):
@@ -262,39 +309,80 @@ class EvidenceStorage(models.Model):
         self.access_count += 1
         self.save()
         StorageLog.log_action(
-            self.storage_location.case_storage, user, 'access',
-            f'Accessed evidence {self.evidence.id}'
+            self.storage_location.case_storage,
+            user,
+            "access",
+            f"Accessed evidence {self.evidence.id}",
         )
 
 
 class CustodyLog(models.Model):
     ACTION_CHOICES = [
-        ('stored', 'Stored'),
-        ('retrieved', 'Retrieved'),
-        ('transferred', 'Transferred'),
-        ('verified', 'Verified'),
-        ('archived', 'Archived'),
-        ('moved', 'Moved'),
+        ("stored", "Stored"),
+        ("retrieved", "Retrieved"),
+        ("transferred", "Transferred"),
+        ("verified", "Verified"),
+        ("archived", "Archived"),
+        ("viewed", "Viewed"),
+        ("downloaded", "Downloaded"),
+        ("moved", "Moved"),
     ]
 
-    evidence = models.ForeignKey('evidence.Evidence', on_delete=models.CASCADE, related_name='custody_logs')
-    case = models.ForeignKey('cases.Case', on_delete=models.CASCADE, related_name='custody_logs')
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='custody_logs')
+    evidence = models.ForeignKey(
+        "evidence.Evidence", on_delete=models.CASCADE, related_name="custody_logs"
+    )
+    case = models.ForeignKey(
+        "cases.Case", on_delete=models.CASCADE, related_name="custody_logs"
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="custody_logs",
+    )
     action = models.CharField(max_length=20, choices=ACTION_CHOICES)
     details = models.TextField(blank=True)
-    from_location = models.ForeignKey(StorageLocation, on_delete=models.SET_NULL, null=True, blank=True, related_name='custody_logs_from')
-    to_location = models.ForeignKey(StorageLocation, on_delete=models.SET_NULL, null=True, blank=True, related_name='custody_logs_to')
-    to_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='custody_logs_received')
+    from_location = models.ForeignKey(
+        StorageLocation,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="custody_logs_from",
+    )
+    to_location = models.ForeignKey(
+        StorageLocation,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="custody_logs_to",
+    )
+    to_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="custody_logs_received",
+    )
     timestamp = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['-timestamp']
+        ordering = ["-timestamp"]
 
     def __str__(self):
-        return f'{self.action}: {self.evidence.description} by {self.user}'
+        return f"{self.action}: {self.evidence.description} by {self.user}"
 
     @classmethod
-    def log_action(cls, evidence, case, user, action, details='', from_location=None, to_location=None, to_user=None):
+    def log_action(
+        cls,
+        evidence,
+        case,
+        user,
+        action,
+        details="",
+        from_location=None,
+        to_location=None,
+        to_user=None,
+    ):
         return cls.objects.create(
             evidence=evidence,
             case=case,
@@ -303,58 +391,65 @@ class CustodyLog(models.Model):
             details=details,
             from_location=from_location,
             to_location=to_location,
-            to_user=to_user
+            to_user=to_user,
         )
 
 
 class StorageLog(models.Model):
     ACTION_CHOICES = [
-        ('created', 'Storage Created'),
-        ('upload', 'Evidence Uploaded'),
-        ('access', 'Evidence Accessed'),
-        ('lock', 'Storage Locked'),
-        ('unlock', 'Storage Unlocked'),
-        ('custodian_change', 'Custodian Changed'),
-        ('transfer', 'Custody Transferred'),
-        ('delete_attempt', 'Delete Attempt'),
+        ("created", "Storage Created"),
+        ("upload", "Evidence Uploaded"),
+        ("access", "Evidence Accessed"),
+        ("lock", "Storage Locked"),
+        ("unlock", "Storage Unlocked"),
+        ("custodian_change", "Custodian Changed"),
+        ("transfer", "Custody Transferred"),
+        ("delete_attempt", "Delete Attempt"),
     ]
 
-    storage = models.ForeignKey(CaseStorage, on_delete=models.CASCADE, related_name='storage_logs')
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='storage_logs')
+    storage = models.ForeignKey(
+        CaseStorage, on_delete=models.CASCADE, related_name="storage_logs"
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="storage_logs",
+    )
     action = models.CharField(max_length=30, choices=ACTION_CHOICES)
     details = models.TextField(blank=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     ip_address = models.GenericIPAddressField(null=True, blank=True)
 
     class Meta:
-        ordering = ['-timestamp']
+        ordering = ["-timestamp"]
 
     def __str__(self):
-        return f'[{self.timestamp}] {self.action} on {self.storage.storage_name}'
+        return f"[{self.timestamp}] {self.action} on {self.storage.storage_name}"
 
     @classmethod
-    def log_action(cls, storage, user, action, details='', ip_address=None):
+    def log_action(cls, storage, user, action, details="", ip_address=None):
         return cls.objects.create(
             storage=storage,
             user=user,
             action=action,
             details=details,
-            ip_address=ip_address
+            ip_address=ip_address,
         )
 
 
 def get_least_loaded_custodian():
     from django.contrib.auth import get_user_model
+
     User = get_user_model()
-    custodians = User.objects.filter(role='custodian', is_active=True)
+    custodians = User.objects.filter(role="custodian", is_active=True)
     if not custodians.exists():
         return None
 
     custodian_loads = []
     for custodian in custodians:
         active_assignments = CustodianAssignment.objects.filter(
-            custodian=custodian,
-            is_active=True
+            custodian=custodian, is_active=True
         ).count()
         custodian_loads.append((custodian, active_assignments))
 
@@ -362,7 +457,7 @@ def get_least_loaded_custodian():
     return custodian_loads[0][0] if custodian_loads else None
 
 
-@receiver(post_save, sender='cases.Case')
+@receiver(post_save, sender="cases.Case")
 def create_case_storage(sender, instance, created, **kwargs):
     if created:
         storage_name = f"STORAGE_{instance.case_id}"
@@ -373,19 +468,21 @@ def create_case_storage(sender, instance, created, **kwargs):
             storage_name=storage_name,
             storage_path=storage_path,
             is_locked=True,
-            is_active=True
+            is_active=True,
         )
 
         storage_location = StorageLocation.objects.create(
             name=f"{storage_name}_PRIMARY",
-            location_type='digital',
+            location_type="digital",
             case_storage=case_storage,
-            is_active=True
+            is_active=True,
         )
 
         StorageLog.log_action(
-            case_storage, None, 'created',
-            f'Storage created for case {instance.case_id}'
+            case_storage,
+            None,
+            "created",
+            f"Storage created for case {instance.case_id}",
         )
 
         custodian = get_least_loaded_custodian()
@@ -395,9 +492,11 @@ def create_case_storage(sender, instance, created, **kwargs):
                 custodian=custodian,
                 assigned_by=None,
                 is_active=True,
-                assignment_reason='System-assigned based on least-loaded custodian rule'
+                assignment_reason="System-assigned based on least-loaded custodian rule",
             )
             StorageLog.log_action(
-                case_storage, None, 'custodian_change',
-                f'Custodian {custodian.username} assigned by system'
+                case_storage,
+                None,
+                "custodian_change",
+                f"Custodian {custodian.username} assigned by system",
             )
