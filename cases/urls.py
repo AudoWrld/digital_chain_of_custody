@@ -25,6 +25,11 @@ urlpatterns = [
         views.approve_case_closure,
         name="admin_approve_case_closure",
     ),
+    path(
+        "<str:case_id>/reopen/",
+        views.reopen_case,
+        name="reopen_case",
+    ),
     # assign investigators
     path(
         "<str:case_id>/assign/", views.assign_investigator, name="assign_investigators"
