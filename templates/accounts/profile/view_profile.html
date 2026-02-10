@@ -1,0 +1,68 @@
+{% extends "accounts/base.html" %}
+{% load static %}
+{% block title %}My Profile{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/accounts/profile/view_profile.css' %}?v={{ STATIC_VERSION }}" />
+{% endblock %}
+
+{% block content %}
+<div class="profile-wrapper">
+  <div class="profile-card">
+    <div class="profile-header">
+      <div class="profile-avatar">
+        {{ user.first_name.0 }}{{ user.last_name.0 }}
+      </div>
+      <div class="profile-name">
+        <h2>{{ user.get_full_name }}</h2>
+        <span class="profile-role">{{ user.get_role_display }}</span>
+      </div>
+    </div>
+
+    <div class="profile-info">
+      <div class="info-row">
+        <span class="info-label">Username</span>
+        <span class="info-value">{{ user.username|default:"Not set" }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Email</span>
+        <span class="info-value">{{ user.email }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">First Name</span>
+        <span class="info-value">{{ user.first_name }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Last Name</span>
+        <span class="info-value">{{ user.last_name }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Role</span>
+        <span class="info-value">{{ user.get_role_display }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Member Since</span>
+        <span class="info-value">{{ user.date_joined|date:"F d, Y" }}</span>
+      </div>
+    </div>
+
+    <div class="profile-actions">
+      <a href="{% url 'accounts:edit_profile' %}" class="btn btn-primary">Edit Profile</a>
+      <a href="{% url 'accounts:change_password' %}" class="btn btn-secondary">Change Password</a>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const toasts = document.querySelectorAll('.toast');
+  toasts.forEach(toast => {
+    setTimeout(() => {
+      toast.style.animation = 'slideOut 0.3s ease-out forwards';
+      setTimeout(() => {
+        toast.remove();
+      }, 300);
+    }, 5000);
+  });
+});
+</script>
+{% endblock %}
