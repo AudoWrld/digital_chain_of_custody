@@ -45,39 +45,6 @@
         {% endif %}
       </div>
     </div>
-
-    <div class="dashboard-section">
-      <div class="section-header">
-        <h2>All Case Storages</h2>
-      </div>
-      <div class="recent-list">
-        {% if case_storages %}
-          {% for storage in case_storages %}
-          <div class="recent-item">
-            <div class="recent-item-icon">
-              <i class='bx bx-hdd'></i>
-            </div>
-            <div class="recent-item-content">
-              <div class="recent-item-title">{{ storage.storage_name }}</div>
-              <div class="recent-item-meta">
-                <span class="user">Case: {{ storage.case.case_id }}</span>
-                <span class="status-badge status-{% if storage.is_locked %}locked{% else %}unlocked{% endif %}">{% if storage.is_locked %}Locked{% else %}Unlocked{% endif %}</span>
-                <span class="date">{{ storage.created_at|date:"M d, Y" }}</span>
-              </div>
-            </div>
-            <a href="{% url 'custody:view_case_storage' storage.case.case_id %}" class="recent-item-action">
-              <i class='bx bx-right-arrow-alt'></i>
-            </a>
-          </div>
-          {% endfor %}
-        {% else %}
-          <div class="empty-state">
-            <i class='bx bx-hdd'></i>
-            <p>No case storages found</p>
-          </div>
-        {% endif %}
-      </div>
-    </div>
   </div>
 </div>
 {% endblock %}
