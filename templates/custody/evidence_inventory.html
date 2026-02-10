@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}Evidence Inventory{% endblock %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/cases/case_list.css' %}?v={{ STATIC_VERSION }}" />
+
+<div class="cases-page-header">
+  <div class="cases-page-title">
+    <h1>Evidence Inventory</h1>
+  </div>
+</div>
+
+{% if evidence_storages %}
+<div class="cases-table-wrapper">
+  <table class="cases-data-table">
+    <thead class="cases-table-head">
+      <tr>
+        <th class="cases-table-header">Evidence ID</th>
+        <th class="cases-table-header">Case</th>
+        <th class="cases-table-header">Filename</th>
+        <th class="cases-table-header">Storage Location</th>
+        <th class="cases-table-header">Status</th>
+        <th class="cases-table-header">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="cases-table-body">
+      {% for storage in evidence_storages %}
+      <tr class="cases-table-row">
+        <td class="cases-table-cell">{{ storage.evidence.id }}</td>
+        <td class="cases-table-cell">
+          <a href="{% url 'cases:view_case' storage.evidence.case.case_id %}">{{ storage.evidence.case.case_id }}</a>
+        </td>
+        <td class="cases-table-cell">{{ storage.evidence.get_filename }}</td>
+        <td class="cases-table-cell">{{ storage.storage_location.location_name|default:"Not assigned" }}</td>
+        <td class="cases-table-cell">
+          {% if storage.evidence.status == 'In Custody' %}
+          <span class="cases-status-badge cases-status-open">{{ storage.evidence.status }}</span>
+          {% elif storage.evidence.status == 'Transferred' %}
+          <span class="cases-status-badge cases-status-pending">{{ storage.evidence.status }}</span>
+          {% elif storage.evidence.status == 'Released' %}
+          <span class="cases-status-badge cases-status-closed">{{ storage.evidence.status }}</span>
+          {% else %}
+          <span class="cases-status-badge">{{ storage.evidence.status }}</span>
+          {% endif %}
+        </td>
+        <td class="cases-table-cell">
+          <a href="{% url 'custody:request_transfer' storage.evidence.id %}" class="cases-action-link">Transfer</a>
+          <a href="{% url 'evidence:view' storage.evidence.id %}" class="cases-action-link">View</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="cases-empty-state">
+  <p>No evidence in inventory.</p>
+</div>
+{% endif %}
+{% endblock %}

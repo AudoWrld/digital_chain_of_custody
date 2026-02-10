@@ -223,13 +223,17 @@
             <i class='bx bx-home'></i>
             <span>Dashboard</span>
           </a>
-          <a href="{% url 'custody:case_storages' %}" class="sidebar-link">
+          <a href="{% url 'custody:evidence_inventory' %}" class="sidebar-link {% if request.path == '/custody/evidence/inventory/' %}active{% endif %}">
             <i class='bx bx-box'></i>
             <span>Evidence Inventory</span>
           </a>
-          <a href="{% url 'custody:case_storages' %}" class="sidebar-link">
+          <a href="{% url 'custody:custody_transfers' %}" class="sidebar-link {% if request.path == '/custody/transfers/' %}active{% endif %}">
             <i class='bx bx-transfer'></i>
             <span>Custody Transfers</span>
+          </a>
+          <a href="{% url 'custody:case_storages' %}" class="sidebar-link {% if request.path == '/custody/case-storages/' %}active{% endif %}">
+            <i class='bx bx-hdd'></i>
+            <span>Case Storages</span>
           </a>
           <a href="{% url 'accounts:view_profile' %}" class="sidebar-link {% if request.path == '/accounts/profile/' %}active{% endif %}">
             <i class='bx bx-user'></i>

@@ -162,6 +162,42 @@ def case_storages_list(request):
 
 @login_required
 @custodian_required
+def evidence_inventory(request):
+    """Evidence inventory page with table like case_list"""
+    # Get all evidence in storage
+    evidence_storages = EvidenceStorage.objects.select_related(
+        'evidence', 'evidence__case', 'storage_location', 'storage_location__case_storage'
+    ).all()
+    
+    context = {
+        'evidence_storages': evidence_storages,
+        'is_superuser': request.user.is_superuser,
+    }
+    return render(request, 'custody/evidence_inventory.html', context)
+
+
+@login_required
+@custodian_required
+def custody_transfers(request):
+    """Custody transfers list page"""
+    pending_transfers = CustodyTransfer.objects.filter(
+        status='pending'
+    ).select_related('evidence', 'evidence__case', 'from_user', 'to_user').order_by('-created_at')
+    
+    my_pending_transfers = CustodyTransfer.objects.filter(
+        Q(from_user=request.user) | Q(to_user=request.user),
+        status='pending'
+    ).select_related('evidence', 'evidence__case', 'from_user', 'to_user').order_by('-created_at')
+    
+    context = {
+        'pending_transfers': pending_transfers,
+        'my_pending_transfers': my_pending_transfers,
+    }
+    return render(request, 'custody/custody_transfers.html', context)
+
+
+@login_required
+@custodian_required
 def view_case_storage(request, case_id):
     case = get_object_or_404(Case, case_id=case_id)
     case_storage = get_object_or_404(CaseStorage, case=case)

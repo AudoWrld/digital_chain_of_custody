@@ -5,6 +5,8 @@ app_name = "custody"
 
 urlpatterns = [
     path('dashboard/', views.custody_dashboard, name='dashboard'),
+    path('evidence/inventory/', views.evidence_inventory, name='evidence_inventory'),
+    path('transfers/', views.custody_transfers, name='custody_transfers'),
     path('transfer/request/<int:evidence_id>/', views.request_custody_transfer, name='request_transfer'),
     path('transfer/approve/<int:transfer_id>/', views.approve_custody_transfer, name='approve_transfer'),
     path('case-storages/', views.case_storages_list, name='case_storages'),
