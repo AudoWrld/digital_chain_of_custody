@@ -245,7 +245,7 @@ def second_authentication(request):
                     return redirect("recovery_codes_view")
 
                 if request.user.is_superuser:
-                    return redirect("/admin/")
+                    return redirect("dashboard:dashboard")
                 elif request.user.role == "analyst":
                     return redirect("reports:dashboard")
                 elif request.user.role == "custodian":
