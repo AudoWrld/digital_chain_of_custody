@@ -273,6 +273,17 @@
   color: #78350f;
 }
 
+.view-case-action-success {
+  background: #10b981;
+  color: #ffffff;
+  border: 1px solid #059669;
+}
+
+.view-case-action-success:hover {
+  background: #059669;
+  color: #ffffff;
+}
+
 .view-case-action-disabled {
   padding: 10px 20px;
   border-radius: 8px;
@@ -666,4 +677,14 @@
 
 .btn-danger:hover {
   background: #dc2626;
+}
+
+.view-case-danger-zone {
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  border: 2px solid #fca5a5;
+}
+
+.view-case-danger-zone .view-case-section-title {
+  color: #991b1b;
+  border-bottom-color: #fca5a5;
 }
