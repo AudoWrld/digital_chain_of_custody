@@ -938,6 +938,9 @@ def edit_profile(request):
         first_name = request.POST.get("first_name")
         last_name = request.POST.get("last_name")
         username = request.POST.get("username")
+        phone_number = request.POST.get("phone_number")
+        profile_picture = request.FILES.get("profile_picture")
+        remove_picture = request.POST.get("remove_picture")
         
         if User.objects.filter(username=username).exclude(pk=user.pk).exists():
             messages.error(request, "Username already exists.")
@@ -946,6 +949,15 @@ def edit_profile(request):
         user.first_name = first_name
         user.last_name = last_name
         user.username = username
+        user.phone_number = phone_number
+        
+        if remove_picture == "true":
+            if user.profile_picture:
+                user.profile_picture.delete(save=False)
+            user.profile_picture = None
+        elif profile_picture:
+            user.profile_picture = profile_picture
+        
         user.save()
         
         from cases.models import CaseAuditLog
@@ -959,6 +971,31 @@ def edit_profile(request):
         return redirect("accounts:view_profile")
     
     return render(request, "accounts/profile/edit_profile.html", {"user": user})
+
+
+@login_required
+def deactivate_account(request):
+    user = request.user
+    
+    if user.is_superuser or user.role == "admin":
+        messages.error(request, "Administrators cannot deactivate their account.")
+        return redirect("accounts:view_profile")
+    
+    if request.method == "POST":
+        user.is_active = False
+        user.save()
+        
+        from cases.models import CaseAuditLog
+        CaseAuditLog.log_action(
+            user=user,
+            action="Account deactivated",
+            details=f"User {user.get_full_name()} deactivated their account",
+        )
+        
+        messages.success(request, "Your account has been deactivated. Please contact an administrator to reactivate.")
+        return redirect("accounts:logout")
+    
+    return redirect("accounts:view_profile")
 
 
 @login_required

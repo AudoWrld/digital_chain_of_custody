@@ -13,9 +13,33 @@
       <a href="{% url 'accounts:view_profile' %}" class="btn btn-ghost">Back to Profile</a>
     </div>
 
-    <form method="post" class="edit-profile-form">
+    <form method="post" class="edit-profile-form" enctype="multipart/form-data">
       {% csrf_token %}
       
+      <div class="profile-pic-section">
+        <div class="profile-pic-preview" id="profilePicContainer">
+          {% if user.profile_picture %}
+          <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}" id="profilePicPreview" />
+          {% else %}
+          <div class="profile-pic-placeholder" id="profilePicPreview">{{ user.first_name.0 }}{{ user.last_name.0 }}</div>
+          {% endif %}
+        </div>
+        <div class="profile-pic-actions">
+          <label for="profile_picture" class="btn btn-secondary">
+            <i class='bx bx-upload'></i>
+            Upload Photo
+          </label>
+          <input type="file" id="profile_picture" name="profile_picture" accept="image/*" onchange="previewProfilePic(this)" />
+          {% if user.profile_picture %}
+          <button type="button" class="btn btn-ghost" id="removePicBtn" onclick="removeProfilePic()">
+            <i class='bx bx-trash'></i>
+            Remove
+          </button>
+          {% endif %}
+        </div>
+        <input type="hidden" name="remove_picture" id="removePicture" value="false" />
+      </div>
+
       <div class="form-group">
         <label for="first_name">First Name</label>
         <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}" required />
@@ -38,8 +62,17 @@
         <span class="help-text">Email cannot be changed</span>
       </div>
 
+      <div class="form-group">
+        <label for="phone_number">Phone Number</label>
+        <input type="tel" id="phone_number" name="phone_number" value="{{ user.phone_number|default:'' }}" placeholder="+1 (555) 000-0000" />
+        <span class="help-text">Optional contact number for account recovery or alerts</span>
+      </div>
+
       <div class="form-actions">
-        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <button type="submit" class="btn btn-primary">
+          <i class='bx bx-check'></i>
+          Save Changes
+        </button>
         <a href="{% url 'accounts:view_profile' %}" class="btn btn-secondary">Cancel</a>
       </div>
     </form>
@@ -47,6 +80,46 @@
 </div>
 
 <script>
+function previewProfilePic(input) {
+  if (input.files && input.files[0]) {
+    document.getElementById('removePicture').value = 'false';
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const container = document.getElementById('profilePicContainer');
+      const existingImg = container.querySelector('img');
+      if (existingImg) {
+        existingImg.src = e.target.result;
+      } else {
+        const newImg = document.createElement('img');
+        newImg.id = 'profilePicPreview';
+        newImg.src = e.target.result;
+        newImg.className = 'profile-pic-img';
+        container.innerHTML = '';
+        container.appendChild(newImg);
+      }
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function removeProfilePic() {
+  document.getElementById('removePicture').value = 'true';
+  document.getElementById('profile_picture').value = '';
+  
+  const container = document.getElementById('profilePicContainer');
+  const placeholder = document.createElement('div');
+  placeholder.className = 'profile-pic-placeholder';
+  placeholder.id = 'profilePicPreview';
+  placeholder.textContent = '{{ user.first_name.0 }}{{ user.last_name.0 }}';
+  container.innerHTML = '';
+  container.appendChild(placeholder);
+  
+  const removeBtn = document.getElementById('removePicBtn');
+  if (removeBtn) {
+    removeBtn.remove();
+  }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   const toasts = document.querySelectorAll('.toast');
   toasts.forEach(toast => {
