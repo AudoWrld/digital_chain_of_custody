@@ -6,93 +6,119 @@
 {% endblock %}
 
 {% block content %}
-<div class="profile-wrapper">
+<div class="profile-container">
+  <div class="profile-header-section">
+    <h1 class="profile-title">My Profile</h1>
+    <p class="profile-subtitle">View and manage your account information</p>
+  </div>
+
   <div class="profile-card">
-    <div class="profile-header">
-      <div class="profile-avatar">
-        {% if user.profile_picture %}
-        <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}" class="profile-pic-img" />
-        {% else %}
-        {{ user.first_name.0 }}{{ user.last_name.0 }}
+    <div class="profile-cover"></div>
+    <div class="profile-content">
+      <div class="profile-avatar-section">
+        <div class="profile-avatar-large">
+          {% if user.profile_picture %}
+          <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}" class="profile-pic-img" />
+          {% else %}
+          {{ user.first_name.0 }}{{ user.last_name.0 }}
+          {% endif %}
+        </div>
+        <div class="profile-avatar-info">
+          <h2 class="profile-name">{{ user.get_full_name }}</h2>
+          {% if user.is_superuser %}
+          <span class="profile-role-badge">Admin</span>
+          {% else %}
+          <span class="profile-role-badge">{{ user.get_role_display }}</span>
+          {% endif %}
+          {% if user.is_active %}
+          <span class="profile-status-active">Active</span>
+          {% else %}
+          <span class="profile-status-inactive">Inactive</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <h3 class="profile-section-title">Account Information</h3>
+        <div class="profile-details-grid">
+          <div class="profile-detail-item">
+            <span class="profile-detail-label">Username</span>
+            <span class="profile-detail-value">{{ user.username|default:"Not set" }}</span>
+          </div>
+          <div class="profile-detail-item">
+            <span class="profile-detail-label">Email</span>
+            <span class="profile-detail-value">{{ user.email }}</span>
+          </div>
+          <div class="profile-detail-item">
+            <span class="profile-detail-label">Phone Number</span>
+            <span class="profile-detail-value">{{ user.phone_number|default:"Not set" }}</span>
+          </div>
+          <div class="profile-detail-item">
+            <span class="profile-detail-label">Member Since</span>
+            <span class="profile-detail-value">{{ user.date_joined|date:"F d, Y" }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <h3 class="profile-section-title">Personal Information</h3>
+        <div class="profile-details-grid">
+          <div class="profile-detail-item">
+            <span class="profile-detail-label">First Name</span>
+            <span class="profile-detail-value">{{ user.first_name }}</span>
+          </div>
+          <div class="profile-detail-item">
+            <span class="profile-detail-label">Last Name</span>
+            <span class="profile-detail-value">{{ user.last_name }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-actions">
+        <a href="{% url 'accounts:edit_profile' %}" class="profile-action-btn profile-action-primary">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+          </svg>
+          Edit Profile
+        </a>
+        <a href="{% url 'accounts:change_password' %}" class="profile-action-btn profile-action-secondary">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+          </svg>
+          Change Password
+        </a>
+        {% if not user.is_superuser and user.role != 'admin' %}
+        <button type="button" class="profile-action-btn profile-action-danger" onclick="confirmDeactivation()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+          </svg>
+          Deactivate Account
+        </button>
         {% endif %}
       </div>
-      <div class="profile-name">
-        <h2>{{ user.get_full_name }}</h2>
-        <span class="profile-role">{{ user.get_role_display }}</span>
-      </div>
-    </div>
-
-    <div class="profile-info">
-      <div class="info-row">
-        <span class="info-label">Username</span>
-        <span class="info-value">{{ user.username|default:"Not set" }}</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Email</span>
-        <span class="info-value">{{ user.email }}</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Phone Number</span>
-        <span class="info-value">{{ user.phone_number|default:"Not set" }}</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">First Name</span>
-        <span class="info-value">{{ user.first_name }}</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Last Name</span>
-        <span class="info-value">{{ user.last_name }}</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Role</span>
-        <span class="info-value">{{ user.get_role_display }}</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Account Status</span>
-        <span class="info-value status-badge {% if user.is_active %}active{% else %}inactive{% endif %}">
-          {% if user.is_active %}Active{% else %}Inactive{% endif %}
-        </span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Member Since</span>
-        <span class="info-value">{{ user.date_joined|date:"F d, Y" }}</span>
-      </div>
-    </div>
-
-    <div class="profile-actions">
-      <a href="{% url 'accounts:edit_profile' %}" class="btn btn-primary">
-        <i class='bx bx-edit-alt'></i>
-        Edit Profile
-      </a>
-      <a href="{% url 'accounts:change_password' %}" class="btn btn-secondary">
-        <i class='bx bx-lock-alt'></i>
-        Change Password
-      </a>
-      {% if not user.is_superuser and user.role != 'admin' %}
-      <button type="button" class="btn btn-danger" onclick="confirmDeactivation()">
-        <i class='bx bx-user-x'></i>
-        Deactivate Account
-      </button>
-      {% endif %}
     </div>
   </div>
 </div>
 
-<div id="deactivationModal" class="modal">
-  <div class="modal-content">
+<div id="deactivationModal" class="modal-overlay">
+  <div class="modal-card">
     <div class="modal-header">
       <h3>Deactivate Account</h3>
-      <button class="modal-close" onclick="closeModal()">&times;</button>
+      <button class="modal-close" onclick="closeModal()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
     </div>
     <div class="modal-body">
       <p>Are you sure you want to deactivate your account?</p>
-      <p class="warning-text">This will immediately log you out and you will not be able to log in again. Contact an administrator to reactivate your account.</p>
+      <p class="modal-warning">This will immediately log you out and you will not be able to log in again. Contact an administrator to reactivate your account.</p>
     </div>
     <div class="modal-actions">
       <form method="post" action="{% url 'accounts:deactivate_account' %}">
         {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Yes, Deactivate</button>
-        <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="profile-action-btn profile-action-danger">Yes, Deactivate</button>
+        <button type="button" class="profile-action-btn profile-action-secondary" onclick="closeModal()">Cancel</button>
       </form>
     </div>
   </div>
@@ -100,11 +126,11 @@
 
 <script>
 function confirmDeactivation() {
-  document.getElementById('deactivationModal').style.display = 'flex';
+  document.getElementById('deactivationModal').classList.add('modal-open');
 }
 
 function closeModal() {
-  document.getElementById('deactivationModal').style.display = 'none';
+  document.getElementById('deactivationModal').classList.remove('modal-open');
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -118,12 +144,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 5000);
   });
 
-  window.onclick = function(event) {
-    const modal = document.getElementById('deactivationModal');
-    if (event.target === modal) {
+  document.getElementById('deactivationModal').addEventListener('click', function(e) {
+    if (e.target === this) {
       closeModal();
     }
-  }
+  });
 });
 </script>
 {% endblock %}

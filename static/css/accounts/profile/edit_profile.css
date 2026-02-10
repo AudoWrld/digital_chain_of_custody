@@ -1,43 +1,79 @@
-.edit-profile-wrapper {
-  display: flex;
-  justify-content: center;
-  padding: 40px 20px;
-  min-height: calc(100vh - 200px);
-}
-
-.edit-profile-card {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  width: 100%;
-  max-width: 500px;
+.edit-profile-container {
+  max-width: 700px;
+  margin: 0 auto;
 }
 
 .edit-profile-header {
-  padding: 20px 30px;
-  border-bottom: 1px solid #eee;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 32px;
 }
 
 .edit-profile-header h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #111827;
   margin: 0;
-  font-size: 20px;
-  color: #1e293b;
+}
+
+.edit-profile-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #6b7280;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  padding: 8px 16px;
+  background: #f3f4f6;
+  border-radius: 8px;
+}
+
+.edit-profile-back-link:hover {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.edit-profile-back-link svg {
+  width: 18px;
+  height: 18px;
+}
+
+.edit-profile-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  padding: 2rem;
 }
 
 .edit-profile-form {
-  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
 
 .profile-pic-section {
   display: flex;
   flex-direction: column;
+  gap: 1rem;
+}
+
+.profile-pic-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.profile-pic-upload-area {
+  display: flex;
   align-items: center;
-  margin-bottom: 30px;
-  padding-bottom: 30px;
-  border-bottom: 1px solid #eee;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: #f9fafb;
+  border: 2px dashed #d1d5db;
+  border-radius: 12px;
 }
 
 .profile-pic-preview {
@@ -45,11 +81,13 @@
   height: 100px;
   border-radius: 50%;
   overflow: hidden;
-  margin-bottom: 15px;
-  background: #f1f5f9;
+  background: linear-gradient(135deg, #1a365d 0%, #2d4a7c 100%);
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  border: 3px solid #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .profile-pic-img {
@@ -64,7 +102,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #1a365d 0%, #2d4a7c 100%);
   color: white;
   font-size: 36px;
   font-weight: 600;
@@ -72,24 +109,81 @@
 
 .profile-pic-actions {
   display: flex;
-  gap: 10px;
-  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
-.profile-pic-actions input[type="file"] {
+.profile-upload-btn,
+.profile-remove-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.profile-upload-btn {
+  background: #3b82f6;
+  color: white;
+}
+
+.profile-upload-btn:hover {
+  background: #2563eb;
+}
+
+.profile-remove-btn {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.profile-remove-btn:hover {
+  background: #fecaca;
+}
+
+.profile-upload-btn svg,
+.profile-remove-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+#profile_picture {
   display: none;
 }
 
+.form-section {
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.form-section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 1.5rem 0;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
 .form-group {
-  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .form-group label {
-  display: block;
-  margin-bottom: 8px;
+  font-size: 14px;
   font-weight: 500;
   color: #374151;
-  font-size: 14px;
 }
 
 .form-group input[type="text"],
@@ -101,7 +195,8 @@
   border: 1px solid #d1d5db;
   border-radius: 8px;
   font-size: 14px;
-  transition: border-color 0.2s ease;
+  color: #111827;
+  transition: all 0.2s ease;
   box-sizing: border-box;
 }
 
@@ -114,70 +209,102 @@
 .form-group input:disabled {
   background: #f3f4f6;
   cursor: not-allowed;
+  color: #6b7280;
 }
 
 .help-text {
-  display: block;
-  margin-top: 5px;
   font-size: 12px;
   color: #6b7280;
 }
 
 .form-actions {
   display: flex;
-  gap: 15px;
-  margin-top: 30px;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
 }
 
-.btn {
+.btn-submit {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
   gap: 8px;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none;
-  border: none;
-}
-
-.btn-primary {
+  padding: 12px 24px;
   background: #3b82f6;
   color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.btn-primary:hover {
+.btn-submit:hover {
   background: #2563eb;
 }
 
-.btn-secondary {
-  background: #e2e8f0;
-  color: #475569;
+.btn-submit:active {
+  transform: scale(0.98);
 }
 
-.btn-secondary:hover {
-  background: #cbd5e1;
+.btn-submit svg {
+  width: 18px;
+  height: 18px;
 }
 
-.btn-ghost {
-  background: transparent;
-  color: #64748b;
-  border: 1px solid #e2e8f0;
+.btn-cancel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  background: #f3f4f6;
+  color: #374151;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
 }
 
-.btn-ghost:hover {
-  background: #f8fafc;
+.btn-cancel:hover {
+  background: #e5e7eb;
+}
+
+.btn-cancel:active {
+  transform: scale(0.98);
 }
 
 @media (max-width: 640px) {
+  .edit-profile-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .edit-profile-back-link {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .profile-pic-upload-area {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .profile-pic-actions {
+    width: 100%;
+    justify-content: center;
+  }
+
   .form-actions {
     flex-direction: column;
   }
 
-  .profile-pic-actions {
-    flex-direction: column;
+  .btn-submit,
+  .btn-cancel {
+    width: 100%;
   }
 }

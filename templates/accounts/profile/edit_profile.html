@@ -6,74 +6,95 @@
 {% endblock %}
 
 {% block content %}
-<div class="edit-profile-wrapper">
-  <div class="edit-profile-card">
-    <div class="edit-profile-header">
-      <h2>Edit Profile</h2>
-      <a href="{% url 'accounts:view_profile' %}" class="btn btn-ghost">Back to Profile</a>
-    </div>
+<div class="edit-profile-container">
+  <div class="edit-profile-header">
+    <h2>Edit Profile</h2>
+    <a href="{% url 'accounts:view_profile' %}" class="edit-profile-back-link">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+      </svg>
+      Back to Profile
+    </a>
+  </div>
 
+  <div class="edit-profile-card">
     <form method="post" class="edit-profile-form" enctype="multipart/form-data">
       {% csrf_token %}
       
       <div class="profile-pic-section">
-        <div class="profile-pic-preview" id="profilePicContainer">
-          {% if user.profile_picture %}
-          <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}" id="profilePicPreview" />
-          {% else %}
-          <div class="profile-pic-placeholder" id="profilePicPreview">{{ user.first_name.0 }}{{ user.last_name.0 }}</div>
-          {% endif %}
+        <label class="profile-pic-label">Profile Photo</label>
+        <div class="profile-pic-upload-area">
+          <div class="profile-pic-preview" id="profilePicContainer">
+            {% if user.profile_picture %}
+            <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}" id="profilePicPreview" />
+            {% else %}
+            <div class="profile-pic-placeholder" id="profilePicPreview">{{ user.first_name.0 }}{{ user.last_name.0 }}</div>
+            {% endif %}
+          </div>
+          <div class="profile-pic-actions">
+            <label for="profile_picture" class="profile-upload-btn">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              Upload Photo
+            </label>
+            <input type="file" id="profile_picture" name="profile_picture" accept="image/*" onchange="previewProfilePic(this)" />
+            {% if user.profile_picture %}
+            <button type="button" class="profile-remove-btn" id="removePicBtn" onclick="removeProfilePic()">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
+              Remove
+            </button>
+            {% endif %}
+          </div>
+          <input type="hidden" name="remove_picture" id="removePicture" value="false" />
         </div>
-        <div class="profile-pic-actions">
-          <label for="profile_picture" class="btn btn-secondary">
-            <i class='bx bx-upload'></i>
-            Upload Photo
-          </label>
-          <input type="file" id="profile_picture" name="profile_picture" accept="image/*" onchange="previewProfilePic(this)" />
-          {% if user.profile_picture %}
-          <button type="button" class="btn btn-ghost" id="removePicBtn" onclick="removeProfilePic()">
-            <i class='bx bx-trash'></i>
-            Remove
-          </button>
-          {% endif %}
+      </div>
+
+      <div class="form-section">
+        <h3 class="form-section-title">Personal Information</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="first_name">First Name</label>
+            <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}" required />
+          </div>
+          <div class="form-group">
+            <label for="last_name">Last Name</label>
+            <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}" required />
+          </div>
         </div>
-        <input type="hidden" name="remove_picture" id="removePicture" value="false" />
       </div>
 
-      <div class="form-group">
-        <label for="first_name">First Name</label>
-        <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}" required />
-      </div>
-
-      <div class="form-group">
-        <label for="last_name">Last Name</label>
-        <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}" required />
-      </div>
-
-      <div class="form-group">
-        <label for="username">Username</label>
-        <input type="text" id="username" name="username" value="{{ user.username }}" required />
-        <span class="help-text">Username must be unique</span>
-      </div>
-
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" value="{{ user.email }}" disabled />
-        <span class="help-text">Email cannot be changed</span>
-      </div>
-
-      <div class="form-group">
-        <label for="phone_number">Phone Number</label>
-        <input type="tel" id="phone_number" name="phone_number" value="{{ user.phone_number|default:'' }}" placeholder="+1 (555) 000-0000" />
-        <span class="help-text">Optional contact number for account recovery or alerts</span>
+      <div class="form-section">
+        <h3 class="form-section-title">Account Information</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" value="{{ user.username }}" required />
+            <span class="help-text">Username must be unique</span>
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" value="{{ user.email }}" disabled />
+            <span class="help-text">Email cannot be changed</span>
+          </div>
+          <div class="form-group">
+            <label for="phone_number">Phone Number</label>
+            <input type="tel" id="phone_number" name="phone_number" value="{{ user.phone_number|default:'' }}" placeholder="+1 (555) 000-0000" />
+            <span class="help-text">Optional contact number for account recovery or alerts</span>
+          </div>
+        </div>
       </div>
 
       <div class="form-actions">
-        <button type="submit" class="btn btn-primary">
-          <i class='bx bx-check'></i>
+        <button type="submit" class="btn-submit">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
           Save Changes
         </button>
-        <a href="{% url 'accounts:view_profile' %}" class="btn btn-secondary">Cancel</a>
+        <a href="{% url 'accounts:view_profile' %}" class="btn-cancel">Cancel</a>
       </div>
     </form>
   </div>
