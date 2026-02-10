@@ -22,22 +22,28 @@ def dashboard(request):
         'is_superuser': request.user.is_superuser,
     }
 
+    # Common chart data available to all users
+    case_status_counts = dict(Case.objects.values('case_status').annotate(count=Count('id')).values_list('case_status', 'count'))
+    case_priority_counts = dict(Case.objects.values('case_priority').annotate(count=Count('id')).values_list('case_priority', 'count'))
+    
+    from django.db.models.functions import TruncDate
+    from django.utils import timezone
+    from datetime import timedelta
+    
+    thirty_days_ago = timezone.now() - timedelta(days=30)
+    cases_by_date = list(Case.objects.filter(date_created__gte=thirty_days_ago).annotate(
+        date=TruncDate('date_created')
+    ).values('date').annotate(count=Count('id')).order_by('date'))
+    
+    cases_by_date_dict = {str(item['date']): item['count'] for item in cases_by_date}
+    
+    context.update({
+        'case_status_counts': json.dumps(case_status_counts),
+        'case_priority_counts': json.dumps(case_priority_counts),
+        'cases_by_date': json.dumps(cases_by_date_dict),
+    })
+
     if request.user.is_superuser:
-        case_status_counts = dict(Case.objects.values('case_status').annotate(count=Count('id')).values_list('case_status', 'count'))
-        case_priority_counts = dict(Case.objects.values('case_priority').annotate(count=Count('id')).values_list('case_priority', 'count'))
-        
-        from django.db.models.functions import TruncDate
-        from django.utils import timezone
-        from datetime import timedelta
-        
-        thirty_days_ago = timezone.now() - timedelta(days=30)
-        cases_by_date = list(Case.objects.filter(date_created__gte=thirty_days_ago).annotate(
-            date=TruncDate('date_created')
-        ).values('date').annotate(count=Count('id')).order_by('date'))
-        
-        cases_by_date_dict = {str(item['date']): item['count'] for item in cases_by_date}
-        
-        user_role_counts = dict(User.objects.values('role').annotate(count=Count('id')).values_list('role', 'count'))
         
         superuser_count = User.objects.filter(is_superuser=True).count()
         if superuser_count > 0:
