@@ -79,6 +79,10 @@
             <i class='bx bx-home'></i>
             <span>Dashboard</span>
           </a>
+          <a href="{% url 'accounts:view_profile' %}" class="sidebar-link {% if request.path == '/accounts/profile/' %}active{% endif %}">
+            <i class='bx bx-user'></i>
+            <span>My Profile</span>
+          </a>
           <a href="{% url 'cases:case_list' %}" class="sidebar-link {% if request.path == '/cases/' %}active{% endif %}">
             <i class='bx bx-briefcase'></i>
             <span>All Cases</span>
@@ -115,6 +119,10 @@
             <i class='bx bx-home'></i>
             <span>Dashboard</span>
           </a>
+          <a href="{% url 'accounts:view_profile' %}" class="sidebar-link {% if request.path == '/accounts/profile/' %}active{% endif %}">
+            <i class='bx bx-user'></i>
+            <span>My Profile</span>
+          </a>
           <a href="{% url 'cases:create_case' %}" class="sidebar-link {% if request.path == '/cases/create/' %}active{% endif %}">
             <i class='bx bx-plus-circle'></i>
             <span>Create Case</span>
@@ -147,6 +155,10 @@
             <i class='bx bx-home'></i>
             <span>Dashboard</span>
           </a>
+          <a href="{% url 'accounts:view_profile' %}" class="sidebar-link {% if request.path == '/accounts/profile/' %}active{% endif %}">
+            <i class='bx bx-user'></i>
+            <span>My Profile</span>
+          </a>
           <a href="{% url 'cases:assigned_cases' %}" class="sidebar-link {% if request.path == '/cases/assigned/' %}active{% endif %}">
             <i class='bx bx-briefcase'></i>
             <span>Assigned Cases</span>
@@ -174,6 +186,10 @@
           <a href="{% url 'reports:dashboard' %}" class="sidebar-link {% if request.path == '/reports/dashboard/' %}active{% endif %}">
             <i class='bx bx-home'></i>
             <span>Dashboard</span>
+          </a>
+          <a href="{% url 'accounts:view_profile' %}" class="sidebar-link {% if request.path == '/accounts/profile/' %}active{% endif %}">
+            <i class='bx bx-user'></i>
+            <span>My Profile</span>
           </a>
           <a href="{% url 'evidence:all_evidence' %}" class="sidebar-link {% if request.path == '/evidence/all/' %}active{% endif %}">
             <i class='bx bx-archive'></i>
@@ -207,6 +223,10 @@
             <i class='bx bx-home'></i>
             <span>Dashboard</span>
           </a>
+          <a href="{% url 'accounts:view_profile' %}" class="sidebar-link {% if request.path == '/accounts/profile/' %}active{% endif %}">
+            <i class='bx bx-user'></i>
+            <span>My Profile</span>
+          </a>
           <a href="{% url 'custody:case_storages' %}" class="sidebar-link">
             <i class='bx bx-box'></i>
             <span>Evidence Inventory</span>
@@ -234,6 +254,10 @@
           <a href="{% url 'dashboard:dashboard' %}" class="sidebar-link {% if request.path == '/dashboard/' %}active{% endif %}">
             <i class='bx bx-home'></i>
             <span>Dashboard</span>
+          </a>
+          <a href="{% url 'accounts:view_profile' %}" class="sidebar-link {% if request.path == '/accounts/profile/' %}active{% endif %}">
+            <i class='bx bx-user'></i>
+            <span>My Profile</span>
           </a>
           <a href="{% url 'evidence:all_evidence' %}" class="sidebar-link {% if request.path == '/evidence/all/' %}active{% endif %}">
             <i class='bx bx-archive'></i>
