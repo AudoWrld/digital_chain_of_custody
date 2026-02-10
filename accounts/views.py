@@ -76,7 +76,7 @@ def register(request):
             )
 
             request.session["pending_verification_email"] = user.email
-            return redirect("verification_sent")
+            return redirect("accounts:verification_sent")
 
         else:
             messages.error(request, "Please correct the errors below.")
@@ -126,13 +126,13 @@ def resend_verification_email(request):
 
     if not email:
         messages.error(request, "Email is required.")
-        return redirect("verification_sent")
+        return redirect("accounts:verification_sent")
 
     try:
         user = User.objects.get(email=email)
         if user.is_active:
             messages.info(request, "This account is already verified. Please log in.")
-            return redirect("login")
+            return redirect("accounts:login")
 
         current_site = get_current_site(request)
         subject = "Verify your email (Recent)"
@@ -160,11 +160,11 @@ def resend_verification_email(request):
         )
 
         messages.success(request, f"A new verification email was sent to {user.email}.")
-        return redirect(f"{reverse('verification_sent')}?email={user.email}")
+        return redirect(f"{reverse('accounts:verification_sent')}?email={user.email}")
 
     except User.DoesNotExist:
         messages.error(request, "No account found with this email.")
-        return redirect("register")
+        return redirect("accounts:register")
 
 
 def verify_email(request, uidb64, token):
@@ -182,10 +182,10 @@ def verify_email(request, uidb64, token):
         messages.success(
             request, "Email verified successfully! Please proceed to complete 2FA."
         )
-        return redirect("second_authentication")
+        return redirect("accounts:second_authentication")
     else:
         messages.error(request, "Verification link is invalid or has expired.")
-        return redirect("register")
+        return redirect("accounts:register")
 
 
 def generate_recovery_codes():
@@ -219,7 +219,7 @@ def second_authentication(request):
                 messages.success(
                     request, "2FA setup complete! Please save your recovery codes."
                 )
-                return redirect("recovery_codes_view")
+                return redirect("accounts:recovery_codes_view")
             else:
                 messages.error(request, "Invalid code. Please try again.")
 
@@ -242,7 +242,7 @@ def second_authentication(request):
                         request,
                         "Please download your recovery codes before proceeding to your dashboard.",
                     )
-                    return redirect("recovery_codes_view")
+                    return redirect("accounts:recovery_codes_view")
 
                 if request.user.is_superuser:
                     return redirect("/admin/")
@@ -278,7 +278,7 @@ def verify_recovery_code(request):
         messages.error(
             request, "Two-factor authentication is not enabled for your account."
         )
-        return redirect("second_authentication")
+        return redirect("accounts:second_authentication")
 
     if request.method == "POST":
         code = request.POST.get("recovery_code").strip().upper()
@@ -294,7 +294,7 @@ def verify_recovery_code(request):
             user.save()
 
             messages.success(request, "Recovery code verified! Please set up new 2FA.")
-            return redirect("setup_new_2fa")
+            return redirect("accounts:setup_new_2fa")
         else:
             messages.error(request, "Invalid recovery code. Please try again.")
 
@@ -311,7 +311,7 @@ def setup_new_2fa(request):
     user.recovery_codes_downloaded = False
     user.recovery_codes = ""
     user.save()
-    return redirect("second_authentication")
+    return redirect("accounts:second_authentication")
 
 
 @login_required
@@ -404,7 +404,7 @@ def forgot_password(request):
             user = User.objects.get(email=email)
         except User.DoesNotExist:
             messages.error(request, "No account found with that email.")
-            return redirect("forgot_password")
+            return redirect("accounts:forgot_password")
 
         current_site = get_current_site(request)
         subject = "Reset your password"
@@ -432,7 +432,7 @@ def forgot_password(request):
         )
 
         messages.success(request, "Password reset email sent. Check your inbox.")
-        return redirect("login")
+        return redirect("accounts:login")
 
     return render(request, "accounts/forgot_password.html")
 
@@ -456,7 +456,7 @@ def reset_password(request, uidb64, token):
             user.set_password(new_password)
             user.save()
             messages.success(request, "Password reset successful. You can now log in.")
-            return redirect("login")
+            return redirect("accounts:login")
 
         return render(request, "accounts/reset_password.html", {"validlink": True})
     else:
@@ -473,7 +473,7 @@ def login_view(request):
             user = User.objects.get(email=email)
         except User.DoesNotExist:
             messages.error(request, "No account found with this email.")
-            return redirect("login")
+            return redirect("accounts:login")
         if not user.verified:
             if not request.session.get("verification_email_sent"):
                 current_site = get_current_site(request)
@@ -563,7 +563,8 @@ def user_management(request):
     custodians = User.objects.filter(role="custodian")
     overloaded_custodians = []
     for custodian in custodians:
-        storage_count = CaseStorage.objects.filter(custodian=custodian).count()
+        from custody.models import CustodianAssignment
+        storage_count = CustodianAssignment.objects.filter(custodian=custodian, is_active=True).count()
         if storage_count > 5:
             overloaded_custodians.append({"user": custodian, "count": storage_count})
     if overloaded_custodians:
@@ -683,7 +684,8 @@ def user_list(request):
                 .count()
             )
         elif user.role == "custodian":
-            workload = CaseStorage.objects.filter(custodian=user).count()
+            from custody.models import CustodianAssignment
+            workload = CustodianAssignment.objects.filter(custodian=user, is_active=True).count()
         else:
             workload = Case.objects.filter(created_by=user).count()
 
@@ -728,20 +730,25 @@ def user_detail(request, user_id):
 
     assignments = {}
     if target_user.role in ["analyst", "investigator"]:
+        from django.db.models import Q
         cases_created = Case.objects.filter(created_by=target_user)
         cases_assigned = Case.objects.filter(assigned_investigators=target_user)
 
         assignments["cases_created"] = cases_created.count()
         assignments["cases_assigned"] = cases_assigned.count()
-        assignments["total_cases"] = cases_created.union(cases_assigned).count()
-        assignments["cases_list"] = list(
-            cases_created.union(cases_assigned).distinct()[:10]
-        )
+        
+        # Get all unique cases using Q objects
+        all_cases = Case.objects.filter(
+            Q(created_by=target_user) | Q(assigned_investigators=target_user)
+        ).distinct()
+        assignments["total_cases"] = all_cases.count()
+        assignments["cases_list"] = list(all_cases[:10])
 
     elif target_user.role == "custodian":
-        storages = CaseStorage.objects.filter(custodian=target_user)
-        assignments["storages_count"] = storages.count()
-        assignments["storages_list"] = list(storages[:10])
+        from custody.models import CustodianAssignment
+        custodian_assignments = CustodianAssignment.objects.filter(custodian=target_user, is_active=True)
+        assignments["storages_count"] = custodian_assignments.count()
+        assignments["storages_list"] = [ca.case_storage for ca in custodian_assignments[:10]]
 
     elif target_user.role == "regular_user":
         cases_created = Case.objects.filter(created_by=target_user)
