@@ -187,3 +187,47 @@
     font-size: 13px;
   }
 }
+
+/* View Case Section Styles */
+.view-case-section {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.view-case-section-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.view-case-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.view-case-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.view-case-detail-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.view-case-detail-value {
+  font-size: 15px;
+  color: #1e293b;
+  font-weight: 500;
+}
