@@ -103,7 +103,7 @@
             <i class='bx bx-shield'></i>
             <span>Admin Panel</span>
           </a>
-          <a href="#" class="sidebar-link">
+          <a href="#" class="sidebar-link help-toggle">
             <i class='bx bx-help-circle'></i>
             <span>Help</span>
           </a>
@@ -135,7 +135,7 @@
             <i class='bx bx-file-blank'></i>
             <span>Case Reports</span>
           </a>
-          <a href="#" class="sidebar-link">
+          <a href="#" class="sidebar-link help-toggle">
             <i class='bx bx-help-circle'></i>
             <span>Help</span>
           </a>
@@ -159,7 +159,7 @@
             <i class='bx bx-history'></i>
             <span>My Activity Log</span>
           </a>
-          <a href="#" class="sidebar-link">
+          <a href="#" class="sidebar-link help-toggle">
             <i class='bx bx-help-circle'></i>
             <span>Help</span>
           </a>
@@ -187,7 +187,7 @@
             <i class='bx bx-file-blank'></i>
             <span>Analysis Reports</span>
           </a>
-          <a href="#" class="sidebar-link">
+          <a href="#" class="sidebar-link help-toggle">
             <i class='bx bx-help-circle'></i>
             <span>Help</span>
           </a>
@@ -211,7 +211,7 @@
             <i class='bx bx-transfer'></i>
             <span>Custody Transfers</span>
           </a>
-          <a href="#" class="sidebar-link">
+          <a href="#" class="sidebar-link help-toggle">
             <i class='bx bx-help-circle'></i>
             <span>Help</span>
           </a>
@@ -239,7 +239,7 @@
             <i class='bx bx-check-shield'></i>
             <span>Integrity Checks</span>
           </a>
-          <a href="#" class="sidebar-link">
+          <a href="#" class="sidebar-link help-toggle">
             <i class='bx bx-help-circle'></i>
             <span>Help</span>
           </a>
@@ -288,20 +288,8 @@
         {% endblock %}
       </main>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const messages = document.querySelectorAll('.message');
-      messages.forEach(function(message) {
-        setTimeout(function() {
-          message.style.opacity = '0';
-          message.style.transform = 'translateX(100%)';
-          setTimeout(function() {
-            message.remove();
-          }, 300);
-        }, 5000);
-      });
-    });
-    </script>
+      {% include 'partials/help.html' %}
+    </div>
     </div>
   </body>
 </html>
