@@ -19,17 +19,22 @@
 <div class="management-filters">
   <form method="get" class="management-search" id="search-form">
     <i class='bx bx-search'></i>
-    <input type="text" name="search" id="search-input" placeholder="Search users by name, email, or username..." value="{{ search_query }}" onkeypress="if(event.key === 'Enter') document.getElementById('search-form').submit();">
+    <input type="text" name="search" id="search-input" placeholder="Search users by name, email, or username..." value="{{ search_query }}" onkeypress="if(event.key === 'Enter') document.getElementById('filter-form').submit();">
+    {% if role_filter %}<input type="hidden" name="role" value="{{ role_filter }}">{% endif %}
+    {% if status_filter %}<input type="hidden" name="status" value="{{ status_filter }}">{% endif %}
+    {% if sort_by %}<input type="hidden" name="sort" value="{{ sort_by }}">{% endif %}
+    {% if sort_order %}<input type="hidden" name="order" value="{{ sort_order }}">{% endif %}
   </form>
   
-  <form method="get" class="management-filter-group">
+  <form method="get" class="management-filter-group" id="filter-form">
+    {% if search_query %}<input type="hidden" name="search" value="{{ search_query }}">{% endif %}
     <select name="role" class="management-filter-select" onchange="this.form.submit()">
       <option value="">All Roles</option>
+      <option value="superuser" {% if role_filter == 'superuser' %}selected{% endif %}>Superuser</option>
       <option value="admin" {% if role_filter == 'admin' %}selected{% endif %}>Admin</option>
       <option value="investigator" {% if role_filter == 'investigator' %}selected{% endif %}>Investigator</option>
       <option value="analyst" {% if role_filter == 'analyst' %}selected{% endif %}>Analyst</option>
       <option value="custodian" {% if role_filter == 'custodian' %}selected{% endif %}>Custodian</option>
-      <option value="regular_user" {% if role_filter == 'regular_user' %}selected{% endif %}>Regular User</option>
       <option value="auditor" {% if role_filter == 'auditor' %}selected{% endif %}>Auditor</option>
     </select>
     
@@ -81,8 +86,8 @@
         </td>
         <td class="management-table-cell">{{ user_data.user.email }}</td>
         <td class="management-table-cell">
-          <span class="management-role-badge management-role-{{ user_data.user.role }}">
-            {{ user_data.user.get_role_display|default:"No Role" }}
+          <span class="management-role-badge {% if user_data.user.is_superuser %}management-role-superuser{% else %}management-role-{{ user_data.user.role }}{% endif %}">
+            {% if user_data.user.is_superuser %}Superuser{% else %}{{ user_data.user.get_role_display|default:"No Role" }}{% endif %}
           </span>
         </td>
         <td class="management-table-cell">
