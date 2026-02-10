@@ -1026,3 +1026,43 @@ def force_logout(request, user_id):
         request, f"User {target_user.get_full_name()} has been forced to logout."
     )
     return redirect("accounts:user_detail", user_id=user_id)
+
+
+@login_required
+def export_users(request):
+    if not request.user.is_superuser and request.user.role != "admin":
+        from django.http import HttpResponseForbidden
+
+        return HttpResponseForbidden("Only administrators can export user data.")
+
+    import csv
+
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = 'attachment; filename="users_export.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(["First Name", "Last Name", "Email", "Username", "Role", "Status", "Date Joined", "Last Login", "2FA Enabled", "Verified"])
+
+    users = User.objects.all()
+    for user in users:
+        writer.writerow([
+            user.first_name,
+            user.last_name,
+            user.email,
+            user.username or "",
+            user.get_role_display() if not user.is_superuser else "Superuser",
+            "Active" if user.is_active else "Inactive",
+            user.date_joined.strftime("%Y-%m-%d %H:%M:%S") if user.date_joined else "",
+            user.last_login.strftime("%Y-%m-%d %H:%M:%S") if user.last_login else "Never",
+            "Yes" if user.two_factor_enabled else "No",
+            "Yes" if user.verified else "No",
+        ])
+
+    from cases.models import CaseAuditLog
+    CaseAuditLog.log_action(
+        user=request.user,
+        action="Export users",
+        details=f"User {request.user.get_full_name()} exported all users to CSV",
+    )
+
+    return response

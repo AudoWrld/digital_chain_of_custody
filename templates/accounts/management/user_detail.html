@@ -2,103 +2,102 @@
 {% block title %}User Details - {{ target_user.get_full_name|default:target_user.username }} - ChainProof{% endblock %}
 {% load static %}
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/accounts/management.css' %}?v={{ STATIC_VERSION }}" />
+<link rel="stylesheet" href="{% static 'css/accounts/management/user_detail.css' %}?v={{ STATIC_VERSION }}" />
 
-<div class="management-page-header">
-  <div class="management-page-title">
+<div class="userdetail-header">
+  <div class="userdetail-title">
     <h1>User Details</h1>
   </div>
-  <div class="management-page-actions">
-    <a href="{% url 'accounts:user_list' %}" class="management-btn management-btn-secondary">
+  <div class="userdetail-actions">
+    <a href="{% url 'accounts:user_list' %}" class="userdetail-btn userdetail-btn-back">
       <i class='bx bx-arrow-back'></i>
       Back to User List
     </a>
   </div>
 </div>
 
-<div class="management-detail-grid">
+<div class="userdetail-layout">
   <div>
-    <div class="management-detail-card" style="margin-bottom: 24px;">
-      <div class="management-detail-header">
+    <div class="userdetail-card" style="margin-bottom: 24px;">
+      <div class="userdetail-card-header">
         <h2><i class='bx bx-user'></i> Basic Information</h2>
       </div>
-      <div class="management-detail-body">
-        <div class="management-detail-row">
-          <span class="management-detail-label">Full Name</span>
-          <span class="management-detail-value">{{ basic_info.full_name }}</span>
+      <div class="userdetail-card-body">
+        <div class="userdetail-info-row">
+          <span class="userdetail-info-label">Full Name</span>
+          <span class="userdetail-info-value">{{ basic_info.full_name }}</span>
         </div>
-        <div class="management-detail-row">
-          <span class="management-detail-label">Username</span>
-          <span class="management-detail-value">@{{ basic_info.username }}</span>
+        <div class="userdetail-info-row">
+          <span class="userdetail-info-label">Username</span>
+          <span class="userdetail-info-value">@{{ basic_info.username }}</span>
         </div>
-        <div class="management-detail-row">
-          <span class="management-detail-label">Email</span>
-          <span class="management-detail-value">{{ basic_info.email }}</span>
+        <div class="userdetail-info-row">
+          <span class="userdetail-info-label">Email</span>
+          <span class="userdetail-info-value">{{ basic_info.email }}</span>
         </div>
-        <div class="management-detail-row">
-          <span class="management-detail-label">Role</span>
-          <span class="management-detail-value">
-            <span class="management-role-badge management-role-{{ target_user.role }}">
-              {{ basic_info.role }}
+        <div class="userdetail-info-row">
+          <span class="userdetail-info-label">Role</span>
+          <span class="userdetail-info-value">
+            <span class="userdetail-role-badge {% if target_user.is_superuser %}userdetail-role-superuser{% else %}userdetail-role-{{ target_user.role }}{% endif %}">
+              {% if target_user.is_superuser %}Superuser{% else %}{{ basic_info.role }}{% endif %}
             </span>
           </span>
         </div>
-        <div class="management-detail-row">
-          <span class="management-detail-label">Status</span>
-          <span class="management-detail-value">
+        <div class="userdetail-info-row">
+          <span class="userdetail-info-label">Status</span>
+          <span class="userdetail-info-value">
             {% if target_user.is_active %}
-            <span class="management-status-badge management-status-active">Active</span>
+            <span class="userdetail-status-badge userdetail-status-active">Active</span>
             {% else %}
-            <span class="management-status-badge management-status-inactive">Inactive</span>
+            <span class="userdetail-status-badge userdetail-status-inactive">Inactive</span>
             {% endif %}
           </span>
         </div>
       </div>
     </div>
 
-    <!-- Security Info -->
-    <div class="management-detail-card" style="margin-bottom: 24px;">
-      <div class="management-detail-header">
+    <div class="userdetail-card" style="margin-bottom: 24px;">
+      <div class="userdetail-card-header">
         <h2><i class='bx bx-shield'></i> Security Information</h2>
       </div>
-      <div class="management-detail-body">
-        <div class="management-detail-row">
-          <span class="management-detail-label">Two-Factor Auth</span>
-          <span class="management-detail-value">
+      <div class="userdetail-card-body">
+        <div class="userdetail-info-row">
+          <span class="userdetail-info-label">Two-Factor Auth</span>
+          <span class="userdetail-info-value">
             {% if security_info.two_factor_enabled %}
-            <span class="management-status-badge management-status-active">Enabled</span>
+            <span class="userdetail-status-badge userdetail-status-active">Enabled</span>
             {% else %}
-            <span class="management-status-badge management-status-inactive">Disabled</span>
+            <span class="userdetail-status-badge userdetail-status-inactive">Disabled</span>
             {% endif %}
           </span>
         </div>
-        <div class="management-detail-row">
-          <span class="management-detail-label">Email Verified</span>
-          <span class="management-detail-value">
+        <div class="userdetail-info-row">
+          <span class="userdetail-info-label">Email Verified</span>
+          <span class="userdetail-info-value">
             {% if security_info.verified %}
-            <span class="management-status-badge management-status-active">Verified</span>
+            <span class="userdetail-status-badge userdetail-status-active">Verified</span>
             {% else %}
-            <span class="management-status-badge management-status-pending">Pending</span>
+            <span class="userdetail-status-badge userdetail-status-pending">Pending</span>
             {% endif %}
           </span>
         </div>
-        <div class="management-detail-row">
-          <span class="management-detail-label">Superuser</span>
-          <span class="management-detail-value">
+        <div class="userdetail-info-row">
+          <span class="userdetail-info-label">Superuser</span>
+          <span class="userdetail-info-value">
             {% if security_info.is_superuser %}
-            <span class="management-status-badge" style="background: #ede9fe; color: #5b21b6;">Yes</span>
+            <span class="userdetail-status-badge userdetail-status-superuser">Yes</span>
             {% else %}
-            <span class="management-status-badge" style="background: #f1f5f9; color: #475569;">No</span>
+            <span class="userdetail-status-badge userdetail-status-no">No</span>
             {% endif %}
           </span>
         </div>
-        <div class="management-detail-row">
-          <span class="management-detail-label">Failed Login Attempts</span>
-          <span class="management-detail-value">{{ security_info.failed_logins }}</span>
+        <div class="userdetail-info-row">
+          <span class="userdetail-info-label">Failed Login Attempts</span>
+          <span class="userdetail-info-value">{{ security_info.failed_logins }}</span>
         </div>
-        <div class="management-detail-row">
-          <span class="management-detail-label">Last Failed Login</span>
-          <span class="management-detail-value">
+        <div class="userdetail-info-row">
+          <span class="userdetail-info-label">Last Failed Login</span>
+          <span class="userdetail-info-value">
             {% if security_info.last_failed_login %}
             {{ security_info.last_failed_login|date:"M d, Y H:i" }}
             {% else %}
@@ -109,22 +108,21 @@
       </div>
     </div>
 
-    <!-- Activity Log -->
-    <div class="management-detail-card">
-      <div class="management-detail-header">
+    <div class="userdetail-card">
+      <div class="userdetail-card-header">
         <h2><i class='bx bx-history'></i> Recent Activity</h2>
       </div>
-      <div class="management-detail-body" style="padding: 0;">
+      <div class="userdetail-card-body" style="padding: 0;">
         {% if recent_activity %}
-        <ul class="management-activity-list" style="padding: 0 24px;">
+        <ul class="userdetail-activity-list" style="padding: 0 24px;">
           {% for activity in recent_activity %}
-          <li class="management-activity-item">
-            <div class="management-activity-icon view">
+          <li class="userdetail-activity-item">
+            <div class="userdetail-activity-icon userdetail-activity-icon-view">
               <i class='bx bx-info-circle'></i>
             </div>
-            <div class="management-activity-content">
-              <div class="management-activity-action">{{ activity.action }}</div>
-              <div class="management-activity-time">{{ activity.timestamp|date:"M d, Y H:i" }}</div>
+            <div class="userdetail-activity-content">
+              <div class="userdetail-activity-action">{{ activity.action }}</div>
+              <div class="userdetail-activity-time">{{ activity.timestamp|date:"M d, Y H:i" }}</div>
             </div>
           </li>
           {% endfor %}
@@ -137,33 +135,32 @@
       </div>
     </div>
 
-    <!-- Evidence Activity -->
-    <div class="management-detail-card" style="margin-top: 24px;">
-      <div class="management-detail-header">
+    <div class="userdetail-card" style="margin-top: 24px;">
+      <div class="userdetail-card-header">
         <h2><i class='bx bx-download'></i> Evidence Activity</h2>
       </div>
-      <div class="management-detail-body">
-        <div class="management-detail-row">
-          <span class="management-detail-label">Evidence Uploads</span>
-          <span class="management-detail-value">{{ evidence_activity.uploads }}</span>
+      <div class="userdetail-card-body">
+        <div class="userdetail-info-row">
+          <span class="userdetail-info-label">Evidence Uploads</span>
+          <span class="userdetail-info-value">{{ evidence_activity.uploads }}</span>
         </div>
-        <div class="management-detail-row">
-          <span class="management-detail-label">Evidence Downloads</span>
-          <span class="management-detail-value">{{ evidence_activity.downloads }}</span>
+        <div class="userdetail-info-row">
+          <span class="userdetail-info-label">Evidence Downloads</span>
+          <span class="userdetail-info-value">{{ evidence_activity.downloads }}</span>
         </div>
       </div>
       {% if evidence_activity.recent_logs %}
-      <div class="management-detail-body" style="padding: 0 24px 24px;">
+      <div class="userdetail-card-body" style="padding: 0 24px 24px;">
         <h4 style="margin: 16px 0 12px; font-size: 14px; color: #64748b;">Recent Download Logs</h4>
-        <ul class="management-activity-list" style="padding: 0;">
+        <ul class="userdetail-activity-list" style="padding: 0;">
           {% for log in evidence_activity.recent_logs %}
-          <li class="management-activity-item">
-            <div class="management-activity-icon view">
+          <li class="userdetail-activity-item">
+            <div class="userdetail-activity-icon userdetail-activity-icon-view">
               <i class='bx bx-download'></i>
             </div>
-            <div class="management-activity-content">
-              <div class="management-activity-action">{{ log.action|title }}: {{ log.evidence.description|truncatewords:10 }}</div>
-              <div class="management-activity-time">{{ log.timestamp|date:"M d, Y H:i" }}</div>
+            <div class="userdetail-activity-content">
+              <div class="userdetail-activity-action">{{ log.action|title }}: {{ log.evidence.description|truncatewords:10 }}</div>
+              <div class="userdetail-activity-time">{{ log.timestamp|date:"M d, Y H:i" }}</div>
             </div>
           </li>
           {% endfor %}
@@ -173,21 +170,19 @@
     </div>
   </div>
 
-  <!-- Right Column: Assignments & Actions -->
   <div>
-    <!-- Account Info -->
-    <div class="management-detail-card" style="margin-bottom: 24px;">
-      <div class="management-detail-header">
+    <div class="userdetail-card" style="margin-bottom: 24px;">
+      <div class="userdetail-card-header">
         <h2><i class='bx bx-info-circle'></i> Account Info</h2>
       </div>
-      <div class="management-detail-body">
-        <div class="management-detail-row">
-          <span class="management-detail-label">Date Joined</span>
-          <span class="management-detail-value">{{ basic_info.date_joined|date:"M d, Y" }}</span>
+      <div class="userdetail-card-body">
+        <div class="userdetail-info-row">
+          <span class="userdetail-info-label">Date Joined</span>
+          <span class="userdetail-info-value">{{ basic_info.date_joined|date:"M d, Y" }}</span>
         </div>
-        <div class="management-detail-row">
-          <span class="management-detail-label">Last Login</span>
-          <span class="management-detail-value">
+        <div class="userdetail-info-row">
+          <span class="userdetail-info-label">Last Login</span>
+          <span class="userdetail-info-value">
             {% if basic_info.last_login %}
             {{ basic_info.last_login|date:"M d, Y H:i" }}
             {% else %}
@@ -198,56 +193,54 @@
       </div>
     </div>
 
-    <!-- Assignments -->
-    <div class="management-detail-card" style="margin-bottom: 24px;">
-      <div class="management-detail-header">
+    <div class="userdetail-card" style="margin-bottom: 24px;">
+      <div class="userdetail-card-header">
         <h2><i class='bx bx-briefcase'></i> Assignments</h2>
       </div>
-      <div class="management-detail-body">
+      <div class="userdetail-card-body">
         {% if target_user.role == 'analyst' or target_user.role == 'investigator' %}
-        <div class="management-detail-row">
-          <span class="management-detail-label">Cases Created</span>
-          <span class="management-detail-value">{{ assignments.cases_created }}</span>
+        <div class="userdetail-info-row">
+          <span class="userdetail-info-label">Cases Created</span>
+          <span class="userdetail-info-value">{{ assignments.cases_created }}</span>
         </div>
-        <div class="management-detail-row">
-          <span class="management-detail-label">Cases Assigned</span>
-          <span class="management-detail-value">{{ assignments.cases_assigned }}</span>
+        <div class="userdetail-info-row">
+          <span class="userdetail-info-label">Cases Assigned</span>
+          <span class="userdetail-info-value">{{ assignments.cases_assigned }}</span>
         </div>
-        <div class="management-detail-row">
-          <span class="management-detail-label">Total Cases</span>
-          <span class="management-detail-value">{{ assignments.total_cases }}</span>
+        <div class="userdetail-info-row">
+          <span class="userdetail-info-label">Total Cases</span>
+          <span class="userdetail-info-value">{{ assignments.total_cases }}</span>
         </div>
         {% elif target_user.role == 'custodian' %}
-        <div class="management-detail-row">
-          <span class="management-detail-label">Active Storages</span>
-          <span class="management-detail-value">{{ assignments.storages_count }}</span>
+        <div class="userdetail-info-row">
+          <span class="userdetail-info-label">Active Storages</span>
+          <span class="userdetail-info-value">{{ assignments.storages_count }}</span>
         </div>
         {% elif target_user.role == 'regular_user' %}
-        <div class="management-detail-row">
-          <span class="management-detail-label">Cases Created</span>
-          <span class="management-detail-value">{{ assignments.cases_created }}</span>
+        <div class="userdetail-info-row">
+          <span class="userdetail-info-label">Cases Created</span>
+          <span class="userdetail-info-value">{{ assignments.cases_created }}</span>
         </div>
         {% else %}
-        <div class="management-detail-row">
-          <span class="management-detail-label">Assignments</span>
-          <span class="management-detail-value">N/A for this role</span>
+        <div class="userdetail-info-row">
+          <span class="userdetail-info-label">Assignments</span>
+          <span class="userdetail-info-value">N/A for this role</span>
         </div>
         {% endif %}
       </div>
     </div>
 
-    <!-- Actions -->
-    <div class="management-detail-card" style="margin-bottom: 24px;">
-      <div class="management-detail-header">
+    {% if target_user != request.user %}
+    <div class="userdetail-card" style="margin-bottom: 24px;">
+      <div class="userdetail-card-header">
         <h2><i class='bx bx-cog'></i> Administrative Actions</h2>
       </div>
-      <div class="management-detail-body">
-        <div class="management-actions">
-          <!-- Toggle Status -->
+      <div class="userdetail-card-body">
+        <div class="userdetail-actions">
           {% if target_user.is_active %}
           <form action="{% url 'accounts:toggle_user_status' target_user.id %}" method="post" style="display: inline;">
             {% csrf_token %}
-            <button type="submit" class="management-btn management-btn-danger" onclick="return confirm('Are you sure you want to deactivate this user?');">
+            <button type="submit" class="userdetail-btn userdetail-btn-danger" onclick="return confirm('Are you sure you want to deactivate this user?');">
               <i class='bx bx-block'></i>
               Deactivate
             </button>
@@ -255,27 +248,25 @@
           {% else %}
           <form action="{% url 'accounts:toggle_user_status' target_user.id %}" method="post" style="display: inline;">
             {% csrf_token %}
-            <button type="submit" class="management-btn management-btn-primary" onclick="return confirm('Are you sure you want to activate this user?');">
+            <button type="submit" class="userdetail-btn userdetail-btn-primary" onclick="return confirm('Are you sure you want to activate this user?');">
               <i class='bx bx-check'></i>
               Activate
             </button>
           </form>
           {% endif %}
 
-          <!-- Reset Password -->
           <form action="{% url 'accounts:admin_reset_password' target_user.id %}" method="post" style="display: inline;">
             {% csrf_token %}
-            <button type="submit" class="management-btn management-btn-warning" onclick="return confirm('Are you sure you want to reset this user password?');">
+            <button type="submit" class="userdetail-btn userdetail-btn-warning" onclick="return confirm('Are you sure you want to reset this user password?');">
               <i class='bx bx-key'></i>
               Reset Password
             </button>
           </form>
 
-          <!-- Force Logout -->
           {% if target_user != request.user %}
           <form action="{% url 'accounts:force_logout' target_user.id %}" method="post" style="display: inline;">
             {% csrf_token %}
-            <button type="submit" class="management-btn management-btn-secondary" onclick="return confirm('Are you sure you want to force logout this user?');">
+            <button type="submit" class="userdetail-btn userdetail-btn-secondary" onclick="return confirm('Are you sure you want to force logout this user?');">
               <i class='bx bx-log-out'></i>
               Force Logout
             </button>
@@ -284,20 +275,20 @@
         </div>
       </div>
     </div>
+    {% endif %}
 
-    <!-- Change Role -->
-    <div class="management-detail-card">
-      <div class="management-detail-header">
+    <div class="userdetail-card">
+      <div class="userdetail-card-header">
         <h2><i class='bx bx-user-pin'></i> Change Role</h2>
       </div>
-      <div class="management-detail-body">
+      <div class="userdetail-card-body">
         <form action="{% url 'accounts:change_user_role' target_user.id %}" method="post">
           {% csrf_token %}
           <div style="margin-bottom: 16px;">
-            <label for="role" style="display: block; margin-bottom: 8px; font-weight: 500; color: #1e293b;">Select New Role</label>
-            <select name="role" class="management-filter-select" style="width: 100%;">
+            <label for="role" class="userdetail-form-label">Select New Role</label>
+            <select name="role" class="userdetail-form-select">
               <option value="">Select a role...</option>
-              <option value="admin" {% if target_user.role == 'admin' %}selected{% endif %}>Admin</option>
+              <option value="superuser" {% if target_user.role == 'superuser' %}selected{% endif %}>Superuser</option>
               <option value="investigator" {% if target_user.role == 'investigator' %}selected{% endif %}>Investigator</option>
               <option value="analyst" {% if target_user.role == 'analyst' %}selected{% endif %}>Analyst</option>
               <option value="custodian" {% if target_user.role == 'custodian' %}selected{% endif %}>Custodian</option>
@@ -305,7 +296,7 @@
               <option value="auditor" {% if target_user.role == 'auditor' %}selected{% endif %}>Auditor</option>
             </select>
           </div>
-          <button type="submit" class="management-btn management-btn-primary" style="width: 100%;" onclick="return confirm('Are you sure you want to change this user role?');">
+          <button type="submit" class="userdetail-btn userdetail-btn-primary" style="width: 100%;" onclick="return confirm('Are you sure you want to change this user role?');">
             <i class='bx bx-save'></i>
             Update Role
           </button>
