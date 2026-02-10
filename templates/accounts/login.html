@@ -16,7 +16,7 @@
 
         <h2>Welcome back</h2>
 
-        <form method="post" action="{% url 'login' %}">
+        <form method="post" action="{% url 'accounts:login' %}">
           {% csrf_token %}
 
           <label for="email">Email</label>
@@ -29,14 +29,14 @@
             <div class="small">
               <label><input type="checkbox" name="remember" /> Remember me</label>
             </div>
-            <a href="{% url 'forgot_password' %}">Forgot?</a>
+            <a href="{% url 'accounts:forgot_password' %}">Forgot?</a>
           </div>
 
           <button type="submit">Login</button>
 
           <div class="login-links">
             <span class="login-note">Don't have an account?</span>
-            <a href="{% url 'register' %}">Register here</a>
+            <a href="{% url 'accounts:register' %}">Register here</a>
           </div>
         </form>
       </div>

@@ -52,7 +52,7 @@
     </section>
 
     <footer class="rc-actions">
-      <form id="download-form" action="{% url 'download_recovery_codes' %}" method="post">
+      <form id="download-form" action="{% url 'accounts:download_recovery_codes' %}" method="post">
         {% csrf_token %}
         <button type="submit" class="btn btn-primary">Download as PDF</button>
       </form>

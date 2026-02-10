@@ -31,6 +31,8 @@ from datetime import datetime
 
 User = get_user_model()
 
+app_name = 'accounts'
+
 
 def register(request):
     if request.method == "POST":
@@ -507,7 +509,7 @@ def login_view(request):
                 request,
                 "Your account isn't verified yet. Please check your email or resend the verification link.",
             )
-            return redirect("verification_sent")
+            return redirect("accounts:verification_sent")
         user = authenticate(request, email=email, password=password)
         if user is not None:
             auth_login(request, user)
@@ -515,13 +517,13 @@ def login_view(request):
                 messages.info(
                     request, "You must enable two-factor authentication to continue."
                 )
-                return redirect("second_authentication")
+                return redirect("accounts:second_authentication")
 
-            return redirect("second_authentication")
+            return redirect("accounts:second_authentication")
 
         else:
             messages.error(request, "Invalid email or password.")
-            return redirect("login")
+            return redirect("accounts:login")
 
     return render(request, "accounts/login.html")
 

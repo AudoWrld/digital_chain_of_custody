@@ -28,7 +28,7 @@
       <input type="hidden" name="email" value="{{ email }}" />
       <div class="form-row">
         <button type="submit" class="btn btn-primary">Resend</button>
-        <a class="btn btn-ghost" href="{% url 'login' %}">Back to Login</a>
+        <a class="btn btn-ghost" href="{% url 'accounts:login' %}">Back to Login</a>
       </div>
     </form>
 
@@ -38,7 +38,7 @@
 
     <div class="login-links">
       <span class="login-note">Already verified?</span>
-      <a href="{% url 'login' %}">Back to Login</a>
+      <a href="{% url 'accounts:login' %}">Back to Login</a>
     </div>
   </div>
 </div>

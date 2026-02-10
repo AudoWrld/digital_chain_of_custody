@@ -21,7 +21,7 @@
       <p>Click below to request a new verification link:</p>
     </div>
 
-    <form method="POST" action="{% url 'resend_verification' %}">
+    <form method="POST" action="{% url 'accounts:resend_verification' %}">
       {% csrf_token %}
       {% if email %}
         <input type="hidden" name="email" value="{{ email }}" />
@@ -36,7 +36,7 @@
 
     <div class="login-links">
       <span class="login-note">Remember your password?</span>
-      <a href="{% url 'login' %}">Back to Login</a>
+      <a href="{% url 'accounts:login' %}">Back to Login</a>
     </div>
   </div>
 </div>

@@ -52,7 +52,7 @@
         {% if user.two_factor_enabled %}
           <p class="muted small" style="margin-top:12px;">
             Lost access to your authenticator app?
-            <a href="{% url 'verify_recovery_code' %}" class="link">Verify using a recovery code</a>
+            <a href="{% url 'accounts:verify_recovery_code' %}" class="link">Verify using a recovery code</a>
           </p>
         {% endif %}
       </div>

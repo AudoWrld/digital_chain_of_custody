@@ -33,12 +33,12 @@
 
         <div class="login-links">
           {% if email %}
-            <a href="{% url 'resend_verification' %}?email={{ email|urlencode }}">Resend verification email</a>
+            <a href="{% url 'accounts:resend_verification' %}?email={{ email|urlencode }}">Resend verification email</a>
           {% else %}
-            <a href="{% url 'resend_verification' %}">Resend verification email</a>
+            <a href="{% url 'accounts:resend_verification' %}">Resend verification email</a>
           {% endif %}
           <span class="login-note">•</span>
-          <a href="{% url 'login' %}">Back to login</a>
+          <a href="{% url 'accounts:login' %}">Back to login</a>
         </div>
       </div>
     </div>

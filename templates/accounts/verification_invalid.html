@@ -27,9 +27,9 @@
 
     <div class="vi-actions">
       {% if resend_link %}
-        <a class="btn btn-primary" href="{% url 'resend_verification' %}">Resend verification email</a>
+        <a class="btn btn-primary" href="{% url 'accounts:resend_verification' %}">Resend verification email</a>
       {% endif %}
-      <a class="btn btn-ghost" href="{% url 'login' %}">Back to Login</a>
+      <a class="btn btn-ghost" href="{% url 'accounts:login' %}">Back to Login</a>
     </div>
 
     <div class="login-links">

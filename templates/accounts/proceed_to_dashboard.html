@@ -18,7 +18,7 @@
     </div>
 
     <div class="ptd-actions">
-      <a class="btn btn-primary" href="{% url 'setup_new_2fa' %}">Setup new 2FA</a>
+      <a class="btn btn-primary" href="{% url 'accounts:setup_new_2fa' %}">Setup new 2FA</a>
       <a class="btn btn-ghost" href="{% url 'dashboard:dashboard' %}">Proceed to Dashboard</a>
     </div>
 
@@ -28,7 +28,7 @@
 
     <div class="login-links">
       <span class="login-note">Need to login again?</span>
-      <a href="{% url 'login' %}">Back to Login</a>
+      <a href="{% url 'accounts:login' %}">Back to Login</a>
     </div>
   </div>
 </div>
