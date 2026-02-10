@@ -524,7 +524,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    {% if is_superuser %}
     const userRoleCounts = JSON.parse(document.getElementById('userRoleData').textContent);
     const roleLabels = ['superuser', 'regular_user', 'investigator', 'analyst', 'custodian', 'auditor'];
     const roleData = roleLabels.map(role => userRoleCounts[role] || 0);
@@ -551,7 +550,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
-    {% endif %}
 });
 </script>
 
