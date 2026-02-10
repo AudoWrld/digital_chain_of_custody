@@ -15,7 +15,6 @@ class RegisterForm(forms.ModelForm):
         model = User
         fields = ["first_name", "last_name", "email", "role", "password"]
 
-    # custom validation
     def clean(self):
         cleaned_data = super().clean()
         password = cleaned_data.get("password")
@@ -25,3 +24,11 @@ class RegisterForm(forms.ModelForm):
             raise forms.ValidationError("Passwords do not match")
 
         return cleaned_data
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.username = user.email.split("@")[0]
+        user.set_password(self.cleaned_data["password"])
+        if commit:
+            user.save()
+        return user
