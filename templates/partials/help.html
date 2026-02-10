@@ -1070,6 +1070,16 @@ document.addEventListener('DOMContentLoaded', function() {
       toggleHelpPanel();
     });
   });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      const panel = document.getElementById('helpPanel');
+      const overlay = document.getElementById('helpOverlay');
+      if (panel && panel.classList.contains('open')) {
+        toggleHelpPanel();
+      }
+    }
+  });
 });
 
 function toggleHelpPanel() {

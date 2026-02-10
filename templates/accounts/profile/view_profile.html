@@ -10,7 +10,11 @@
   <div class="profile-card">
     <div class="profile-header">
       <div class="profile-avatar">
+        {% if user.profile_picture %}
+        <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}" class="profile-pic-img" />
+        {% else %}
         {{ user.first_name.0 }}{{ user.last_name.0 }}
+        {% endif %}
       </div>
       <div class="profile-name">
         <h2>{{ user.get_full_name }}</h2>
@@ -28,6 +32,10 @@
         <span class="info-value">{{ user.email }}</span>
       </div>
       <div class="info-row">
+        <span class="info-label">Phone Number</span>
+        <span class="info-value">{{ user.phone_number|default:"Not set" }}</span>
+      </div>
+      <div class="info-row">
         <span class="info-label">First Name</span>
         <span class="info-value">{{ user.first_name }}</span>
       </div>
@@ -40,19 +48,65 @@
         <span class="info-value">{{ user.get_role_display }}</span>
       </div>
       <div class="info-row">
+        <span class="info-label">Account Status</span>
+        <span class="info-value status-badge {% if user.is_active %}active{% else %}inactive{% endif %}">
+          {% if user.is_active %}Active{% else %}Inactive{% endif %}
+        </span>
+      </div>
+      <div class="info-row">
         <span class="info-label">Member Since</span>
         <span class="info-value">{{ user.date_joined|date:"F d, Y" }}</span>
       </div>
     </div>
 
     <div class="profile-actions">
-      <a href="{% url 'accounts:edit_profile' %}" class="btn btn-primary">Edit Profile</a>
-      <a href="{% url 'accounts:change_password' %}" class="btn btn-secondary">Change Password</a>
+      <a href="{% url 'accounts:edit_profile' %}" class="btn btn-primary">
+        <i class='bx bx-edit-alt'></i>
+        Edit Profile
+      </a>
+      <a href="{% url 'accounts:change_password' %}" class="btn btn-secondary">
+        <i class='bx bx-lock-alt'></i>
+        Change Password
+      </a>
+      {% if not user.is_superuser and user.role != 'admin' %}
+      <button type="button" class="btn btn-danger" onclick="confirmDeactivation()">
+        <i class='bx bx-user-x'></i>
+        Deactivate Account
+      </button>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div id="deactivationModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Deactivate Account</h3>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p>Are you sure you want to deactivate your account?</p>
+      <p class="warning-text">This will immediately log you out and you will not be able to log in again. Contact an administrator to reactivate your account.</p>
+    </div>
+    <div class="modal-actions">
+      <form method="post" action="{% url 'accounts:deactivate_account' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Yes, Deactivate</button>
+        <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      </form>
     </div>
   </div>
 </div>
 
 <script>
+function confirmDeactivation() {
+  document.getElementById('deactivationModal').style.display = 'flex';
+}
+
+function closeModal() {
+  document.getElementById('deactivationModal').style.display = 'none';
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   const toasts = document.querySelectorAll('.toast');
   toasts.forEach(toast => {
@@ -63,6 +117,13 @@ document.addEventListener('DOMContentLoaded', function() {
       }, 300);
     }, 5000);
   });
+
+  window.onclick = function(event) {
+    const modal = document.getElementById('deactivationModal');
+    if (event.target === modal) {
+      closeModal();
+    }
+  }
 });
 </script>
 {% endblock %}

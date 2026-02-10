@@ -61,7 +61,11 @@
           </div>
         </div>
         <div class="user-avatar">
+          {% if user.profile_picture %}
+          <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}" class="user-avatar-img" />
+          {% else %}
           {{ user.first_name.0 }}{{ user.last_name.0 }}
+          {% endif %}
         </div>
         <a href="{% url 'accounts:logout' %}" class="logout-btn">
           <i class='bx bx-log-out'></i>
@@ -323,16 +327,5 @@
       {% include 'partials/help.html' %}
     </div>
     </div>
-
-    <script>
-      document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-          const helpPanel = document.getElementById('helpPanel');
-          if (helpPanel && helpPanel.classList.contains('active')) {
-            toggleHelpPanel();
-          }
-        }
-      });
-    </script>
   </body>
 </html>
