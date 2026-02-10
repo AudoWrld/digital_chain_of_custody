@@ -1,5 +1,7 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
+
+app_name = 'accounts'
 
 urlpatterns = [
     path("login", views.login_view, name="login"),
@@ -28,4 +30,11 @@ urlpatterns = [
     path("logout", views.logout_view, name="logout"),
     path("forgot-password/", views.forgot_password, name="forgot_password"),
     path("reset/<uidb64>/<token>/", views.reset_password, name="reset_password"),
+    path("management/", views.user_management, name="user_management"),
+    path("management/list/", views.user_list, name="user_list"),
+    path("management/detail/<int:user_id>/", views.user_detail, name="user_detail"),
+    path("management/toggle-status/<int:user_id>/", views.toggle_user_status, name="toggle_user_status"),
+    path("management/change-role/<int:user_id>/", views.change_user_role, name="change_user_role"),
+    path("management/reset-password/<int:user_id>/", views.admin_reset_password, name="admin_reset_password"),
+    path("management/force-logout/<int:user_id>/", views.force_logout, name="force_logout"),
 ]
