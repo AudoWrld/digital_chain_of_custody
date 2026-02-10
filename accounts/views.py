@@ -611,7 +611,7 @@ def user_management(request):
 
     return render(
         request,
-        "accounts/user_management.html",
+        "accounts/management/user_management.html",
         {
             "total_users": total_users,
             "active_users": active_users,
@@ -689,7 +689,7 @@ def user_list(request):
 
     return render(
         request,
-        "accounts/user_list.html",
+        "accounts/management/user_list.html",
         {
             "users": users_with_workload,
             "search_query": search_query,
@@ -761,7 +761,7 @@ def user_detail(request, user_id):
 
     return render(
         request,
-        "accounts/user_detail.html",
+        "accounts/management/user_detail.html",
         {
             "target_user": target_user,
             "basic_info": basic_info,

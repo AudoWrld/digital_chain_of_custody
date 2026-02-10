@@ -87,11 +87,11 @@
             <i class='bx bx-archive'></i>
             <span>All Evidence</span>
           </a>
-          <a href="#" class="sidebar-link">
+          <a href="{% url 'accounts:user_management' %}" class="sidebar-link {% if request.path == '/accounts/management/' %}active{% endif %}">
             <i class='bx bx-group'></i>
             <span>User Management</span>
           </a>
-          <a href="#" class="sidebar-link">
+          <a href="{% url 'accounts:user_list' %}" class="sidebar-link {% if request.path == '/accounts/management/list/' %}active{% endif %}">
             <i class='bx bx-user-check'></i>
             <span>Role Assignment</span>
           </a>

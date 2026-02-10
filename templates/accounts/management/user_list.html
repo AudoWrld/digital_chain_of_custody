@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% block title %}User List - ChainProof{% endblock %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/accounts/management.css' %}?v={{ STATIC_VERSION }}" />
+
+<div class="management-page-header">
+  <div class="management-page-title">
+    <h1>User List</h1>
+  </div>
+  <div class="management-page-actions">
+    <a href="{% url 'accounts:user_management' %}" class="management-btn management-btn-secondary">
+      <i class='bx bx-arrow-back'></i>
+      Back to Dashboard
+    </a>
+  </div>
+</div>
+
+<!-- Filters -->
+<div class="management-filters">
+  <div class="management-search">
+    <i class='bx bx-search'></i>
+    <input type="text" name="search" placeholder="Search users by name, email, or username..." value="{{ search_query }}">
+  </div>
+  
+  <form method="get" class="management-filter-group">
+    <select name="role" class="management-filter-select" onchange="this.form.submit()">
+      <option value="">All Roles</option>
+      <option value="admin" {% if role_filter == 'admin' %}selected{% endif %}>Admin</option>
+      <option value="investigator" {% if role_filter == 'investigator' %}selected{% endif %}>Investigator</option>
+      <option value="analyst" {% if role_filter == 'analyst' %}selected{% endif %}>Analyst</option>
+      <option value="custodian" {% if role_filter == 'custodian' %}selected{% endif %}>Custodian</option>
+      <option value="regular_user" {% if role_filter == 'regular_user' %}selected{% endif %}>Regular User</option>
+      <option value="auditor" {% if role_filter == 'auditor' %}selected{% endif %}>Auditor</option>
+    </select>
+    
+    <select name="status" class="management-filter-select" onchange="this.form.submit()">
+      <option value="">All Status</option>
+      <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+      <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+    </select>
+    
+    <select name="sort" class="management-filter-select" onchange="this.form.submit()">
+      <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Sort by Name</option>
+      <option value="email" {% if sort_by == 'email' %}selected{% endif %}>Sort by Email</option>
+      <option value="role" {% if sort_by == 'role' %}selected{% endif %}>Sort by Role</option>
+      <option value="status" {% if sort_by == 'status' %}selected{% endif %}>Sort by Status</option>
+      <option value="last_login" {% if sort_by == 'last_login' %}selected{% endif %}>Sort by Last Login</option>
+    </select>
+    
+    <input type="hidden" name="order" value="{% if sort_order == 'asc' %}desc{% else %}asc{% endif %}">
+  </form>
+</div>
+
+{% if users %}
+<div class="management-table-wrapper">
+  <table class="management-data-table">
+    <thead class="management-table-head">
+      <tr>
+        <th class="management-table-header">User</th>
+        <th class="management-table-header">Email</th>
+        <th class="management-table-header">Role</th>
+        <th class="management-table-header">Status</th>
+        <th class="management-table-header">Workload</th>
+        <th class="management-table-header">Last Login</th>
+        <th class="management-table-header">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="management-table-body">
+      {% for user_data in users %}
+      <tr class="management-table-row">
+        <td class="management-table-cell">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div class="user-avatar" style="width: 36px; height: 36px; border-radius: 50%; background: #3b82f6; color: white; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600;">
+              {{ user_data.user.first_name.0 }}{{ user_data.user.last_name.0 }}
+            </div>
+            <div>
+              <div style="font-weight: 600;">{{ user_data.user.get_full_name|default:user_data.user.username }}</div>
+              <div style="font-size: 12px; color: #64748b;">@{{ user_data.user.username }}</div>
+            </div>
+          </div>
+        </td>
+        <td class="management-table-cell">{{ user_data.user.email }}</td>
+        <td class="management-table-cell">
+          <span class="management-role-badge management-role-{{ user_data.user.role }}">
+            {{ user_data.user.get_role_display|default:"No Role" }}
+          </span>
+        </td>
+        <td class="management-table-cell">
+          {% if user_data.user.is_active %}
+          <span class="management-status-badge management-status-active">Active</span>
+          {% else %}
+          <span class="management-status-badge management-status-inactive">Inactive</span>
+          {% endif %}
+        </td>
+        <td class="management-table-cell">{{ user_data.workload }} items</td>
+        <td class="management-table-cell">
+          {% if user_data.user.last_login %}
+          {{ user_data.user.last_login|date:"M d, Y H:i" }}
+          {% else %}
+          <span style="color: #94a3b8;">Never</span>
+          {% endif %}
+        </td>
+        <td class="management-table-cell">
+          <a href="{% url 'accounts:user_detail' user_data.user.id %}" class="management-action-link">View</a>
+          {% if user_data.user.is_active %}
+          <a href="{% url 'accounts:toggle_user_status' user_data.user.id %}" class="management-action-link">Deactivate</a>
+          {% else %}
+          <a href="{% url 'accounts:toggle_user_status' user_data.user.id %}" class="management-action-link">Activate</a>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="management-empty-state">
+  <i class='bx bx-users' style="font-size: 48px; color: #94a3b8; margin-bottom: 16px;"></i>
+  <p>No users found matching your criteria.</p>
+  <a href="{% url 'accounts:user_list' %}" class="management-btn management-btn-secondary" style="margin-top: 16px;">
+    Clear Filters
+  </a>
+</div>
+{% endif %}
+{% endblock %}
