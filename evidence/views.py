@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import JsonResponse, HttpResponse, FileResponse
+from django.http import JsonResponse, HttpResponse, FileResponse, HttpResponseForbidden
 from django.views.decorators.http import require_http_methods
 from django.db.models import Q
 from cases.permissions import role_required, can_upload_evidence
@@ -80,10 +80,14 @@ def upload_evidence(request, case_id):
 
 
 @login_required
-@role_required("investigator", "analyst", "admin", "auditor")
+@role_required("investigator", "analyst", "admin", "auditor", "regular_user")
 def view_evidence(request, evidence_id):
     evidence = get_object_or_404(Evidence, id=evidence_id)
 
+    if request.user.role == 'regular_user':
+        if request.user != evidence.case.created_by:
+            return HttpResponseForbidden("You are not allowed to view this evidence!")
+    
     audit_logs = EvidenceAuditLog.objects.filter(evidence=evidence).order_by(
         "-timestamp"
     )
@@ -228,10 +232,15 @@ def verify_evidence_integrity(request, evidence_id):
 
 
 @login_required
-@role_required("investigator", "analyst", "admin", "auditor")
+@role_required("investigator", "analyst", "admin", "auditor", "regular_user")
 def view_evidence_file(request, evidence_id):
     evidence = get_object_or_404(Evidence, id=evidence_id)
 
+    # Check if user is case owner (regular user) - allow view access
+    if request.user.role == 'regular_user':
+        if request.user != evidence.case.created_by:
+            return HttpResponseForbidden("You are not allowed to view this evidence file!")
+    
     try:
         decrypted_file = evidence.get_decrypted_file()
 
@@ -263,10 +272,14 @@ def view_evidence_file(request, evidence_id):
 
 
 @login_required
-@role_required("investigator", "analyst", "admin", "auditor")
+@role_required("investigator", "analyst", "admin", "auditor", "regular_user")
 def download_evidence_file(request, evidence_id):
     evidence = get_object_or_404(Evidence, id=evidence_id)
 
+    if request.user.role == 'regular_user':
+        if request.user != evidence.case.created_by:
+            return HttpResponseForbidden("You are not allowed to download this evidence!")
+    
     try:
         decrypted_file = evidence.get_decrypted_file()
 
@@ -303,3 +316,37 @@ def download_evidence_file(request, evidence_id):
     except Exception as e:
         messages.error(request, f"Error downloading evidence: {str(e)}")
         return redirect("evidence:view", evidence_id=evidence.id)
+
+
+@login_required
+@role_required("admin", "auditor")
+def all_evidence(request):
+    evidence_list = Evidence.objects.select_related('case', 'uploaded_by').all().order_by("-date_uploaded")
+    
+    return render(
+        request,
+        "evidence/all_evidence.html",
+        {"evidence_list": evidence_list, "is_superuser": request.user.is_superuser}
+    )
+
+
+@login_required
+def my_evidence(request):
+    if request.user.role == 'regular_user':
+        evidence_list = Evidence.objects.select_related('case', 'uploaded_by').filter(
+            case__created_by=request.user
+        ).order_by("-date_uploaded")
+    elif request.user.role == 'investigator':
+        evidence_list = Evidence.objects.select_related('case', 'uploaded_by').filter(
+            uploaded_by=request.user
+        ).order_by("-date_uploaded")
+    else:
+        evidence_list = Evidence.objects.select_related('case', 'uploaded_by').filter(
+            case__created_by=request.user
+        ).order_by("-date_uploaded")
+    
+    return render(
+        request,
+        "evidence/my_evidence.html",
+        {"evidence_list": evidence_list}
+    )
