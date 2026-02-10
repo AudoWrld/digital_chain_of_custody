@@ -75,8 +75,12 @@
   <div class="view-case-section">
     <h2 class="view-case-section-title">Actions</h2>
     <div class="view-case-actions">
+      {% if user.role == 'custodian' %}
+      <a href="{% url 'custody:view_case_storage' evidence.case.case_id %}" class="view-case-action-btn view-case-action-secondary">Back to Storage</a>
+      {% else %}
       <a href="{% url 'evidence:view' evidence.id %}" class="view-case-action-btn view-case-action-secondary">Back to Evidence</a>
       <a href="{% url 'cases:view_case' evidence.case.case_id %}" class="view-case-action-btn view-case-action-secondary">Back to Case</a>
+      {% endif %}
     </div>
   </div>
 </div>
