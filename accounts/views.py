@@ -512,6 +512,10 @@ def login_view(request):
             return redirect("accounts:verification_sent")
         user = authenticate(request, email=email, password=password)
         if user is not None:
+            user.failed_login_attempts = 0
+            user.last_failed_login = None
+            user.save()
+            
             auth_login(request, user)
             if not user.two_factor_enabled:
                 messages.info(
@@ -522,6 +526,14 @@ def login_view(request):
             return redirect("accounts:second_authentication")
 
         else:
+            try:
+                user = User.objects.get(email=email)
+                user.failed_login_attempts += 1
+                from django.utils import timezone
+                user.last_failed_login = timezone.now()
+                user.save()
+            except User.DoesNotExist:
+                pass
             messages.error(request, "Invalid email or password.")
             return redirect("accounts:login")
 
@@ -762,6 +774,22 @@ def user_detail(request, user_id):
         "verified": target_user.verified,
         "last_password_change": getattr(target_user, "last_password_change", None),
         "failed_logins": getattr(target_user, "failed_login_attempts", 0),
+        "last_failed_login": target_user.last_failed_login,
+    }
+
+    # Get evidence uploads and downloads
+    from custody.models import CustodyLog
+    evidence_uploads = Evidence.objects.filter(uploaded_by=target_user).count()
+    evidence_downloads = CustodyLog.objects.filter(
+        user=target_user, action="downloaded"
+    ).count()
+    
+    evidence_activity = {
+        "uploads": evidence_uploads,
+        "downloads": evidence_downloads,
+        "recent_logs": CustodyLog.objects.filter(
+            user=target_user
+        ).order_by("-timestamp")[:10]
     }
 
     recent_activity = CaseAuditLog.objects.filter(user=target_user).order_by(
@@ -777,6 +805,7 @@ def user_detail(request, user_id):
             "assignments": assignments,
             "security_info": security_info,
             "recent_activity": recent_activity,
+            "evidence_activity": evidence_activity,
         },
     )
 
