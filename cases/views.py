@@ -419,7 +419,7 @@ def request_case_closure(request, case_id):
             details=reason,
         )
 
-        return redirect("view_case", case_id=case.case_id)
+        return redirect("cases:view_case", case_id=case.case_id)
 
     return render(request, "cases/request_closure.html", {"case": case})
 
@@ -496,7 +496,7 @@ def approve_case_closure(request, case_id):
             )
 
         case.save()
-        return redirect("view_case", case_id=case.case_id)
+        return redirect("cases:view_case", case_id=case.case_id)
 
     return render(request, "cases/approve_closure.html", {"case": case})
 
