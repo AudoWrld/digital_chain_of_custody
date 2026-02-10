@@ -5,6 +5,9 @@ from django.db.models import Count, Q
 from django.http import JsonResponse
 import json
 from cases.models import Case, CaseAuditLog
+from django.db.models.functions import TruncDate
+from django.utils import timezone
+from datetime import timedelta
 
 try:
     from evidence.models import Evidence
@@ -29,10 +32,6 @@ def dashboard(request):
         # Admin sees all data
         case_status_counts = dict(Case.objects.values('case_status').annotate(count=Count('id')).values_list('case_status', 'count'))
         case_priority_counts = dict(Case.objects.values('case_priority').annotate(count=Count('id')).values_list('case_priority', 'count'))
-        
-        from django.db.models.functions import TruncDate
-        from django.utils import timezone
-        from datetime import timedelta
         
         thirty_days_ago = timezone.now() - timedelta(days=30)
         cases_by_date = list(Case.objects.filter(date_created__gte=thirty_days_ago).annotate(

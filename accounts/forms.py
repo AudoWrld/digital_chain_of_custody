@@ -10,10 +10,31 @@ class RegisterForm(forms.ModelForm):
         widget=forms.PasswordInput,
         label="Confirm Password"
     )
+    
+    # Explicitly define role field to exclude admin/superuser
+    role = forms.ChoiceField(
+        choices=[],
+        label="Role",
+        help_text="Select your role"
+    )
 
     class Meta:
         model = User
         fields = ["first_name", "last_name", "email", "role", "password"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Set role choices excluding admin/superuser
+        self.fields['role'].choices = [
+            ('regular_user', 'Regular User'),
+            ('investigator', 'Investigator'),
+            ('analyst', 'Analyst'),
+            ('custodian', 'Custodian'),
+            ('auditor', 'Auditor'),
+        ]
+        # Set default role
+        if not self.initial.get('role'):
+            self.fields['role'].initial = 'regular_user'
 
     def clean(self):
         cleaned_data = super().clean()
@@ -32,3 +53,4 @@ class RegisterForm(forms.ModelForm):
         if commit:
             user.save()
         return user
+
