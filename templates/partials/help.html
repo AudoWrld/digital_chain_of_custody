@@ -6,11 +6,11 @@
     </button>
   </div>
   <div class="help-panel-content">
-    <!-- Quick Start Section -->
+
+    {% if user.is_superuser %}
     <div class="help-section help-quick-start">
       <h3><i class='bx bx-rocket'></i> Quick Start</h3>
       <div class="help-steps">
-        {% if user.is_superuser %}
         <div class="help-step">
           <span class="help-step-number">1</span>
           <div class="help-step-text">
@@ -32,7 +32,191 @@
             <p>Monitor all cases, approve closures, and assign investigators.</p>
           </div>
         </div>
-        {% elif user.role == 'regular_user' %}
+      </div>
+    </div>
+
+    <div class="help-section">
+      <h3><i class='bx bx-shield'></i> Administrator Permissions</h3>
+      <p>As an Administrator, you have full system access including user management, case oversight, and system configuration.</p>
+      <ul class="help-permissions">
+        <li><i class='bx bx-check'></i> All permissions from other roles</li>
+        <li><i class='bx bx-check'></i> Create, edit, and close cases</li>
+        <li><i class='bx bx-check'></i> Upload and manage evidence</li>
+        <li><i class='bx bx-check'></i> Modify custody records</li>
+        <li><i class='bx bx-check'></i> Review and approve analysis reports</li>
+        <li><i class='bx bx-check'></i> Manage all storage locations</li>
+        <li><i class='bx bx-check'></i> Assign investigators to cases</li>
+        <li><i class='bx bx-check'></i> Manage user accounts and roles</li>
+        <li><i class='bx bx-check'></i> Access system settings and configuration</li>
+        <li><i class='bx bx-check'></i> Approve case closures</li>
+        <li><i class='bx bx-check'></i> Verify custody logs and audit trails</li>
+      </ul>
+    </div>
+
+    <div class="help-section">
+      <h3><i class='bx bx-file-blank'></i> Case Management</h3>
+      <p>Administrators have full control over the case lifecycle.</p>
+      <div class="help-concept-list">
+        <div class="help-concept-item">
+          <div class="help-concept-icon"><i class='bx bx-plus-circle'></i></div>
+          <div>
+            <strong>Create Cases</strong>
+            <p>Create new cases with detailed descriptions and assign them to investigators.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon"><i class='bx bx-edit'></i></div>
+          <div>
+            <strong>Manage Cases</strong>
+            <p>Edit case details, move cases through lifecycle stages, and assign team members.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon"><i class='bx bx-lock'></i></div>
+          <div>
+            <strong>Close Cases</strong>
+            <p>Review reports, verify custody, approve closure. Closed cases become read-only.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <h3><i class='bx bx-upload'></i> Evidence Management</h3>
+      <p>Upload and manage evidence with automatic encryption and hash generation.</p>
+      <ul class="help-permissions">
+        <li><i class='bx bx-check'></i> Upload evidence files to any case</li>
+        <li><i class='bx bx-check'></i> Automatic AES-256 encryption with case-specific keys</li>
+        <li><i class='bx bx-check'></i> Automatic SHA-256 and MD5 hash generation</li>
+        <li><i class='bx bx-check'></i> Modify custody records and transfer evidence</li>
+        <li><i class='bx bx-check'></i> Verify evidence integrity at any time</li>
+        <li><i class='bx bx-check'></i> View complete custody logs and audit trails</li>
+      </ul>
+    </div>
+
+    <div class="help-section">
+      <h3><i class='bx bx-list-check'></i> Case Lifecycle Stages</h3>
+      <div class="help-concept-list">
+        <div class="help-concept-item">
+          <div class="help-concept-icon">1</div>
+          <div>
+            <strong>Created</strong>
+            <p>Case is created by regular user. Add details and submit for review.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon">2</div>
+          <div>
+            <strong>Evidence Collection</strong>
+            <p>Investigator uploads evidence, registers hashes, and views custody logs.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon">3</div>
+          <div>
+            <strong>Analysis</strong>
+            <p>Analyst analyzes evidence, verifies integrity, and creates analysis reports.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon">4</div>
+          <div>
+            <strong>Review</strong>
+            <p>Admin reviews reports, verifies custody, and approves closure.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon">5</div>
+          <div>
+            <strong>Closed</strong>
+            <p>Case is locked and made read-only. No modifications allowed.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon">6</div>
+          <div>
+            <strong>Archived</strong>
+            <p>Long-term encrypted storage with read-only access.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="help-section help-concepts">
+      <h3><i class='bx bx-bulb'></i> Key Concepts</h3>
+      <div class="help-concept-list">
+        <div class="help-concept-item">
+          <div class="help-concept-icon"><i class='bx bx-link-alt'></i></div>
+          <div>
+            <strong>Chain of Custody</strong>
+            <p>A chronological record documenting who handled evidence, when, and why. Every transfer is logged and requires approval.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon"><i class='bx bx-fingerprint'></i></div>
+          <div>
+            <strong>Hash Verification</strong>
+            <p>SHA-256 and MD5 hashes are generated when evidence is uploaded. Re-verify anytime to confirm the file hasn't been altered.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon"><i class='bx bx-lock'></i></div>
+          <div>
+            <strong>Evidence Encryption</strong>
+            <p>Each case has a unique AES-256 encryption key. Files are encrypted before storage and only decrypted for authorized users.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon"><i class='bx bx-transfer'></i></div>
+          <div>
+            <strong>Custody Transfers</strong>
+            <p>When evidence changes hands, a transfer request must be submitted and approved by a custodian to maintain the chain.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon"><i class='bx bx-list-check'></i></div>
+          <div>
+            <strong>Audit Trail</strong>
+            <p>Every action in the system is logged automatically, creating a tamper-proof record for compliance and legal proceedings.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="help-section help-faq">
+      <h3><i class='bx bx-question-mark'></i> Frequently Asked Questions</h3>
+      <div class="help-faq-list">
+        <details class="help-faq-item">
+          <summary>How do I verify evidence integrity?</summary>
+          <p>Navigate to the evidence detail page and click "Verify Integrity". The system will recalculate the file hash and compare it against the original hash recorded at upload.</p>
+        </details>
+        <details class="help-faq-item">
+          <summary>What happens when a custody transfer is requested?</summary>
+          <p>The custodian receives a notification and can approve or reject the transfer. Once approved, the chain of custody is updated automatically with a timestamped record.</p>
+        </details>
+        <details class="help-faq-item">
+          <summary>Can I edit a case after it's been submitted?</summary>
+          <p>Administrators can edit case details while the case is still open. Once a case is closed, it becomes read-only to preserve the record.</p>
+        </details>
+        <details class="help-faq-item">
+          <summary>How are files secured in the system?</summary>
+          <p>All uploaded files are encrypted using AES-256 encryption with case-specific keys. SHA-256 and MD5 hashes are generated at upload time. Any modification to the file will result in a hash mismatch during verification.</p>
+        </details>
+        <details class="help-faq-item">
+          <summary>How do I close a case?</summary>
+          <p>Before closure, verify evidence hashes, ensure reports are finalized, and review custody logs. After closure, no modifications are allowed and the case becomes read-only.</p>
+        </details>
+        <details class="help-faq-item">
+          <summary>What are custody actions?</summary>
+          <p>Custody actions include: Stored (evidence stored in a location), Retrieved (evidence retrieved from storage), Transferred (custody transferred to another user), Verified (integrity verified), Archived (archived for long-term storage), and Moved (moved between storage locations).</p>
+        </details>
+      </div>
+    </div>
+
+    {% elif user.role == 'regular_user' %}
+    <div class="help-section help-quick-start">
+      <h3><i class='bx bx-rocket'></i> Quick Start</h3>
+      <div class="help-steps">
         <div class="help-step">
           <span class="help-step-number">1</span>
           <div class="help-step-text">
@@ -50,11 +234,141 @@
         <div class="help-step">
           <span class="help-step-number">3</span>
           <div class="help-step-text">
+            <strong>Submit for Review</strong>
+            <p>Submit your case for review so it can be assigned to an investigator.</p>
+          </div>
+        </div>
+        <div class="help-step">
+          <span class="help-step-number">4</span>
+          <div class="help-step-text">
             <strong>Track Progress</strong>
             <p>Monitor your cases from the dashboard and view updates.</p>
           </div>
         </div>
-        {% elif user.role == 'investigator' %}
+      </div>
+    </div>
+
+    <div class="help-section">
+      <h3><i class='bx bx-user'></i> Regular User Permissions</h3>
+      <p>As a Regular User, you can create and manage your own cases. Once a case is created, it can be assigned to investigators for evidence collection.</p>
+      <ul class="help-permissions">
+        <li><i class='bx bx-check'></i> Create new cases with detailed descriptions</li>
+        <li><i class='bx bx-check'></i> Edit your own case details</li>
+        <li><i class='bx bx-check'></i> Submit cases for review</li>
+        <li><i class='bx bx-check'></i> Request case closure</li>
+        <li><i class='bx bx-check'></i> View your assigned cases and their status</li>
+        <li><i class='bx bx-check'></i> View evidence attached to your cases</li>
+      </ul>
+      <div class="help-restrictions">
+        <h4><i class='bx bx-block'></i> Restrictions</h4>
+        <ul>
+          <li><i class='bx bx-x'></i> Cannot upload evidence directly</li>
+          <li><i class='bx bx-x'></i> Cannot modify custody records</li>
+          <li><i class='bx bx-x'></i> Cannot assign investigators</li>
+          <li><i class='bx bx-x'></i> Cannot close cases (must request closure)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <h3><i class='bx bx-list-check'></i> Case Lifecycle</h3>
+      <p>Your cases will move through these stages:</p>
+      <div class="help-concept-list">
+        <div class="help-concept-item">
+          <div class="help-concept-icon">1</div>
+          <div>
+            <strong>Created</strong>
+            <p>You create the case and add all necessary details.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon">2</div>
+          <div>
+            <strong>Evidence Collection</strong>
+            <p>An investigator is assigned to upload and manage evidence.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon">3</div>
+          <div>
+            <strong>Analysis</strong>
+            <p>An analyst reviews evidence and creates analysis reports.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon">4</div>
+          <div>
+            <strong>Review</strong>
+            <p>An admin reviews all reports and custody logs.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon">5</div>
+          <div>
+            <strong>Closed</strong>
+            <p>Case is finalized and locked for long-term storage.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="help-section help-concepts">
+      <h3><i class='bx bx-bulb'></i> Key Concepts</h3>
+      <div class="help-concept-list">
+        <div class="help-concept-item">
+          <div class="help-concept-icon"><i class='bx bx-link-alt'></i></div>
+          <div>
+            <strong>Chain of Custody</strong>
+            <p>A chronological record documenting who handled evidence, when, and why. This ensures evidence integrity throughout your case.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon"><i class='bx bx-lock'></i></div>
+          <div>
+            <strong>Evidence Encryption</strong>
+            <p>All evidence is encrypted using AES-256 encryption with case-specific keys for security.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon"><i class='bx bx-list-check'></i></div>
+          <div>
+            <strong>Audit Trail</strong>
+            <p>Every action on your case is logged automatically for transparency and accountability.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="help-section help-faq">
+      <h3><i class='bx bx-question-mark'></i> Frequently Asked Questions</h3>
+      <div class="help-faq-list">
+        <details class="help-faq-item">
+          <summary>How do I create a new case?</summary>
+          <p>Click "Create Case" in the sidebar, fill in the case title and description, and click submit. Your case will then be available for assignment to an investigator.</p>
+        </details>
+        <details class="help-faq-item">
+          <summary>Can I edit a case after I submit it?</summary>
+          <p>You can edit case details while the case is in the Created stage. Once it moves to Evidence Collection or later stages, only administrators can make changes.</p>
+        </details>
+        <details class="help-faq-item">
+          <summary>How do I track my case progress?</summary>
+          <p>View your dashboard to see all your cases and their current lifecycle stage. You can also view evidence that has been uploaded to your cases.</p>
+        </details>
+        <details class="help-faq-item">
+          <summary>Why can't I upload evidence to my case?</summary>
+          <p>Only investigators and administrators can upload evidence to ensure proper chain of custody procedures are followed. Your case will be assigned to an investigator who will handle evidence collection.</p>
+        </details>
+        <details class="help-faq-item">
+          <summary>How do I close my case?</summary>
+          <p>You can request case closure, but final approval must come from an administrator after all evidence has been verified and reports have been reviewed.</p>
+        </details>
+      </div>
+    </div>
+
+    {% elif user.role == 'investigator' %}
+    <div class="help-section help-quick-start">
+      <h3><i class='bx bx-rocket'></i> Quick Start</h3>
+      <div class="help-steps">
         <div class="help-step">
           <span class="help-step-number">1</span>
           <div class="help-step-text">
@@ -66,17 +380,161 @@
           <span class="help-step-number">2</span>
           <div class="help-step-text">
             <strong>Upload Evidence</strong>
-            <p>Upload digital evidence files with automatic hash generation.</p>
+            <p>Upload digital evidence files with automatic hash generation and encryption.</p>
           </div>
         </div>
         <div class="help-step">
           <span class="help-step-number">3</span>
           <div class="help-step-text">
-            <strong>Request Transfers</strong>
+            <strong>Manage Custody</strong>
             <p>Request custody transfers when evidence needs to change hands.</p>
           </div>
         </div>
-        {% elif user.role == 'analyst' %}
+      </div>
+    </div>
+
+    <div class="help-section">
+      <h3><i class='bx bx-search'></i> Investigator Permissions</h3>
+      <p>As an Investigator, you handle evidence collection and custody transfers for your assigned cases. All evidence uploads are automatically hashed for integrity verification.</p>
+      <ul class="help-permissions">
+        <li><i class='bx bx-check'></i> Upload evidence to assigned cases</li>
+        <li><i class='bx bx-check'></i> Automatic AES-256 encryption with case-specific keys</li>
+        <li><i class='bx bx-check'></i> Automatic SHA-256 and MD5 hash generation</li>
+        <li><i class='bx bx-check'></i> View custody logs and full history</li>
+        <li><i class='bx bx-check'></i> Request custody transfers</li>
+        <li><i class='bx bx-check'></i> Add notes and metadata to evidence</li>
+        <li><i class='bx bx-check'></i> View case details and progress</li>
+        <li><i class='bx bx-check'></i> View chain of custody records</li>
+      </ul>
+      <div class="help-restrictions">
+        <h4><i class='bx bx-block'></i> Restrictions</h4>
+        <ul>
+          <li><i class='bx bx-x'></i> Cannot create or close cases</li>
+          <li><i class='bx bx-x'></i> Cannot approve custody transfers</li>
+          <li><i class='bx bx-x'></i> Cannot access cases not assigned to you</li>
+          <li><i class='bx bx-x'></i> Cannot create analysis reports</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <h3><i class='bx bx-upload'></i> Evidence Upload Process</h3>
+      <div class="help-concept-list">
+        <div class="help-concept-item">
+          <div class="help-concept-icon">1</div>
+          <div>
+            <strong>Select Evidence File</strong>
+            <p>Choose the digital evidence file from your computer.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon">2</div>
+          <div>
+            <strong>Automatic Processing</strong>
+            <p>System generates SHA-256 and MD5 hashes before encryption.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon">3</div>
+          <div>
+            <strong>Encryption</strong>
+            <p>File is encrypted using AES-256 with case-specific key.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon">4</div>
+          <div>
+            <strong>Add Metadata</strong>
+            <p>Add notes, tags, and metadata to describe the evidence.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon">5</div>
+          <div>
+            <strong>Custody Logged</strong>
+            <p>Upload is logged in the chain of custody automatically.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <h3><i class='bx bx-transfer'></i> Custody Transfers</h3>
+      <p>When evidence needs to change hands, follow these steps:</p>
+      <ul class="help-permissions">
+        <li><i class='bx bx-check'></i> Select the evidence to transfer</li>
+        <li><i class='bx bx-check'></i> Choose the recipient user</li>
+        <li><i class='bx bx-check'></i> Provide a reason for the transfer</li>
+        <li><i class='bx bx-check'></i> Submit transfer request</li>
+        <li><i class='bx bx-check'></i> Wait for custodian approval</li>
+      </ul>
+      <p><strong>Note:</strong> All transfers require custodian approval and are logged in the chain of custody.</p>
+    </div>
+
+    <div class="help-section help-concepts">
+      <h3><i class='bx bx-bulb'></i> Key Concepts</h3>
+      <div class="help-concept-list">
+        <div class="help-concept-item">
+          <div class="help-concept-icon"><i class='bx bx-link-alt'></i></div>
+          <div>
+            <strong>Chain of Custody</strong>
+            <p>A chronological record documenting who handled evidence, when, and why. Every action you take is logged automatically.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon"><i class='bx bx-fingerprint'></i></div>
+          <div>
+            <strong>Hash Generation</strong>
+            <p>SHA-256 and MD5 hashes are automatically generated when you upload evidence. These ensure file integrity can be verified later.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon"><i class='bx bx-lock'></i></div>
+          <div>
+            <strong>Evidence Encryption</strong>
+            <p>All files you upload are encrypted with AES-256 using case-specific keys before storage.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon"><i class='bx bx-transfer'></i></div>
+          <div>
+            <strong>Custody Actions</strong>
+            <p>Actions include: Stored, Retrieved, Transferred, Verified, Archived, and Moved. Each action is timestamped and logged.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="help-section help-faq">
+      <h3><i class='bx bx-question-mark'></i> Frequently Asked Questions</h3>
+      <div class="help-faq-list">
+        <details class="help-faq-item">
+          <summary>What file types can I upload as evidence?</summary>
+          <p>You can upload any file type. The system will automatically generate hashes and encrypt the file regardless of format.</p>
+        </details>
+        <details class="help-faq-item">
+          <summary>What happens when I upload evidence?</summary>
+          <p>The system generates SHA-256 and MD5 hashes, encrypts the file with AES-256 using a case-specific key, extracts metadata, and logs the upload in the chain of custody.</p>
+        </details>
+        <details class="help-faq-item">
+          <summary>How do I request a custody transfer?</summary>
+          <p>Navigate to the evidence detail page, click "Request Transfer", select the recipient, provide a reason, and submit. A custodian must approve the transfer.</p>
+        </details>
+        <details class="help-faq-item">
+          <summary>Can I modify evidence after uploading?</summary>
+          <p>No. Evidence is immutable once uploaded. Any modification would break the hash verification and compromise the chain of custody.</p>
+        </details>
+        <details class="help-faq-item">
+          <summary>How do I view custody logs?</summary>
+          <p>Navigate to the case or evidence detail page. The custody log shows all actions taken, including who performed them and when.</p>
+        </details>
+      </div>
+    </div>
+
+    {% elif user.role == 'analyst' %}
+    <div class="help-section help-quick-start">
+      <h3><i class='bx bx-rocket'></i> Quick Start</h3>
+      <div class="help-steps">
         <div class="help-step">
           <span class="help-step-number">1</span>
           <div class="help-step-text">
@@ -98,7 +556,158 @@
             <p>Document your findings and submit analysis reports for review.</p>
           </div>
         </div>
-        {% elif user.role == 'custodian' %}
+      </div>
+    </div>
+
+    <div class="help-section">
+      <h3><i class='bx bx-analyse'></i> Analyst Permissions</h3>
+      <p>As an Analyst, you analyze evidence, verify its integrity, and create detailed reports. Your analysis reports go through a review process before finalization.</p>
+      <ul class="help-permissions">
+        <li><i class='bx bx-check'></i> View evidence and case details</li>
+        <li><i class='bx bx-check'></i> Verify evidence integrity via SHA-256 and MD5 hash comparison</li>
+        <li><i class='bx bx-check'></i> Create and edit analysis reports</li>
+        <li><i class='bx bx-check'></i> Submit reports for review</li>
+        <li><i class='bx bx-check'></i> Access evidence metadata and file details</li>
+        <li><i class='bx bx-check'></i> View chain of custody history (read-only)</li>
+        <li><i class='bx bx-check'></i> Download decrypted evidence for analysis</li>
+      </ul>
+      <div class="help-restrictions">
+        <h4><i class='bx bx-block'></i> Restrictions</h4>
+        <ul>
+          <li><i class='bx bx-x'></i> Cannot upload original evidence</li>
+          <li><i class='bx bx-x'></i> Cannot modify custody records</li>
+          <li><i class='bx bx-x'></i> Cannot approve your own reports</li>
+          <li><i class='bx bx-x'></i> Cannot create or close cases</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <h3><i class='bx bx-fingerprint'></i> Evidence Integrity Verification</h3>
+      <p>Verify that evidence has not been tampered with:</p>
+      <div class="help-concept-list">
+        <div class="help-concept-item">
+          <div class="help-concept-icon">1</div>
+          <div>
+            <strong>Navigate to Evidence</strong>
+            <p>Go to the evidence detail page for the file you want to verify.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon">2</div>
+          <div>
+            <strong>Click Verify Integrity</strong>
+            <p>The system will recalculate the file's hash values.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon">3</div>
+          <div>
+            <strong>Compare Hashes</strong>
+            <p>System compares new hashes against original SHA-256 and MD5 values.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon">4</div>
+          <div>
+            <strong>View Results</strong>
+            <p>If hashes match, evidence is intact. Any mismatch indicates tampering.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <h3><i class='bx bx-file-blank'></i> Analysis Report Workflow</h3>
+      <div class="help-concept-list">
+        <div class="help-concept-item">
+          <div class="help-concept-icon">1</div>
+          <div>
+            <strong>Draft</strong>
+            <p>Create a new report and add your analysis, findings, and recommendations.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon">2</div>
+          <div>
+            <strong>Submitted</strong>
+            <p>Submit your report for admin review. You can no longer edit it.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon">3</div>
+          <div>
+            <strong>Reviewed</strong>
+            <p>Admin reviews your report and may request changes or approve it.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon">4</div>
+          <div>
+            <strong>Approved</strong>
+            <p>Report is finalized and becomes part of the case record.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="help-section help-concepts">
+      <h3><i class='bx bx-bulb'></i> Key Concepts</h3>
+      <div class="help-concept-list">
+        <div class="help-concept-item">
+          <div class="help-concept-icon"><i class='bx bx-fingerprint'></i></div>
+          <div>
+            <strong>Hash Verification</strong>
+            <p>SHA-256 and MD5 hashes were generated when evidence was uploaded. You can re-verify anytime to confirm integrity.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon"><i class='bx bx-lock'></i></div>
+          <div>
+            <strong>Evidence Decryption</strong>
+            <p>Evidence is encrypted with AES-256. When you download for analysis, it's automatically decrypted for authorized users.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon"><i class='bx bx-link-alt'></i></div>
+          <div>
+            <strong>Chain of Custody</strong>
+            <p>You can view who handled evidence and when, but cannot modify these records. This ensures audit trail integrity.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="help-section help-faq">
+      <h3><i class='bx bx-question-mark'></i> Frequently Asked Questions</h3>
+      <div class="help-faq-list">
+        <details class="help-faq-item">
+          <summary>How do I verify evidence integrity?</summary>
+          <p>Navigate to the evidence detail page and click "Verify Integrity". The system will recalculate SHA-256 and MD5 hashes and compare them against the originals. A match confirms the file hasn't been altered.</p>
+        </details>
+        <details class="help-faq-item">
+          <summary>What should I include in an analysis report?</summary>
+          <p>Include a title, detailed analysis content, specific findings, and recommendations. Link the report to the case and relevant evidence.</p>
+        </details>
+        <details class="help-faq-item">
+          <summary>Can I edit a report after submitting it?</summary>
+          <p>No. Once submitted, reports cannot be edited by analysts. If changes are needed, contact an admin who can send it back to draft status.</p>
+        </details>
+        <details class="help-faq-item">
+          <summary>What if hash verification fails?</summary>
+          <p>A hash mismatch indicates the file has been modified since upload. Document this finding immediately and report it to your supervisor and system admin.</p>
+        </details>
+        <details class="help-faq-item">
+          <summary>Can I download evidence files?</summary>
+          <p>Yes, you can download evidence for analysis. Files are automatically decrypted when downloaded by authorized users.</p>
+        </details>
+      </div>
+    </div>
+
+    {% elif user.role == 'custodian' %}
+    <div class="help-section help-quick-start">
+      <h3><i class='bx bx-rocket'></i> Quick Start</h3>
+      <div class="help-steps">
         <div class="help-step">
           <span class="help-step-number">1</span>
           <div class="help-step-text">
@@ -120,7 +729,158 @@
             <p>Monitor evidence inventory and maintain chain of custody.</p>
           </div>
         </div>
-        {% elif user.role == 'auditor' %}
+      </div>
+    </div>
+
+    <div class="help-section">
+      <h3><i class='bx bx-box'></i> Custodian Permissions</h3>
+      <p>As a Custodian, you are responsible for the physical and digital storage of evidence. You manage storage locations and approve custody transfers to maintain the chain of custody.</p>
+      <ul class="help-permissions">
+        <li><i class='bx bx-check'></i> Create and manage storage locations</li>
+        <li><i class='bx bx-check'></i> Approve or reject custody transfers</li>
+        <li><i class='bx bx-check'></i> Assign evidence to storage locations</li>
+        <li><i class='bx bx-check'></i> View complete custody logs</li>
+        <li><i class='bx bx-check'></i> Update storage conditions and notes</li>
+        <li><i class='bx bx-check'></i> Track evidence movement history</li>
+        <li><i class='bx bx-check'></i> Request custody transfers</li>
+      </ul>
+      <div class="help-restrictions">
+        <h4><i class='bx bx-block'></i> Restrictions</h4>
+        <ul>
+          <li><i class='bx bx-x'></i> Cannot upload or modify evidence files</li>
+          <li><i class='bx bx-x'></i> Cannot create or close cases</li>
+          <li><i class='bx bx-x'></i> Cannot create analysis reports</li>
+          <li><i class='bx bx-x'></i> Cannot verify evidence hashes</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <h3><i class='bx bx-building'></i> Storage Location Management</h3>
+      <div class="help-concept-list">
+        <div class="help-concept-item">
+          <div class="help-concept-icon"><i class='bx bx-plus-circle'></i></div>
+          <div>
+            <strong>Create Storage Locations</strong>
+            <p>Set up physical, digital, or cloud storage locations with capacity tracking.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon"><i class='bx bx-box'></i></div>
+          <div>
+            <strong>Storage Types</strong>
+            <p>Physical (secure rooms, vaults), Digital (servers, drives), Cloud (encrypted cloud storage).</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon"><i class='bx bx-chart'></i></div>
+          <div>
+            <strong>Capacity Tracking</strong>
+            <p>Monitor storage capacity and available space for each location.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon"><i class='bx bx-note'></i></div>
+          <div>
+            <strong>Conditions & Notes</strong>
+            <p>Update storage conditions, environmental controls, and maintenance notes.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <h3><i class='bx bx-transfer'></i> Custody Transfer Approval</h3>
+      <p>When a transfer request is submitted:</p>
+      <div class="help-concept-list">
+        <div class="help-concept-item">
+          <div class="help-concept-icon">1</div>
+          <div>
+            <strong>Review Request</strong>
+            <p>Check transfer details, reason, and involved parties.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon">2</div>
+          <div>
+            <strong>Verify Authority</strong>
+            <p>Confirm the requesting user has proper authorization.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon">3</div>
+          <div>
+            <strong>Approve or Reject</strong>
+            <p>Make decision and provide reason if rejecting.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon">4</div>
+          <div>
+            <strong>Automatic Logging</strong>
+            <p>System logs transfer in chain of custody with timestamp.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="help-section help-concepts">
+      <h3><i class='bx bx-bulb'></i> Key Concepts</h3>
+      <div class="help-concept-list">
+        <div class="help-concept-item">
+          <div class="help-concept-icon"><i class='bx bx-link-alt'></i></div>
+          <div>
+            <strong>Chain of Custody</strong>
+            <p>Your approvals are critical to maintaining the chain. Every transfer you approve is timestamped and logged.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon"><i class='bx bx-transfer'></i></div>
+          <div>
+            <strong>Custody Actions</strong>
+            <p>Stored, Retrieved, Transferred, Verified, Archived, Moved. Each action requires proper documentation.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon"><i class='bx bx-list-check'></i></div>
+          <div>
+            <strong>Audit Trail</strong>
+            <p>All storage assignments and transfer approvals are logged for compliance and legal proceedings.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="help-section help-faq">
+      <h3><i class='bx bx-question-mark'></i> Frequently Asked Questions</h3>
+      <div class="help-faq-list">
+        <details class="help-faq-item">
+          <summary>How do I create a storage location?</summary>
+          <p>Navigate to Custody Management, click "Create Storage Location", select the type (Physical, Digital, or Cloud), add capacity details, and provide location information.</p>
+        </details>
+        <details class="help-faq-item">
+          <summary>What should I consider when approving transfers?</summary>
+          <p>Verify the requesting user has proper authority, ensure the transfer reason is valid, and confirm the recipient is authorized to receive the evidence.</p>
+        </details>
+        <details class="help-faq-item">
+          <summary>Can I reject a transfer request?</summary>
+          <p>Yes. If a transfer request doesn't meet requirements or lacks proper authorization, you can reject it with a reason for rejection.</p>
+        </details>
+        <details class="help-faq-item">
+          <summary>How do I assign evidence to storage?</summary>
+          <p>Navigate to the evidence detail page, select "Assign to Storage", choose the storage location, and confirm. This action is logged in the chain of custody.</p>
+        </details>
+        <details class="help-faq-item">
+          <summary>What are the different storage types?</summary>
+          <p>Physical (secure rooms, vaults, evidence lockers), Digital (servers, external drives, network storage), and Cloud (encrypted cloud storage platforms).</p>
+        </details>
+      </div>
+    </div>
+
+    {% elif user.role == 'auditor' %}
+    <div class="help-section help-quick-start">
+      <h3><i class='bx bx-rocket'></i> Quick Start</h3>
+      <div class="help-steps">
         <div class="help-step">
           <span class="help-step-number">1</span>
           <div class="help-step-text">
@@ -142,122 +902,20 @@
             <p>Create audit reports documenting compliance and findings.</p>
           </div>
         </div>
-        {% endif %}
       </div>
     </div>
 
-    <!-- Role Permissions Section -->
-    {% if user.is_superuser %}
-    <div class="help-section">
-      <h3><i class='bx bx-shield'></i> Administrator Permissions</h3>
-      <p>As an Administrator, you have full system access including user management, case oversight, and system configuration.</p>
-      <ul class="help-permissions">
-        <li><i class='bx bx-check'></i> All permissions from other roles</li>
-        <li><i class='bx bx-check'></i> Create, edit, and close cases</li>
-        <li><i class='bx bx-check'></i> Upload and manage evidence</li>
-        <li><i class='bx bx-check'></i> Modify custody records</li>
-        <li><i class='bx bx-check'></i> Review and approve analysis reports</li>
-        <li><i class='bx bx-check'></i> Manage all storage locations</li>
-        <li><i class='bx bx-check'></i> Assign investigators to cases</li>
-        <li><i class='bx bx-check'></i> Manage user accounts and roles</li>
-        <li><i class='bx bx-check'></i> Access system settings and configuration</li>
-      </ul>
-    </div>
-    {% elif user.role == 'regular_user' %}
-    <div class="help-section">
-      <h3><i class='bx bx-user'></i> Regular User Permissions</h3>
-      <p>As a Regular User, you can create and manage your own cases. Once a case is created, it can be assigned to investigators for evidence collection.</p>
-      <ul class="help-permissions">
-        <li><i class='bx bx-check'></i> Create new cases with detailed descriptions</li>
-        <li><i class='bx bx-check'></i> Edit your own case details</li>
-        <li><i class='bx bx-check'></i> Submit cases for review</li>
-        <li><i class='bx bx-check'></i> Request case closure</li>
-        <li><i class='bx bx-check'></i> View your assigned cases and their status</li>
-        <li><i class='bx bx-check'></i> View evidence attached to your cases</li>
-      </ul>
-      <div class="help-restrictions">
-        <h4><i class='bx bx-block'></i> Restrictions</h4>
-        <ul>
-          <li><i class='bx bx-x'></i> Cannot upload evidence directly</li>
-          <li><i class='bx bx-x'></i> Cannot modify custody records</li>
-          <li><i class='bx bx-x'></i> Cannot assign investigators</li>
-        </ul>
-      </div>
-    </div>
-    {% elif user.role == 'investigator' %}
-    <div class="help-section">
-      <h3><i class='bx bx-search'></i> Investigator Permissions</h3>
-      <p>As an Investigator, you handle evidence collection and custody transfers for your assigned cases. All evidence uploads are automatically hashed for integrity verification.</p>
-      <ul class="help-permissions">
-        <li><i class='bx bx-check'></i> Upload evidence to assigned cases</li>
-        <li><i class='bx bx-check'></i> Automatic SHA-256 and MD5 hash generation</li>
-        <li><i class='bx bx-check'></i> View custody logs and full history</li>
-        <li><i class='bx bx-check'></i> Request custody transfers</li>
-        <li><i class='bx bx-check'></i> Add notes and metadata to evidence</li>
-        <li><i class='bx bx-check'></i> View case details and progress</li>
-      </ul>
-      <div class="help-restrictions">
-        <h4><i class='bx bx-block'></i> Restrictions</h4>
-        <ul>
-          <li><i class='bx bx-x'></i> Cannot create or close cases</li>
-          <li><i class='bx bx-x'></i> Cannot approve custody transfers</li>
-          <li><i class='bx bx-x'></i> Cannot access cases not assigned to you</li>
-        </ul>
-      </div>
-    </div>
-    {% elif user.role == 'analyst' %}
-    <div class="help-section">
-      <h3><i class='bx bx-analyse'></i> Analyst Permissions</h3>
-      <p>As an Analyst, you analyze evidence, verify its integrity, and create detailed reports. Your analysis reports go through a review process before finalization.</p>
-      <ul class="help-permissions">
-        <li><i class='bx bx-check'></i> View evidence and case details</li>
-        <li><i class='bx bx-check'></i> Verify evidence integrity via hash comparison</li>
-        <li><i class='bx bx-check'></i> Create and edit analysis reports</li>
-        <li><i class='bx bx-check'></i> Submit reports for review</li>
-        <li><i class='bx bx-check'></i> Access evidence metadata and file details</li>
-        <li><i class='bx bx-check'></i> View chain of custody history</li>
-      </ul>
-      <div class="help-restrictions">
-        <h4><i class='bx bx-block'></i> Restrictions</h4>
-        <ul>
-          <li><i class='bx bx-x'></i> Cannot upload original evidence</li>
-          <li><i class='bx bx-x'></i> Cannot modify custody records</li>
-          <li><i class='bx bx-x'></i> Cannot approve your own reports</li>
-        </ul>
-      </div>
-    </div>
-    {% elif user.role == 'custodian' %}
-    <div class="help-section">
-      <h3><i class='bx bx-box'></i> Custodian Permissions</h3>
-      <p>As a Custodian, you are responsible for the physical and digital storage of evidence. You manage storage locations and approve custody transfers to maintain the chain of custody.</p>
-      <ul class="help-permissions">
-        <li><i class='bx bx-check'></i> Create and manage storage locations</li>
-        <li><i class='bx bx-check'></i> Approve or reject custody transfers</li>
-        <li><i class='bx bx-check'></i> Assign evidence to storage locations</li>
-        <li><i class='bx bx-check'></i> View complete custody logs</li>
-        <li><i class='bx bx-check'></i> Update storage conditions and notes</li>
-        <li><i class='bx bx-check'></i> Track evidence movement history</li>
-      </ul>
-      <div class="help-restrictions">
-        <h4><i class='bx bx-block'></i> Restrictions</h4>
-        <ul>
-          <li><i class='bx bx-x'></i> Cannot upload or modify evidence files</li>
-          <li><i class='bx bx-x'></i> Cannot create or close cases</li>
-          <li><i class='bx bx-x'></i> Cannot create analysis reports</li>
-        </ul>
-      </div>
-    </div>
-    {% elif user.role == 'auditor' %}
     <div class="help-section">
       <h3><i class='bx bx-check-shield'></i> Auditor Permissions</h3>
       <p>As an Auditor, you have read-only access to review custody logs, verify evidence integrity, and ensure compliance with chain of custody procedures.</p>
       <ul class="help-permissions">
         <li><i class='bx bx-check'></i> View all custody logs across cases</li>
-        <li><i class='bx bx-check'></i> Verify evidence hashes for integrity</li>
+        <li><i class='bx bx-check'></i> Verify evidence hashes (SHA-256 and MD5) for integrity</li>
         <li><i class='bx bx-check'></i> Review complete case audit trails</li>
         <li><i class='bx bx-check'></i> Generate audit and compliance reports</li>
         <li><i class='bx bx-check'></i> Access chain of custody records</li>
         <li><i class='bx bx-check'></i> Review evidence handling procedures</li>
+        <li><i class='bx bx-check'></i> Check assignment history and role compliance</li>
       </ul>
       <div class="help-restrictions">
         <h4><i class='bx bx-block'></i> Restrictions</h4>
@@ -265,68 +923,122 @@
           <li><i class='bx bx-x'></i> Cannot modify any data (read-only access)</li>
           <li><i class='bx bx-x'></i> Cannot upload evidence</li>
           <li><i class='bx bx-x'></i> Cannot approve transfers or closures</li>
+          <li><i class='bx bx-x'></i> Cannot create or close cases</li>
         </ul>
       </div>
     </div>
-    {% endif %}
 
-    <!-- Key Concepts Section -->
+    <div class="help-section">
+      <h3><i class='bx bx-list-check'></i> Audit Review Process</h3>
+      <div class="help-concept-list">
+        <div class="help-concept-item">
+          <div class="help-concept-icon">1</div>
+          <div>
+            <strong>Access Custody Logs</strong>
+            <p>Review complete custody logs for all cases showing every action taken.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon">2</div>
+          <div>
+            <strong>Verify Integrity</strong>
+            <p>Check SHA-256 and MD5 hashes to confirm evidence hasn't been tampered with.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon">3</div>
+          <div>
+            <strong>Review Chain of Custody</strong>
+            <p>Examine who handled evidence, when, and why to ensure proper procedures.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon">4</div>
+          <div>
+            <strong>Document Findings</strong>
+            <p>Create audit reports documenting compliance, issues, and recommendations.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <h3><i class='bx bx-fingerprint'></i> Evidence Integrity Verification</h3>
+      <p>Verify evidence integrity to ensure compliance:</p>
+      <ul class="help-permissions">
+        <li><i class='bx bx-check'></i> Navigate to evidence detail page</li>
+        <li><i class='bx bx-check'></i> Click "Verify Integrity" button</li>
+        <li><i class='bx bx-check'></i> System recalculates SHA-256 and MD5 hashes</li>
+        <li><i class='bx bx-check'></i> Compare against original hash values</li>
+        <li><i class='bx bx-check'></i> Document any mismatches in audit report</li>
+      </ul>
+    </div>
+
     <div class="help-section help-concepts">
       <h3><i class='bx bx-bulb'></i> Key Concepts</h3>
       <div class="help-concept-list">
         <div class="help-concept-item">
-          <div class="help-concept-icon"><i class='bx bx-link-alt'></i></div>
+          <div class="help-concept-icon"><i class='bx bx-list-check'></i></div>
           <div>
-            <strong>Chain of Custody</strong>
-            <p>A chronological record documenting who handled evidence, when, and why. Every transfer is logged and requires approval.</p>
+            <strong>Audit Trail</strong>
+            <p>Every action is logged automatically. Your role is to review these logs for compliance and proper procedures.</p>
           </div>
         </div>
         <div class="help-concept-item">
           <div class="help-concept-icon"><i class='bx bx-fingerprint'></i></div>
           <div>
             <strong>Hash Verification</strong>
-            <p>SHA-256 and MD5 hashes are generated when evidence is uploaded. Re-verify anytime to confirm the file hasn't been altered.</p>
+            <p>SHA-256 and MD5 hashes ensure evidence integrity. Verify these to confirm files haven't been altered.</p>
           </div>
         </div>
         <div class="help-concept-item">
-          <div class="help-concept-icon"><i class='bx bx-transfer'></i></div>
+          <div class="help-concept-icon"><i class='bx bx-link-alt'></i></div>
           <div>
-            <strong>Custody Transfers</strong>
-            <p>When evidence changes hands, a transfer request must be submitted and approved by a custodian to maintain the chain.</p>
+            <strong>Chain of Custody</strong>
+            <p>Review custody logs to ensure proper transfers, approvals, and documentation throughout evidence lifecycle.</p>
           </div>
         </div>
         <div class="help-concept-item">
-          <div class="help-concept-icon"><i class='bx bx-list-check'></i></div>
+          <div class="help-concept-icon"><i class='bx bx-shield'></i></div>
           <div>
-            <strong>Audit Trail</strong>
-            <p>Every action in the system is logged automatically, creating a tamper-proof record for compliance and legal proceedings.</p>
+            <strong>Custody Actions</strong>
+            <p>Stored, Retrieved, Transferred, Verified, Archived, Moved. Each should have proper authorization and documentation.</p>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- FAQ Section -->
     <div class="help-section help-faq">
       <h3><i class='bx bx-question-mark'></i> Frequently Asked Questions</h3>
       <div class="help-faq-list">
         <details class="help-faq-item">
           <summary>How do I verify evidence integrity?</summary>
-          <p>Navigate to the evidence detail page and click "Verify Integrity". The system will recalculate the file hash and compare it against the original hash recorded at upload.</p>
+          <p>Navigate to the evidence detail page and click "Verify Integrity". The system recalculates SHA-256 and MD5 hashes and compares them against the original values recorded at upload. A match confirms the file is intact.</p>
         </details>
         <details class="help-faq-item">
-          <summary>What happens when a custody transfer is requested?</summary>
-          <p>The custodian receives a notification and can approve or reject the transfer. Once approved, the chain of custody is updated automatically with a timestamped record.</p>
+          <summary>What should I look for in custody logs?</summary>
+          <p>Review that all transfers were properly approved, actions have valid reasons, timestamps are consistent, and only authorized users performed actions.</p>
         </details>
         <details class="help-faq-item">
-          <summary>Can I edit a case after it's been submitted?</summary>
-          <p>Case owners and administrators can edit case details while the case is still open. Once a case is closed, it becomes read-only to preserve the record.</p>
+          <summary>Can I modify any records?</summary>
+          <p>No. As an auditor, you have read-only access. You cannot modify cases, evidence, custody records, or any other data. This ensures audit independence.</p>
         </details>
         <details class="help-faq-item">
-          <summary>How are files secured in the system?</summary>
-          <p>All uploaded files are stored securely with cryptographic hashes (SHA-256 and MD5) generated at upload time. Any modification to the file will result in a hash mismatch during verification.</p>
+          <summary>What if I find a compliance issue?</summary>
+          <p>Document the issue in detail in your audit report, including the case ID, evidence ID, users involved, and the nature of the compliance violation.</p>
+        </details>
+        <details class="help-faq-item">
+          <summary>How do I generate an audit report?</summary>
+          <p>Review all relevant custody logs, verify evidence integrity, check assignment history, and compile your findings into a comprehensive audit report documenting compliance status.</p>
+        </details>
+        <details class="help-faq-item">
+          <summary>What are custody actions I should review?</summary>
+          <p>Stored (evidence stored in location), Retrieved (evidence retrieved from storage), Transferred (custody transferred to another user), Verified (integrity verified), Archived (archived for long-term storage), Moved (moved between storage locations).</p>
         </details>
       </div>
     </div>
+
+    {% endif %}
     
     <div class="help-footer">
       <a href="{% url 'contact' %}" class="help-contact-btn">
@@ -336,35 +1048,34 @@
   </div>
 </div>
 
-<!-- Overlay for help panel -->
 <div class="help-overlay" id="helpOverlay" onclick="toggleHelpPanel()"></div>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const messages = document.querySelectorAll('.message');
-      messages.forEach(function(message) {
-        setTimeout(function() {
-          message.style.opacity = '0';
-          message.style.transform = 'translateX(100%)';
-          setTimeout(function() {
-            message.remove();
-          }, 300);
-        }, 5000);
-      });
-      
-      // Help panel toggle
-      const helpToggles = document.querySelectorAll('.help-toggle');
-      helpToggles.forEach(function(toggle) {
-        toggle.addEventListener('click', function(e) {
-          e.preventDefault();
-          toggleHelpPanel();
-        });
-      });
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const messages = document.querySelectorAll('.message');
+  messages.forEach(function(message) {
+    setTimeout(function() {
+      message.style.opacity = '0';
+      message.style.transform = 'translateX(100%)';
+      setTimeout(function() {
+        message.remove();
+      }, 300);
+    }, 5000);
+  });
+  
+  const helpToggles = document.querySelectorAll('.help-toggle');
+  helpToggles.forEach(function(toggle) {
+    toggle.addEventListener('click', function(e) {
+      e.preventDefault();
+      toggleHelpPanel();
     });
-    
-    function toggleHelpPanel() {
-      const panel = document.getElementById('helpPanel');
-      const overlay = document.getElementById('helpOverlay');
-      panel.classList.toggle('open');
-      overlay.classList.toggle('show');
-    }
-    </script>
+  });
+});
+
+function toggleHelpPanel() {
+  const panel = document.getElementById('helpPanel');
+  const overlay = document.getElementById('helpOverlay');
+  panel.classList.toggle('open');
+  overlay.classList.toggle('show');
+}
+</script>
