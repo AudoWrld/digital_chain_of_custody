@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}All Evidence{% endblock %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/evidence/evidence_list.css' %}?v={{ STATIC_VERSION }}" />
+
+<div class="evidence-page-header">
+  <div class="evidence-page-title">
+    <h1>All Evidence</h1>
+  </div>
+</div>
+
+{% if evidence_list %}
+<div class="evidence-table-wrapper">
+  <table class="evidence-data-table">
+    <thead class="evidence-table-head">
+      <tr>
+        <th class="evidence-table-header">ID</th>
+        <th class="evidence-table-header">Description</th>
+        <th class="evidence-table-header">Case</th>
+        <th class="evidence-table-header">Type</th>
+        <th class="evidence-table-header">Status</th>
+        <th class="evidence-table-header">Uploaded By</th>
+        <th class="evidence-table-header">Date</th>
+        <th class="evidence-table-header">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="evidence-table-body">
+      {% for evidence in evidence_list %}
+      <tr class="evidence-table-row">
+        <td class="evidence-table-cell">{{ evidence.id }}</td>
+        <td class="evidence-table-cell">{{ evidence.description }}</td>
+        <td class="evidence-table-cell">
+          <a href="{% url 'cases:view_case' evidence.case.case_id %}" class="evidence-action-link">
+            {{ evidence.case.case_id }}
+          </a>
+        </td>
+        <td class="evidence-table-cell">
+          <span class="evidence-type-badge evidence-type-{{ evidence.media_type }}">
+            {{ evidence.get_media_type_display }}
+          </span>
+        </td>
+        <td class="evidence-table-cell">
+          {% if evidence.media_status == 'Valid' %}
+          <span class="evidence-status-badge evidence-status-valid">{{ evidence.media_status }}</span>
+          {% elif evidence.media_status == 'Invalid' %}
+          <span class="evidence-status-badge evidence-status-invalid">{{ evidence.media_status }}</span>
+          {% elif evidence.media_status == 'Archived' %}
+          <span class="evidence-status-badge evidence-status-archived">{{ evidence.media_status }}</span>
+          {% else %}
+          <span class="evidence-status-badge">{{ evidence.media_status }}</span>
+          {% endif %}
+        </td>
+        <td class="evidence-table-cell">
+          {% if evidence.uploaded_by %}
+            {{ evidence.uploaded_by.get_full_name|default:evidence.uploaded_by.username }}
+          {% else %}
+            N/A
+          {% endif %}
+        </td>
+        <td class="evidence-table-cell">{{ evidence.date_uploaded|date:"F d, Y g:i A" }}</td>
+        <td class="evidence-table-cell">
+          <a href="{% url 'evidence:view' evidence.id %}" class="evidence-action-link">View</a>
+          <span class="evidence-action-separator">|</span>
+          <a href="{% url 'evidence:download_file' evidence.id %}" class="evidence-action-link">Download</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="evidence-empty-state">
+  <p>No evidence available.</p>
+</div>
+{% endif %}
+{% endblock %}
