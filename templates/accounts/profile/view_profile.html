@@ -25,7 +25,11 @@
         </div>
         <div class="profile-avatar-info">
           <h2 class="profile-name">{{ user.get_full_name }}</h2>
+          {% if user.is_superuser %}
+          <span class="profile-role-badge">Admin</span>
+          {% else %}
           <span class="profile-role-badge">{{ user.get_role_display }}</span>
+          {% endif %}
           {% if user.is_active %}
           <span class="profile-status-active">Active</span>
           {% else %}
