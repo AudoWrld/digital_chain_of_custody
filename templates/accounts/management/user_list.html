@@ -103,6 +103,7 @@
         </td>
         <td class="management-table-cell">
           <a href="{% url 'accounts:user_detail' user_data.user.id %}" class="management-action-link">View</a>
+          <span class="evidence-action-separator">|</span>
           {% if user_data.user.is_active %}
           <a href="{% url 'accounts:toggle_user_status' user_data.user.id %}" class="management-action-link">Deactivate</a>
           {% else %}
