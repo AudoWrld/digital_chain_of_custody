@@ -39,6 +39,10 @@ def dashboard(request):
         
         user_role_counts = dict(User.objects.values('role').annotate(count=Count('id')).values_list('role', 'count'))
         
+        superuser_count = User.objects.filter(is_superuser=True).count()
+        if superuser_count > 0:
+            user_role_counts['superuser'] = superuser_count
+        
         if EVIDENCE_AVAILABLE:
             total_evidence = Evidence.objects.count()
             valid_evidence = Evidence.objects.filter(media_status='Valid').count()
