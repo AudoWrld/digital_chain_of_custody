@@ -37,4 +37,7 @@ urlpatterns = [
     path("management/change-role/<int:user_id>/", views.change_user_role, name="change_user_role"),
     path("management/reset-password/<int:user_id>/", views.admin_reset_password, name="admin_reset_password"),
     path("management/force-logout/<int:user_id>/", views.force_logout, name="force_logout"),
+    path("profile/", views.view_profile, name="view_profile"),
+    path("profile/edit/", views.edit_profile, name="edit_profile"),
+    path("profile/change-password/", views.change_password, name="change_password"),
 ]
