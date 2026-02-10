@@ -2,26 +2,25 @@
 {% block title %}User List - ChainProof{% endblock %}
 {% load static %}
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/accounts/management.css' %}?v={{ STATIC_VERSION }}" />
+<link rel="stylesheet" href="{% static 'css/accounts/management/user_list.css' %}?v={{ STATIC_VERSION }}" />
 
 <div class="management-page-header">
   <div class="management-page-title">
     <h1>User List</h1>
   </div>
   <div class="management-page-actions">
-    <a href="{% url 'accounts:user_management' %}" class="management-btn management-btn-secondary">
+    <a href="{% url 'dashboard:dashboard' %}" class="management-btn management-btn-secondary">
       <i class='bx bx-arrow-back'></i>
       Back to Dashboard
     </a>
   </div>
 </div>
 
-<!-- Filters -->
 <div class="management-filters">
-  <div class="management-search">
+  <form method="get" class="management-search" id="search-form">
     <i class='bx bx-search'></i>
-    <input type="text" name="search" placeholder="Search users by name, email, or username..." value="{{ search_query }}">
-  </div>
+    <input type="text" name="search" id="search-input" placeholder="Search users by name, email, or username..." value="{{ search_query }}" onkeypress="if(event.key === 'Enter') document.getElementById('search-form').submit();">
+  </form>
   
   <form method="get" class="management-filter-group">
     <select name="role" class="management-filter-select" onchange="this.form.submit()">
@@ -103,7 +102,7 @@
         </td>
         <td class="management-table-cell">
           <a href="{% url 'accounts:user_detail' user_data.user.id %}" class="management-action-link">View</a>
-          <span class="evidence-action-separator">|</span>
+          <span class="user-action-separator">|</span>
           {% if user_data.user.is_active %}
           <a href="{% url 'accounts:toggle_user_status' user_data.user.id %}" class="management-action-link">Deactivate</a>
           {% else %}
