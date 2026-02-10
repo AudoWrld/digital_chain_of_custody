@@ -408,7 +408,7 @@ def request_case_closure(request, case_id):
 
         case.close_reason = reason
         case.closure_requested = True
-        case.case_status = "Under Review"
+        case.case_status = "Under Review"  # Pending admin approval
         case.save()
 
         CaseAuditLog.log_action(
@@ -462,41 +462,56 @@ def approve_case_closure(request, case_id):
         action = request.POST.get("action")
 
         if action == "approve":
-            if request.user == case.created_by:
-                case.closure_creator_approved = True
-                CaseAuditLog.log_action(
-                    user=request.user, case=case, action="Creator approved case closure"
-                )
-            elif request.user.is_staff:
-                case.closure_approved = True
-                CaseAuditLog.log_action(
-                    user=request.user, case=case, action="Admin approved case closure"
-                )
-
-            if case.closure_creator_approved and case.closure_approved:
-                case.case_status = "Closed"
-                CaseAuditLog.log_action(
-                    user=request.user,
-                    case=case,
-                    action="Case closed after both approvals",
-                )
-
-        elif action == "reject":
-            case.closure_requested = False
-            case.closure_creator_approved = False
-            case.closure_approved = False
-            case.case_status = "Under Review"
-
+            case.case_status = "Closed"
+            case.closure_approved = True
+            case.save()
             CaseAuditLog.log_action(
                 user=request.user,
                 case=case,
-                action="Rejected case closure - reset to pending",
+                action="Admin approved case closure",
+                details=f"Closure reason: {case.close_reason}",
+            )
+        elif action == "reject":
+            case.closure_requested = False
+            case.case_status = "Under Review"
+            case.closure_approved = False
+            case.close_reason = ""
+            case.save()
+            CaseAuditLog.log_action(
+                user=request.user,
+                case=case,
+                action="Admin rejected case closure - reopened case",
             )
 
-        case.save()
         return redirect("cases:view_case", case_id=case.case_id)
 
     return render(request, "cases/approve_closure.html", {"case": case})
+
+
+@login_required
+def reopen_case(request, case_id):
+    case = get_object_or_404(Case, case_id=case_id)
+    if not (request.user.is_staff or request.user.is_superuser or request.user.role == 'admin'):
+        return HttpResponseForbidden(
+            "Only admins can reopen cases."
+        )
+
+    if case.case_status != "Closed":
+        return HttpResponse("Only closed cases can be reopened.")
+
+    case.case_status = "Under Review"
+    case.closure_requested = False
+    case.closure_approved = False
+    case.save()
+
+    CaseAuditLog.log_action(
+        user=request.user,
+        case=case,
+        action="Admin reopened closed case",
+    )
+
+    messages.success(request, "Case has been reopened.")
+    return redirect("cases:view_case", case_id=case.case_id)
 
 
 @login_required
