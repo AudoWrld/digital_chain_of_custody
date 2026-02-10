@@ -117,7 +117,6 @@
     {% endif %}
   </div>
 
-  {% if is_superuser %}
   <div class="stats-grid" style="margin-top: 24px;">
     <div class="stat-card" style="grid-column: span 2;">
       <h3 style="margin-bottom: 16px; font-size: 18px; font-weight: 600; color: #1e293b;">Case Status Distribution</h3>
@@ -147,7 +146,6 @@
       </div>
     </div>
   </div>
-  {% endif %}
 
   {% if user_role == 'custodian' %}
   <div class="stats-grid">
@@ -420,17 +418,16 @@
 </div>
 {% endif %}
 
-{% if is_superuser %}
 <script id="caseStatusData" type="application/json">{{ case_status_counts|safe }}</script>
 <script id="casePriorityData" type="application/json">{{ case_priority_counts|safe }}</script>
 <script id="casesByDateData" type="application/json">{{ cases_by_date|safe }}</script>
 <script id="userRoleData" type="application/json">{{ user_role_counts|safe }}</script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const caseStatusCounts = JSON.parse(document.getElementById('caseStatusData').textContent);
     const casePriorityCounts = JSON.parse(document.getElementById('casePriorityData').textContent);
     const casesByDate = JSON.parse(document.getElementById('casesByDateData').textContent);
-    const userRoleCounts = JSON.parse(document.getElementById('userRoleData').textContent);
 
     const statusLabels = ['Open', 'Under Review', 'Closed', 'Archived', 'Invalid', 'Withdrawn', 'Pending Admin Approval'];
     const statusData = statusLabels.map(status => caseStatusCounts[status] || 0);
@@ -527,6 +524,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    {% if is_superuser %}
+    const userRoleCounts = JSON.parse(document.getElementById('userRoleData').textContent);
     const roleLabels = ['superuser', 'regular_user', 'investigator', 'analyst', 'custodian', 'auditor'];
     const roleData = roleLabels.map(role => userRoleCounts[role] || 0);
     const roleColors = ['#f59e0b', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444'];
@@ -552,8 +551,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+    {% endif %}
 });
 </script>
-{% endif %}
 
 {% endblock %}
