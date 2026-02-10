@@ -13,4 +13,6 @@ urlpatterns = [
     path('verify/<int:evidence_id>/', views.verify_evidence_integrity, name='verify'),
     path('api/metadata/<int:evidence_id>/', views.evidence_metadata_api, name='metadata_api'),
     path('api/case/<str:case_id>/', views.case_evidence_list_api, name='case_list_api'),
+    path('all/', views.all_evidence, name='all_evidence'),
+    path('my/', views.my_evidence, name='my_evidence'),
 ]
