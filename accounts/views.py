@@ -919,6 +919,78 @@ def admin_reset_password(request, user_id):
 
 
 @login_required
+def view_profile(request):
+    user = request.user
+    return render(request, "accounts/profile/view_profile.html", {"user": user})
+
+
+@login_required
+def edit_profile(request):
+    user = request.user
+    if request.method == "POST":
+        first_name = request.POST.get("first_name")
+        last_name = request.POST.get("last_name")
+        username = request.POST.get("username")
+        
+        if User.objects.filter(username=username).exclude(pk=user.pk).exists():
+            messages.error(request, "Username already exists.")
+            return redirect("accounts:edit_profile")
+        
+        user.first_name = first_name
+        user.last_name = last_name
+        user.username = username
+        user.save()
+        
+        from cases.models import CaseAuditLog
+        CaseAuditLog.log_action(
+            user=request.user,
+            action="Profile updated",
+            details=f"User {user.get_full_name()} updated their profile",
+        )
+        
+        messages.success(request, "Profile updated successfully.")
+        return redirect("accounts:view_profile")
+    
+    return render(request, "accounts/profile/edit_profile.html", {"user": user})
+
+
+@login_required
+def change_password(request):
+    user = request.user
+    if request.method == "POST":
+        current_password = request.POST.get("current_password")
+        new_password = request.POST.get("new_password")
+        confirm_password = request.POST.get("confirm_password")
+        
+        if not user.check_password(current_password):
+            messages.error(request, "Current password is incorrect.")
+            return redirect("accounts:change_password")
+        
+        if new_password != confirm_password:
+            messages.error(request, "New passwords do not match.")
+            return redirect("accounts:change_password")
+        
+        if len(new_password) < 8:
+            messages.error(request, "Password must be at least 8 characters.")
+            return redirect("accounts:change_password")
+        
+        user.set_password(new_password)
+        user.save()
+        
+        from cases.models import CaseAuditLog
+        CaseAuditLog.log_action(
+            user=request.user,
+            action="Password changed",
+            details=f"User {user.get_full_name()} changed their password",
+        )
+        
+        messages.success(request, "Password changed successfully. Please log in again.")
+        return redirect("accounts:logout")
+    
+    return render(request, "accounts/profile/change_password.html")
+
+
+@login_required
 def force_logout(request, user_id):
     if not request.user.is_superuser and request.user.role != "admin":
         from django.http import HttpResponseForbidden
