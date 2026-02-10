@@ -2,69 +2,67 @@
 {% block title %}User Management - ChainProof{% endblock %}
 {% load static %}
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/accounts/management.css' %}?v={{ STATIC_VERSION }}" />
+<link rel="stylesheet" href="{% static 'css/accounts/management/user_management.css' %}?v={{ STATIC_VERSION }}" />
 
-<div class="management-page-header">
-  <div class="management-page-title">
+<div class="usermgmt-header">
+  <div class="usermgmt-title">
     <h1>User Management</h1>
   </div>
-  <div class="management-page-actions">
-    <a href="{% url 'accounts:user_list' %}" class="management-create-btn">
+  <div class="usermgmt-actions">
+    <a href="{% url 'accounts:user_list' %}" class="usermgmt-btn-primary">
       <i class='bx bx-list-plus'></i>
       View All Users
     </a>
   </div>
 </div>
 
-<!-- Stats Cards -->
-<div class="management-stats-grid">
-  <div class="management-stat-card">
-    <div class="management-stat-icon users">
-      <i class='bx bx-users'></i>
+<div class="usermgmt-stats-container">
+  <div class="usermgmt-stats-card">
+    <div class="usermgmt-stats-icon usermgmt-icon-users">
+      <i class='bx bx-user'></i>
     </div>
-    <div class="management-stat-content">
+    <div class="usermgmt-stats-info">
       <h3>{{ total_users }}</h3>
       <p>Total Users</p>
     </div>
   </div>
   
-  <div class="management-stat-card">
-    <div class="management-stat-icon active">
+  <div class="usermgmt-stats-card">
+    <div class="usermgmt-stats-icon usermgmt-icon-active">
       <i class='bx bx-user-check'></i>
     </div>
-    <div class="management-stat-content">
+    <div class="usermgmt-stats-info">
       <h3>{{ active_users }}</h3>
       <p>Active Users</p>
     </div>
   </div>
   
-  <div class="management-stat-card">
-    <div class="management-stat-icon inactive">
+  <div class="usermgmt-stats-card">
+    <div class="usermgmt-stats-icon usermgmt-icon-inactive">
       <i class='bx bx-user-x'></i>
     </div>
-    <div class="management-stat-content">
+    <div class="usermgmt-stats-info">
       <h3>{{ inactive_users }}</h3>
       <p>Inactive Users</p>
     </div>
   </div>
   
-  <div class="management-stat-card">
-    <div class="management-stat-icon roles">
+  <div class="usermgmt-stats-card">
+    <div class="usermgmt-stats-icon usermgmt-icon-roles">
       <i class='bx bx-shield-quarter'></i>
     </div>
-    <div class="management-stat-content">
+    <div class="usermgmt-stats-info">
       <h3>{{ users_by_role|length }}</h3>
       <p>Roles Active</p>
     </div>
   </div>
 </div>
 
-<!-- Alerts Section -->
 {% if alerts %}
-<div class="management-alerts-section">
+<div class="usermgmt-alerts-wrapper">
   {% for alert in alerts %}
-  <div class="management-alert {{ alert.type }}">
-    <div class="management-alert-title">
+  <div class="usermgmt-alert usermgmt-alert-{{ alert.type }}">
+    <div class="usermgmt-alert-heading">
       {% if alert.type == 'warning' %}
       <i class='bx bx-warning'></i>
       {% elif alert.type == 'error' %}
@@ -74,7 +72,7 @@
       {% endif %}
       <h4>{{ alert.title }}</h4>
     </div>
-    <div class="management-alert-message">
+    <div class="usermgmt-alert-content">
       {{ alert.message }}
       {% if alert.details %}
       <ul style="margin: 12px 0 0 20px; padding: 0;">
@@ -92,64 +90,61 @@
 </div>
 {% endif %}
 
-<!-- Quick Actions -->
-<div class="management-quick-actions">
-  <a href="{% url 'accounts:user_list' %}" class="management-quick-action-card">
-    <div class="management-quick-action-icon">
+<div class="usermgmt-actions-grid">
+  <a href="{% url 'accounts:user_list' %}" class="usermgmt-action-box">
+    <div class="usermgmt-action-icon">
       <i class='bx bx-list-ul'></i>
     </div>
-    <div class="management-quick-action-content">
+    <div class="usermgmt-action-text">
       <h4>User List</h4>
       <p>View and manage all users</p>
     </div>
   </a>
   
-  <a href="{% url 'accounts:user_list' %}?status=inactive" class="management-quick-action-card">
-    <div class="management-quick-action-icon" style="background: #fee2e2; color: #dc2626;">
+  <a href="{% url 'accounts:user_list' %}?status=inactive" class="usermgmt-action-box">
+    <div class="usermgmt-action-icon usermgmt-action-icon-red">
       <i class='bx bx-block'></i>
     </div>
-    <div class="management-quick-action-content">
+    <div class="usermgmt-action-text">
       <h4>Inactive Users</h4>
       <p>{{ inactive_users }} accounts disabled</p>
     </div>
   </a>
   
-  <a href="{% url 'accounts:user_list' %}?role=admin" class="management-quick-action-card">
-    <div class="management-quick-action-icon" style="background: #ede9fe; color: #5b21b6;">
+  <a href="{% url 'accounts:user_list' %}?role=admin" class="usermgmt-action-box">
+    <div class="usermgmt-action-icon usermgmt-action-icon-purple">
       <i class='bx bx-crown'></i>
     </div>
-    <div class="management-quick-action-content">
+    <div class="usermgmt-action-text">
       <h4>Administrators</h4>
       <p>Manage admin accounts</p>
     </div>
   </a>
   
-  <a href="{% url 'accounts:user_list' %}?role=custodian" class="management-quick-action-card">
-    <div class="management-quick-action-icon" style="background: #fef3c7; color: #d97706;">
+  <a href="{% url 'accounts:user_list' %}?role=custodian" class="usermgmt-action-box">
+    <div class="usermgmt-action-icon usermgmt-action-icon-yellow">
       <i class='bx bx-box'></i>
     </div>
-    <div class="management-quick-action-content">
+    <div class="usermgmt-action-text">
       <h4>Custodians</h4>
       <p>Manage evidence custodians</p>
     </div>
   </a>
 </div>
 
-<!-- Users by Role -->
-<div class="management-detail-card" style="margin-bottom: 32px;">
-  <div class="management-detail-header">
+<div class="usermgmt-section-card" style="margin-bottom: 32px;">
+  <div class="usermgmt-section-head">
     <h2><i class='bx bx-pie-chart-alt-2'></i> Users by Role</h2>
   </div>
-  <div class="management-detail-body">
+  <div class="usermgmt-section-body">
     {% if users_by_role %}
-    <div class="management-stats-grid" style="margin-bottom: 0;">
+    <div class="usermgmt-stats-container" style="margin-bottom: 0;">
       {% for role_data in users_by_role.values %}
-      <div class="management-stat-card">
-        <div class="management-stat-icon" style="background: #f1f5f9; color: #475569;">
+      <div class="usermgmt-stats-card">
+        <div class="usermgmt-stats-icon usermgmt-icon-default">
           <i class='bx bx-user'></i>
         </div>
-        </div>
-        <div class="management-stat-content">
+        <div class="usermgmt-stats-info">
           <h3>{{ role_data.count }}</h3>
           <p>{{ role_data.name }}</p>
         </div>
@@ -157,46 +152,45 @@
       {% endfor %}
     </div>
     {% else %}
-    <div class="management-empty-state" style="padding: 32px;">
+    <div class="usermgmt-empty-message">
       <p>No users with assigned roles yet.</p>
     </div>
     {% endif %}
   </div>
 </div>
 
-<!-- Recent Activity Summary -->
-<div class="management-detail-grid">
-  <div class="management-detail-card">
-    <div class="management-detail-header">
+<div class="usermgmt-grid-layout">
+  <div class="usermgmt-section-card">
+    <div class="usermgmt-section-head">
       <h2><i class='bx bx-trending-up'></i> Activity Summary</h2>
     </div>
-    <div class="management-detail-body">
-      <div class="management-detail-row">
-        <span class="management-detail-label">New Users (Last 7 Days)</span>
-        <span class="management-detail-value">{{ recent_users }}</span>
+    <div class="usermgmt-section-body">
+      <div class="usermgmt-info-row">
+        <span class="usermgmt-info-label">New Users (Last 7 Days)</span>
+        <span class="usermgmt-info-value">{{ recent_users }}</span>
       </div>
-      <div class="management-detail-row">
-        <span class="management-detail-label">Users Never Logged In</span>
-        <span class="management-detail-value">{{ never_logged_in }}</span>
+      <div class="usermgmt-info-row">
+        <span class="usermgmt-info-label">Users Never Logged In</span>
+        <span class="usermgmt-info-value">{{ never_logged_in }}</span>
       </div>
-      <div class="management-detail-row">
-        <span class="management-detail-label">Users Without Roles</span>
-        <span class="management-detail-value">{{ users_without_roles|default:0 }}</span>
+      <div class="usermgmt-info-row">
+        <span class="usermgmt-info-label">Users Without Roles</span>
+        <span class="usermgmt-info-value">{{ users_without_roles|default:0 }}</span>
       </div>
     </div>
   </div>
   
-  <div class="management-detail-card">
-    <div class="management-detail-header">
+  <div class="usermgmt-section-card">
+    <div class="usermgmt-section-head">
       <h2><i class='bx bx-cog'></i> Quick Actions</h2>
     </div>
-    <div class="management-detail-body">
-      <div class="management-actions">
-        <a href="{% url 'accounts:user_list' %}" class="management-btn management-btn-primary">
+    <div class="usermgmt-section-body">
+      <div class="usermgmt-button-group">
+        <a href="{% url 'accounts:user_list' %}" class="usermgmt-btn usermgmt-btn-blue">
           <i class='bx bx-list-ul'></i>
           Manage Users
         </a>
-        <a href="#" class="management-btn management-btn-secondary">
+        <a href="#" class="usermgmt-btn usermgmt-btn-gray">
           <i class='bx bx-export'></i>
           Export Report
         </a>
