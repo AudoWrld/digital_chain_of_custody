@@ -212,7 +212,7 @@
     <div class="dashboard-section">
       <div class="section-header">
         <h2>Recent Users</h2>
-        <a href="{% url 'admin:accounts_user_changelist' %}" class="view-all-link">View All</a>
+        <a href="{% url 'accounts:user_list' %}" class="view-all-link">View All</a>
       </div>
       <div class="recent-list">
         {% for user in recent_users %}
@@ -239,13 +239,6 @@
         <h2>Admin Quick Actions</h2>
       </div>
       <div class="quick-actions">
-        <a href="{% url 'admin:index' %}" class="quick-action-card">
-          <div class="quick-action-icon">
-            <i class='bx bx-cog'></i>
-          </div>
-          <div class="quick-action-title">Admin Panel</div>
-          <div class="quick-action-description">Access Django admin interface</div>
-        </a>
         <a href="{% url 'cases:case_list' %}" class="quick-action-card">
           <div class="quick-action-icon">
             <i class='bx bx-briefcase'></i>
@@ -253,7 +246,7 @@
           <div class="quick-action-title">Manage Cases</div>
           <div class="quick-action-description">View and manage all cases</div>
         </a>
-        <a href="{% url 'admin:accounts_user_changelist' %}" class="quick-action-card">
+        <a href="{% url 'accounts:user_list' %}" class="quick-action-card">
           <div class="quick-action-icon">
             <i class='bx bx-user'></i>
           </div>
@@ -279,7 +272,7 @@
         </a>
         {% endif %}
         {% if unverified_users > 0 %}
-        <a href="{% url 'admin:accounts_user_changelist' %}?is_verified__exact=0" class="quick-action-card" style="border: 2px solid #3b82f6;">
+        <a href="{% url 'accounts:user_list' %}?is_verified__exact=0" class="quick-action-card" style="border: 2px solid #3b82f6;">
           <div class="quick-action-icon" style="color: #3b82f6;">
             <i class='bx bx-user-plus'></i>
           </div>
