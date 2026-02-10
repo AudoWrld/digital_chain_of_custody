@@ -66,43 +66,22 @@
   </div>
 
   <div class="view-case-section">
-    <h2 class="view-case-section-title">Closure Request Details</h2>
+    <h2 class="view-case-section-title">Closure Request</h2>
     <div class="view-case-details-grid">
       <div class="view-case-detail-item" style="grid-column: 1 / -1;">
-        <span class="view-case-detail-label">Close Reason</span>
+        <span class="view-case-detail-label">Closure Reason</span>
         <span class="view-case-detail-value">{{ case.close_reason }}</span>
-      </div>
-      <div class="view-case-detail-item">
-        <span class="view-case-detail-label">Creator Approved</span>
-        <span class="view-case-detail-value">
-          {% if case.closure_creator_approved %}
-          <span class="view-case-status-badge view-case-status-approved">Yes</span>
-          {% else %}
-          <span class="view-case-status-badge view-case-status-pending">No</span>
-          {% endif %}
-        </span>
-      </div>
-      <div class="view-case-detail-item">
-        <span class="view-case-detail-label">Admin Approved</span>
-        <span class="view-case-detail-value">
-          {% if case.closure_approved %}
-          <span class="view-case-status-badge view-case-status-approved">Yes</span>
-          {% else %}
-          <span class="view-case-status-badge view-case-status-pending">No</span>
-          {% endif %}
-        </span>
       </div>
     </div>
   </div>
 
-  <div class="view-case-section">
-    <h2 class="view-case-section-title">Admin Approval</h2>
+  <div class="view-case-section view-case-danger-zone">
+    <h2 class="view-case-section-title">Admin Action</h2>
     <form method="post" class="closure-form">
       {% csrf_token %}
       <div class="form-actions">
-        <button type="submit" name="action" value="approve" class="btn btn-primary">Approve Closure</button>
-        <button type="submit" name="action" value="reject" class="btn btn-danger">Reject</button>
-        <a href="{% url 'cases:view_case' case.id %}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" name="action" value="approve" class="btn btn-danger">Approve Closure</button>
+        <button type="submit" name="action" value="reject" class="btn btn-secondary">Cancel</button>
       </div>
     </form>
   </div>
