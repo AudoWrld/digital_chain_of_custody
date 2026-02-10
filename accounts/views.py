@@ -569,6 +569,10 @@ def user_management(request):
         count = User.objects.filter(role=role).count()
         if count > 0:
             users_by_role[role] = {"name": role_name, "count": count}
+    
+    superuser_count = User.objects.filter(is_superuser=True).count()
+    if superuser_count > 0:
+        users_by_role["superuser"] = {"name": "Superuser", "count": superuser_count}
 
     alerts = []
 
@@ -665,7 +669,10 @@ def user_list(request):
 
     role_filter = request.GET.get("role", "")
     if role_filter:
-        users = users.filter(role=role_filter)
+        if role_filter == "admin":
+            users = users.filter(is_superuser=True)
+        else:
+            users = users.filter(role=role_filter)
 
     status_filter = request.GET.get("status", "")
     if status_filter == "active":
@@ -737,7 +744,7 @@ def user_detail(request, user_id):
         "username": target_user.username,
         "date_joined": target_user.date_joined,
         "last_login": target_user.last_login,
-        "role": target_user.get_role_display(),
+        "role": "Superuser" if target_user.is_superuser else target_user.get_role_display(),
     }
 
     assignments = {}
