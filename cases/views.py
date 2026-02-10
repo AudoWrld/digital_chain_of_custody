@@ -392,7 +392,6 @@ def assign_investigator(request, case_id):
 
 
 @login_required
-@can_close_case
 def request_case_closure(request, case_id):
     case = get_object_or_404(Case, case_id=case_id)
     if (
@@ -409,7 +408,7 @@ def request_case_closure(request, case_id):
 
         case.close_reason = reason
         case.closure_requested = True
-        case.case_status = "Under Review"  # moves to review stage
+        case.case_status = "Under Review"
         case.save()
 
         CaseAuditLog.log_action(
@@ -429,8 +428,8 @@ def request_case_closure(request, case_id):
 def close_case(request, case_id):
     case = get_object_or_404(Case, case_id=case_id)
 
-    if request.user != case.created_by and not request.user.is_staff:
-        return HttpResponseForbidden("you are not autorised to close this case")
+    if not (request.user.is_staff or request.user.is_superuser or request.user.role == 'admin'):
+        return HttpResponseForbidden("Only admins can close cases.")
 
     if case.case_status != "Closed":
         return HttpResponseForbidden("Case status must be 'closed' before finalizing.")
@@ -449,12 +448,11 @@ def close_case(request, case_id):
 
 
 @login_required
-@can_close_case
 def approve_case_closure(request, case_id):
     case = get_object_or_404(Case, case_id=case_id)
-    if request.user != case.created_by and not request.user.is_staff:
+    if not (request.user.is_staff or request.user.is_superuser or request.user.role == 'admin'):
         return HttpResponseForbidden(
-            "Only the case creator or admins can approve closures."
+            "Only admins can approve closures."
         )
 
     if not case.closure_requested:

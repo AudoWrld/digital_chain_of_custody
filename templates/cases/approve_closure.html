@@ -1,19 +1,110 @@
 {% extends 'base.html' %}
 {% block title %}Approve Case Closure{% endblock %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/cases/view_case.css' %}?v={{ STATIC_VERSION }}" />
+{% endblock %}
 
 {% block content %}
-<h2>Approve Closure for Case: {{ case.get_title }}</h2>
+<div class="view-case-container">
+  <div class="view-case-header">
+    <h1 class="view-case-title">Approve Closure - {{ case.case_id }} - {{ case.get_title }}</h1>
+    <div class="view-case-meta">
+      <div class="view-case-meta-item">
+        <span class="view-case-meta-label">Created By:</span>
+        <span class="view-case-meta-value">{{ case.created_by.get_full_name }}</span>
+      </div>
+      <div class="view-case-meta-item">
+        <span class="view-case-meta-label">Created At:</span>
+        <span class="view-case-meta-value">{{ case.date_created|date:"F d, Y g:i A" }}</span>
+      </div>
+    </div>
+  </div>
 
-<p><strong>Description:</strong> {{ case.get_description }}</p>
-<p><strong>Close Reason:</strong> {{ case.close_reason }}</p>
-<p><strong>Creator Approved:</strong> {% if case.closure_creator_approved %}Yes{% else %}No{% endif %}</p>
-<p><strong>Admin Approved:</strong> {% if case.closure_approved %}Yes{% else %}No{% endif %}</p>
+  <div class="view-case-section">
+    <h2 class="view-case-section-title">Case Details</h2>
+    <div class="view-case-details-grid">
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">Status</span>
+        <span class="view-case-detail-value">
+          {% if case.case_status == 'Open' %}
+          <span class="view-case-status-badge view-case-status-open">{{ case.case_status }}</span>
+          {% elif case.case_status == 'Pending Admin Approval' %}
+          <span class="view-case-status-badge view-case-status-pending">{{ case.case_status }}</span>
+          {% elif case.case_status == 'Approved & Assigned' %}
+          <span class="view-case-status-badge view-case-status-approved">{{ case.case_status }}</span>
+          {% elif case.case_status == 'Under Review' %}
+          <span class="view-case-status-badge view-case-status-under">{{ case.case_status }}</span>
+          {% elif case.case_status == 'Closed' %}
+          <span class="view-case-status-badge view-case-status-closed">{{ case.case_status }}</span>
+          {% elif case.case_status == 'Archived' %}
+          <span class="view-case-status-badge view-case-status-archived">{{ case.case_status }}</span>
+          {% elif case.case_status == 'Invalid' %}
+          <span class="view-case-status-badge view-case-status-invalid">{{ case.case_status }}</span>
+          {% elif case.case_status == 'Withdrawn' %}
+          <span class="view-case-status-badge view-case-status-withdrawn">{{ case.case_status }}</span>
+          {% else %}
+          <span class="view-case-status-badge">{{ case.case_status }}</span>
+          {% endif %}
+        </span>
+      </div>
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">Priority</span>
+        <span class="view-case-detail-value">
+          {% if case.case_priority == 'low' %}
+          <span class="view-case-priority-badge view-case-priority-low">{{ case.get_case_priority_display }}</span>
+          {% elif case.case_priority == 'medium' %}
+          <span class="view-case-priority-badge view-case-priority-medium">{{ case.get_case_priority_display }}</span>
+          {% elif case.case_priority == 'high' %}
+          <span class="view-case-priority-badge view-case-priority-high">{{ case.get_case_priority_display }}</span>
+          {% elif case.case_priority == 'critical' %}
+          <span class="view-case-priority-badge view-case-priority-critical">{{ case.get_case_priority_display }}</span>
+          {% endif %}
+        </span>
+      </div>
+    </div>
+  </div>
 
-<form method="post">
-    {% csrf_token %}
-    <button type="submit" name="action" value="approve">Approve</button>
-    <button type="submit" name="action" value="reject">Reject</button>
-</form>
+  <div class="view-case-section">
+    <h2 class="view-case-section-title">Closure Request Details</h2>
+    <div class="view-case-details-grid">
+      <div class="view-case-detail-item" style="grid-column: 1 / -1;">
+        <span class="view-case-detail-label">Close Reason</span>
+        <span class="view-case-detail-value">{{ case.close_reason }}</span>
+      </div>
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">Creator Approved</span>
+        <span class="view-case-detail-value">
+          {% if case.closure_creator_approved %}
+          <span class="view-case-status-badge view-case-status-approved">Yes</span>
+          {% else %}
+          <span class="view-case-status-badge view-case-status-pending">No</span>
+          {% endif %}
+        </span>
+      </div>
+      <div class="view-case-detail-item">
+        <span class="view-case-detail-label">Admin Approved</span>
+        <span class="view-case-detail-value">
+          {% if case.closure_approved %}
+          <span class="view-case-status-badge view-case-status-approved">Yes</span>
+          {% else %}
+          <span class="view-case-status-badge view-case-status-pending">No</span>
+          {% endif %}
+        </span>
+      </div>
+    </div>
+  </div>
 
-<a href="{% url 'cases:view_case' case.id %}">Back to Case</a>
+  <div class="view-case-section">
+    <h2 class="view-case-section-title">Admin Approval</h2>
+    <form method="post" class="closure-form">
+      {% csrf_token %}
+      <div class="form-actions">
+        <button type="submit" name="action" value="approve" class="btn btn-primary">Approve Closure</button>
+        <button type="submit" name="action" value="reject" class="btn btn-danger">Reject</button>
+        <a href="{% url 'cases:view_case' case.id %}" class="btn btn-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
 {% endblock %}
