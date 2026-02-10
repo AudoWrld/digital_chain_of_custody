@@ -37,18 +37,19 @@ def dashboard(request):
     
     cases_by_date_dict = {str(item['date']): item['count'] for item in cases_by_date}
     
+    user_role_counts = dict(User.objects.values('role').annotate(count=Count('id')).values_list('role', 'count'))
+    superuser_count = User.objects.filter(is_superuser=True).count()
+    if superuser_count > 0:
+        user_role_counts['superuser'] = superuser_count
+    
     context.update({
         'case_status_counts': json.dumps(case_status_counts),
         'case_priority_counts': json.dumps(case_priority_counts),
         'cases_by_date': json.dumps(cases_by_date_dict),
+        'user_role_counts': json.dumps(user_role_counts),
     })
 
     if request.user.is_superuser:
-        
-        superuser_count = User.objects.filter(is_superuser=True).count()
-        if superuser_count > 0:
-            user_role_counts['superuser'] = superuser_count
-        
         if EVIDENCE_AVAILABLE:
             total_evidence = Evidence.objects.count()
             valid_evidence = Evidence.objects.filter(media_status='Valid').count()
@@ -122,10 +123,6 @@ def dashboard(request):
             'total_users': User.objects.count(),
             'recent_cases': Case.objects.all().order_by('-date_created')[:5],
             'recent_audit_logs': CaseAuditLog.objects.all().order_by('-timestamp')[:5],
-            'case_status_counts': json.dumps(case_status_counts),
-            'case_priority_counts': json.dumps(case_priority_counts),
-            'cases_by_date': json.dumps(cases_by_date_dict),
-            'user_role_counts': json.dumps(user_role_counts),
             'pending_approval_cases': pending_approval_cases,
             'cases_without_investigators': cases_without_investigators,
             'unverified_users': unverified_users,
