@@ -116,7 +116,9 @@
     </div>
     {% endif %}
   </div>
+{% endif %}
 
+  {% if is_superuser %}
   <div class="stats-grid" style="margin-top: 24px;">
     <div class="stat-card" style="grid-column: span 2;">
       <h3 style="margin-bottom: 16px; font-size: 18px; font-weight: 600; color: #1e293b;">Case Status Distribution</h3>
@@ -146,6 +148,33 @@
       </div>
     </div>
   </div>
+  {% endif %}
+
+  {% if user_role == 'regular_user' or user_role == 'investigator' or user_role == 'analyst' %}
+  <div class="stats-grid" style="margin-top: 24px;">
+    <div class="stat-card" style="grid-column: span 2;">
+      <h3 style="margin-bottom: 16px; font-size: 18px; font-weight: 600; color: #1e293b;">Case Status Distribution</h3>
+      <div style="height: 300px; position: relative;">
+        <canvas id="caseStatusChart"></canvas>
+      </div>
+    </div>
+    <div class="stat-card" style="grid-column: span 1;">
+      <h3 style="margin-bottom: 16px; font-size: 18px; font-weight: 600; color: #1e293b;">Case Priority Distribution</h3>
+      <div style="height: 300px; position: relative;">
+        <canvas id="casePriorityChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-grid" style="margin-top: 24px;">
+    <div class="stat-card" style="grid-column: span 3;">
+      <h3 style="margin-bottom: 16px; font-size: 18px; font-weight: 600; color: #1e293b;">Cases Created (Last 30 Days)</h3>
+      <div style="height: 300px; position: relative;">
+        <canvas id="casesByDateChart"></canvas>
+      </div>
+    </div>
+  </div>
+  {% endif %}
 
   {% if user_role == 'custodian' %}
   <div class="stats-grid">
@@ -425,131 +454,145 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const caseStatusCounts = JSON.parse(document.getElementById('caseStatusData').textContent);
-    const casePriorityCounts = JSON.parse(document.getElementById('casePriorityData').textContent);
-    const casesByDate = JSON.parse(document.getElementById('casesByDateData').textContent);
+    // Check if caseStatusChart canvas exists (Admin, Regular User, Investigator, Analyst)
+    if (document.getElementById('caseStatusChart')) {
+        const caseStatusCounts = JSON.parse(document.getElementById('caseStatusData').textContent);
+        
+        const statusLabels = ['Open', 'Under Review', 'Closed', 'Archived', 'Invalid', 'Withdrawn', 'Pending Admin Approval'];
+        const statusData = statusLabels.map(status => caseStatusCounts[status] || 0);
+        const statusColors = ['#3b82f6', '#f59e0b', '#10b981', '#6366f1', '#ef4444', '#8b5cf6', '#f97316'];
 
-    const statusLabels = ['Open', 'Under Review', 'Closed', 'Archived', 'Invalid', 'Withdrawn', 'Pending Admin Approval'];
-    const statusData = statusLabels.map(status => caseStatusCounts[status] || 0);
-    const statusColors = ['#3b82f6', '#f59e0b', '#10b981', '#6366f1', '#ef4444', '#8b5cf6', '#f97316'];
-
-    new Chart(document.getElementById('caseStatusChart'), {
-        type: 'bar',
-        data: {
-            labels: statusLabels,
-            datasets: [{
-                label: 'Number of Cases',
-                data: statusData,
-                backgroundColor: statusColors,
-                borderColor: statusColors.map(color => color),
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
+        new Chart(document.getElementById('caseStatusChart'), {
+            type: 'bar',
+            data: {
+                labels: statusLabels,
+                datasets: [{
+                    label: 'Number of Cases',
+                    data: statusData,
+                    backgroundColor: statusColors,
+                    borderColor: statusColors.map(color => color),
+                    borderWidth: 1
+                }]
             },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
                     }
                 }
             }
-        }
-    });
+        });
+    }
 
-    const priorityLabels = ['low', 'medium', 'high', 'critical'];
-    const priorityData = priorityLabels.map(priority => casePriorityCounts[priority] || 0);
-    const priorityColors = ['#10b981', '#f59e0b', '#f97316', '#ef4444'];
+    // Check if casePriorityChart canvas exists (Admin, Regular User, Investigator, Analyst)
+    if (document.getElementById('casePriorityChart')) {
+        const casePriorityCounts = JSON.parse(document.getElementById('casePriorityData').textContent);
+        
+        const priorityLabels = ['low', 'medium', 'high', 'critical'];
+        const priorityData = priorityLabels.map(priority => casePriorityCounts[priority] || 0);
+        const priorityColors = ['#10b981', '#f59e0b', '#f97316', '#ef4444'];
 
-    new Chart(document.getElementById('casePriorityChart'), {
-        type: 'doughnut',
-        data: {
-            labels: ['Low', 'Medium', 'High', 'Critical'],
-            datasets: [{
-                data: priorityData,
-                backgroundColor: priorityColors,
-                borderColor: '#ffffff',
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                }
-            }
-        }
-    });
-
-    const dateLabels = Object.keys(casesByDate).sort();
-    const dateData = dateLabels.map(date => casesByDate[date]);
-
-    new Chart(document.getElementById('casesByDateChart'), {
-        type: 'bar',
-        data: {
-            labels: dateLabels,
-            datasets: [{
-                label: 'Cases Created',
-                data: dateData,
-                backgroundColor: '#3b82f6',
-                borderColor: '#2563eb',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
+        new Chart(document.getElementById('casePriorityChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Low', 'Medium', 'High', 'Critical'],
+                datasets: [{
+                    data: priorityData,
+                    backgroundColor: priorityColors,
+                    borderColor: '#ffffff',
+                    borderWidth: 2
+                }]
             },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
                     }
                 }
             }
-        }
-    });
+        });
+    }
 
-    const userRoleCounts = JSON.parse(document.getElementById('userRoleData').textContent);
-    const roleLabels = ['superuser', 'regular_user', 'investigator', 'analyst', 'custodian', 'auditor'];
-    const roleData = roleLabels.map(role => userRoleCounts[role] || 0);
-    const roleColors = ['#f59e0b', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444'];
+    // Check if casesByDateChart canvas exists (Admin, Regular User, Investigator, Analyst)
+    if (document.getElementById('casesByDateChart')) {
+        const casesByDate = JSON.parse(document.getElementById('casesByDateData').textContent);
+        
+        const dateLabels = Object.keys(casesByDate).sort();
+        const dateData = dateLabels.map(date => casesByDate[date]);
 
-    new Chart(document.getElementById('userRoleChart'), {
-        type: 'pie',
-        data: {
-            labels: ['Superuser', 'Regular User', 'Investigator', 'Analyst', 'Custodian', 'Auditor'],
-            datasets: [{
-                data: roleData,
-                backgroundColor: roleColors,
-                borderColor: '#ffffff',
-                borderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom'
+        new Chart(document.getElementById('casesByDateChart'), {
+            type: 'bar',
+            data: {
+                labels: dateLabels,
+                datasets: [{
+                    label: 'Cases Created',
+                    data: dateData,
+                    backgroundColor: '#3b82f6',
+                    borderColor: '#2563eb',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
                 }
             }
-        }
-    });
+        });
+    }
+
+    // Check if userRoleChart canvas exists (Admin only)
+    if (document.getElementById('userRoleChart')) {
+        const userRoleCounts = JSON.parse(document.getElementById('userRoleData').textContent);
+        const roleLabels = ['superuser', 'regular_user', 'investigator', 'analyst', 'custodian', 'auditor'];
+        const roleData = roleLabels.map(role => userRoleCounts[role] || 0);
+        const roleColors = ['#f59e0b', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444'];
+
+        new Chart(document.getElementById('userRoleChart'), {
+            type: 'pie',
+            data: {
+                labels: ['Superuser', 'Regular User', 'Investigator', 'Analyst', 'Custodian', 'Auditor'],
+                datasets: [{
+                    data: roleData,
+                    backgroundColor: roleColors,
+                    borderColor: '#ffffff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
 });
 </script>
 
