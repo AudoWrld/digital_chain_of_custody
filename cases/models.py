@@ -279,7 +279,7 @@ class InvestigatorCaseStatus(models.Model):
 
 
 class CaseAuditLog(models.Model):
-    case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name="audit_logs")
+    case = models.ForeignKey(Case, on_delete=models.CASCADE, related_name="audit_logs", null=True, blank=True)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True
     )
@@ -288,7 +288,7 @@ class CaseAuditLog(models.Model):
     details = models.TextField(blank=True, null=True)
 
     @classmethod
-    def log_action(cls, user, case, action, details=None):
+    def log_action(cls, user, case=None, action=None, details=None):
         cls.objects.create(user=user, case=case, action=action, details=details)
 
     def __str__(self):
