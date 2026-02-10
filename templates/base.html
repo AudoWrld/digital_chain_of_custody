@@ -323,16 +323,5 @@
       {% include 'partials/help.html' %}
     </div>
     </div>
-
-    <script>
-      document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-          const helpPanel = document.getElementById('helpPanel');
-          if (helpPanel && helpPanel.classList.contains('active')) {
-            toggleHelpPanel();
-          }
-        }
-      });
-    </script>
   </body>
 </html>
