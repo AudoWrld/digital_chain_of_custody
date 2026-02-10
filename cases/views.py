@@ -19,17 +19,17 @@ logger = logging.getLogger(__name__)
 @login_required
 def case_list(request):
     if request.user.is_superuser:
-        cases = Case.objects.all().select_related("encryption_key")
+        cases = Case.objects.all().select_related("encryption_key").order_by('-date_created')
         is_superuser = True
     elif request.user.role == "regular_user":
         cases = Case.objects.filter(created_by=request.user).select_related(
             "encryption_key"
-        )
+        ).order_by('-date_created')
         is_superuser = False
     elif request.user.role == "investigator":
         cases = Case.objects.filter(assigned_investigators=request.user).select_related(
             "encryption_key"
-        )
+        ).order_by('-date_created')
         is_superuser = False
     else:
         return HttpResponseForbidden("You do not have permission to view cases.")
@@ -42,12 +42,12 @@ def case_list(request):
 @login_required
 def assigned_cases(request):
     if request.user.is_superuser:
-        cases = Case.objects.all().select_related("encryption_key")
+        cases = Case.objects.all().select_related("encryption_key").order_by('-date_created')
         is_superuser = True
     elif request.user.role == "investigator":
         cases = Case.objects.filter(assigned_investigators=request.user).select_related(
             "encryption_key"
-        )
+        ).order_by('-date_created')
         is_superuser = False
     else:
         return HttpResponseForbidden("Only investigators can view assigned cases.")
