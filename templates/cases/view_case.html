@@ -100,35 +100,6 @@
         </span>
       </div>
     </div>
-
-    {% if case.close_reason %}
-    <div style="margin-top: 20px;">
-      <span class="view-case-detail-label">Close Reason:</span>
-      <p style="margin-top: 8px; color: #475569; line-height: 1.6;">{{ case.close_reason }}</p>
-    </div>
-    {% endif %}
-
-    {% if case.invalid_reason %}
-    <div style="margin-top: 20px;">
-      <span class="view-case-detail-label">Invalid Reason:</span>
-      <p style="margin-top: 8px; color: #475569; line-height: 1.6;">{{ case.invalid_reason }}</p>
-    </div>
-    {% endif %}
-
-    {% if case.withdraw_reason %}
-    <div style="margin-top: 20px;">
-      <span class="view-case-detail-label">Withdraw Reason:</span>
-      <p style="margin-top: 8px; color: #475569; line-height: 1.6;">{{ case.withdraw_reason }}</p>
-    </div>
-    {% endif %}
-
-    {% if case.closure_requested %}
-    <div class="view-case-closure-info">
-      <div class="view-case-closure-info-title">Closure Requested</div>
-      <div class="view-case-closure-info-item">Creator Approved: {{ case.closure_creator_approved|yesno:"Yes,No" }}</div>
-      <div class="view-case-closure-info-item">Admin Approved: {{ case.closure_approved|yesno:"Yes,No" }}</div>
-    </div>
-    {% endif %}
   </div>
 
   <div class="view-case-section">
@@ -185,7 +156,6 @@
     <div class="view-case-actions">
       {% if is_superuser %}
         <a href="{% url 'cases:assign_investigators' case.case_id %}" class="view-case-action-btn view-case-action-primary">{% if investigators %}Update Investigators{% else %}Assign Investigators{% endif %}</a>
-        <a href="{% url 'cases:close_case' case.case_id %}" class="view-case-action-btn view-case-action-danger">Close Case</a>
         <a href="{% url 'cases:view_case_audit_log' case.case_id %}" class="view-case-action-btn view-case-action-secondary">Case Audit Log</a>
         <a href="{% url 'cases:case_list' %}" class="view-case-action-btn view-case-action-secondary">Back to Cases</a>
       {% elif user.role == 'regular_user' and not is_superuser %}
@@ -219,10 +189,6 @@
         {% if case.case_status == 'Open' %}
         <a href="{% url 'cases:edit_case' case.case_id %}" class="view-case-action-btn view-case-action-secondary">Edit Case</a>
         <a href="{% url 'cases:assign_investigators' case.case_id %}" class="view-case-action-btn view-case-action-secondary">Assign Investigators</a>
-        {% if not case.closure_requested %}
-        <a href="{% url 'cases:request_case_closure' case.case_id %}" class="view-case-action-btn view-case-action-warning">Request Closure</a>
-        {% endif %}
-        <a href="{% url 'cases:close_case' case.case_id %}" class="view-case-action-btn view-case-action-danger">Close Case</a>
         <a href="{% url 'cases:withdraw_case' case.case_id %}" class="view-case-action-btn view-case-action-danger">Withdraw Case</a>
         <a href="{% url 'cases:invalidate_case' case.case_id %}" class="view-case-action-btn view-case-action-danger">Mark Invalid</a>
         {% endif %}
@@ -275,14 +241,21 @@
   </div>
   {% endif %}
 
-  {% if case.closure_requested %}
-  <div class="view-case-section">
-    <h2 class="view-case-section-title">Closure Approval</h2>
-    {% if request.user == case.created_by and not case.closure_creator_approved %}
-    <a href="{% url 'cases:admin_approve_case_closure' case.id %}" class="view-case-action-btn view-case-action-primary">Approve Closure (Creator)</a>
+  {% if case.closure_requested or case.case_status == 'Closed' %}
+  <div class="view-case-section view-case-danger-zone">
+    <h2 class="view-case-section-title">Case Closure</h2>
+    {% if case.close_reason %}
+    <div style="margin-bottom: 16px;">
+      <span class="view-case-detail-label">Closure Reason:</span>
+      <p style="margin-top: 8px; color: #475569; line-height: 1.6;">{{ case.close_reason }}</p>
+    </div>
     {% endif %}
-    {% if request.user.is_staff and not case.closure_approved %}
-    <a href="{% url 'cases:admin_approve_case_closure' case.id %}" class="view-case-action-btn view-case-action-primary">Approve Closure (Admin)</a>
+    {% if request.user.is_staff or request.user.is_superuser %}
+      {% if case.case_status != 'Closed' %}
+      <a href="{% url 'cases:admin_approve_case_closure' case.case_id %}" class="view-case-action-btn view-case-action-danger">Approve Closure</a>
+      {% else %}
+      <a href="{% url 'cases:reopen_case' case.case_id %}" class="view-case-action-btn view-case-action-success">Reopen Case</a>
+      {% endif %}
     {% endif %}
   </div>
   {% endif %}
