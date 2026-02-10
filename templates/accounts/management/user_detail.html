@@ -230,6 +230,7 @@
       </div>
     </div>
 
+    {% if target_user != request.user %}
     <div class="userdetail-card" style="margin-bottom: 24px;">
       <div class="userdetail-card-header">
         <h2><i class='bx bx-cog'></i> Administrative Actions</h2>
@@ -274,6 +275,7 @@
         </div>
       </div>
     </div>
+    {% endif %}
 
     <div class="userdetail-card">
       <div class="userdetail-card-header">
