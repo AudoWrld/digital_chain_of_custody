@@ -527,14 +527,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    const roleLabels = ['regular_user', 'investigator', 'analyst', 'custodian', 'auditor'];
+    const roleLabels = ['superuser', 'regular_user', 'investigator', 'analyst', 'custodian', 'auditor'];
     const roleData = roleLabels.map(role => userRoleCounts[role] || 0);
-    const roleColors = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444'];
+    const roleColors = ['#f59e0b', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444'];
 
     new Chart(document.getElementById('userRoleChart'), {
         type: 'pie',
         data: {
-            labels: ['Regular User', 'Investigator', 'Analyst', 'Custodian', 'Auditor'],
+            labels: ['Superuser', 'Regular User', 'Investigator', 'Analyst', 'Custodian', 'Auditor'],
             datasets: [{
                 data: roleData,
                 backgroundColor: roleColors,
