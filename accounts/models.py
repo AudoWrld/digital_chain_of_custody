@@ -65,13 +65,21 @@ class User(AbstractUser, PermissionsMixin):
     profile_picture = models.ImageField(
         upload_to="profile_pics/", blank=True, null=True
     )
+    phone_number = models.CharField(
+        max_length=20,
+        blank=True,
+        null=True,
+        help_text="Optional contact number for account recovery or alerts",
+    )
     two_factor_secret = models.CharField(max_length=16, blank=True, null=True)
     two_factor_enabled = models.BooleanField(default=False)
     recovery_codes = models.TextField(blank=True, null=True)
-    recovery_codes_downloaded = models.BooleanField(default=False, blank=True, null=True)
+    recovery_codes_downloaded = models.BooleanField(
+        default=False, blank=True, null=True
+    )
     failed_login_attempts = models.IntegerField(default=0)
     last_failed_login = models.DateTimeField(null=True, blank=True)
-    
+
     groups = models.ManyToManyField(
         "auth.Group",
         related_name="custom_user_groups",
@@ -85,9 +93,6 @@ class User(AbstractUser, PermissionsMixin):
     objects = UserProfileManager()
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name"]
-    
- 
-
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
