@@ -63,6 +63,14 @@
                 <span class="date">Accessed: {{ storage.last_accessed|date:"M d, Y H:i" }}</span>
               </div>
             </div>
+            <div class="recent-item-actions">
+              <a href="{% url 'evidence:verify' storage.evidence.id %}" class="recent-item-action recent-item-action-verify" title="Verify Hash">
+                <i class='bx bx-check-circle'></i>
+              </a>
+              <a href="{% url 'custody:evidence_custody_log' storage.evidence.id %}" class="recent-item-action recent-item-action-logs" title="View Logs">
+                <i class='bx bx-history'></i>
+              </a>
+            </div>
           </div>
           {% endfor %}
         {% else %}
