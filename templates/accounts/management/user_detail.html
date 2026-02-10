@@ -17,9 +17,7 @@
 </div>
 
 <div class="management-detail-grid">
-  <!-- Left Column: User Info -->
   <div>
-    <!-- Basic Info -->
     <div class="management-detail-card" style="margin-bottom: 24px;">
       <div class="management-detail-header">
         <h2><i class='bx bx-user'></i> Basic Information</h2>
@@ -98,6 +96,16 @@
           <span class="management-detail-label">Failed Login Attempts</span>
           <span class="management-detail-value">{{ security_info.failed_logins }}</span>
         </div>
+        <div class="management-detail-row">
+          <span class="management-detail-label">Last Failed Login</span>
+          <span class="management-detail-value">
+            {% if security_info.last_failed_login %}
+            {{ security_info.last_failed_login|date:"M d, Y H:i" }}
+            {% else %}
+            Never
+            {% endif %}
+          </span>
+        </div>
       </div>
     </div>
 
@@ -127,6 +135,41 @@
         </div>
         {% endif %}
       </div>
+    </div>
+
+    <!-- Evidence Activity -->
+    <div class="management-detail-card" style="margin-top: 24px;">
+      <div class="management-detail-header">
+        <h2><i class='bx bx-download'></i> Evidence Activity</h2>
+      </div>
+      <div class="management-detail-body">
+        <div class="management-detail-row">
+          <span class="management-detail-label">Evidence Uploads</span>
+          <span class="management-detail-value">{{ evidence_activity.uploads }}</span>
+        </div>
+        <div class="management-detail-row">
+          <span class="management-detail-label">Evidence Downloads</span>
+          <span class="management-detail-value">{{ evidence_activity.downloads }}</span>
+        </div>
+      </div>
+      {% if evidence_activity.recent_logs %}
+      <div class="management-detail-body" style="padding: 0 24px 24px;">
+        <h4 style="margin: 16px 0 12px; font-size: 14px; color: #64748b;">Recent Download Logs</h4>
+        <ul class="management-activity-list" style="padding: 0;">
+          {% for log in evidence_activity.recent_logs %}
+          <li class="management-activity-item">
+            <div class="management-activity-icon view">
+              <i class='bx bx-download'></i>
+            </div>
+            <div class="management-activity-content">
+              <div class="management-activity-action">{{ log.action|title }}: {{ log.evidence.description|truncatewords:10 }}</div>
+              <div class="management-activity-time">{{ log.timestamp|date:"M d, Y H:i" }}</div>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
     </div>
   </div>
 
@@ -161,7 +204,7 @@
         <h2><i class='bx bx-briefcase'></i> Assignments</h2>
       </div>
       <div class="management-detail-body">
-        {% if target_user.role in 'analyst','investigator' %}
+        {% if target_user.role == 'analyst' or target_user.role == 'investigator' %}
         <div class="management-detail-row">
           <span class="management-detail-label">Cases Created</span>
           <span class="management-detail-value">{{ assignments.cases_created }}</span>
