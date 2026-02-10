@@ -63,13 +63,11 @@ class Evidence(models.Model):
         return sha256.hexdigest()
 
     def encrypt_file(self, file_obj, cipher):
-        encrypted_chunks = []
-        for chunk in file_obj.chunks():
-            padded_data = self._pad_data(chunk)
-            encryptor = cipher.encryptor()
-            encrypted_chunk = encryptor.update(padded_data) + encryptor.finalize()
-            encrypted_chunks.append(encrypted_chunk)
-        return b''.join(encrypted_chunks)
+        encryptor = cipher.encryptor()
+        file_content = file_obj.read()
+        padded_data = self._pad_data(file_content)
+        encrypted_data = encryptor.update(padded_data) + encryptor.finalize()
+        return encrypted_data
 
     def decrypt_file(self, encrypted_file, cipher):
         decryptor = cipher.decryptor()
