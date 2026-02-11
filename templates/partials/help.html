@@ -101,7 +101,7 @@
           <div class="help-concept-icon">1</div>
           <div>
             <strong>Created</strong>
-            <p>Case is created by regular user. Add details and submit for review.</p>
+            <p>Case is created by regular user. Storage location and custodian are automatically assigned. Add details and submit for review.</p>
           </div>
         </div>
         <div class="help-concept-item">
@@ -180,6 +180,13 @@
             <p>Every action in the system is logged automatically, creating a tamper-proof record for compliance and legal proceedings.</p>
           </div>
         </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon"><i class='bx bx-user-check'></i></div>
+          <div>
+            <strong>Automatic Custodian Assignment</strong>
+            <p>When a case is created, a custodian and storage location are randomly assigned from available resources to ensure fair distribution.</p>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -210,6 +217,10 @@
           <summary>What are custody actions?</summary>
           <p>Custody actions include: Stored (evidence stored in a location), Retrieved (evidence retrieved from storage), Transferred (custody transferred to another user), Verified (integrity verified), Archived (archived for long-term storage), and Moved (moved between storage locations).</p>
         </details>
+        <details class="help-faq-item">
+          <summary>How is a custodian assigned to a case?</summary>
+          <p>When a case is created, the system automatically assigns a custodian and storage location randomly from available custodians to ensure balanced workload distribution.</p>
+        </details>
       </div>
     </div>
 
@@ -228,7 +239,7 @@
           <span class="help-step-number">2</span>
           <div class="help-step-text">
             <strong>Add Case Details</strong>
-            <p>Fill in the case title, description, and relevant information.</p>
+            <p>Fill in the case title, description, and relevant information. A custodian and storage will be automatically assigned.</p>
           </div>
         </div>
         <div class="help-step">
@@ -278,7 +289,7 @@
           <div class="help-concept-icon">1</div>
           <div>
             <strong>Created</strong>
-            <p>You create the case and add all necessary details.</p>
+            <p>You create the case and add all necessary details. A custodian and storage location are automatically assigned by the system.</p>
           </div>
         </div>
         <div class="help-concept-item">
@@ -336,6 +347,13 @@
             <p>Every action on your case is logged automatically for transparency and accountability.</p>
           </div>
         </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon"><i class='bx bx-user-check'></i></div>
+          <div>
+            <strong>Automatic Custodian Assignment</strong>
+            <p>When you create a case, the system automatically assigns a custodian and storage location to manage evidence custody.</p>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -344,7 +362,7 @@
       <div class="help-faq-list">
         <details class="help-faq-item">
           <summary>How do I create a new case?</summary>
-          <p>Click "Create Case" in the sidebar, fill in the case title and description, and click submit. Your case will then be available for assignment to an investigator.</p>
+          <p>Click "Create Case" in the sidebar, fill in the case title and description, and click submit. A custodian and storage location will be automatically assigned. Your case will then be available for assignment to an investigator.</p>
         </details>
         <details class="help-faq-item">
           <summary>Can I edit a case after I submit it?</summary>
@@ -361,6 +379,10 @@
         <details class="help-faq-item">
           <summary>How do I close my case?</summary>
           <p>You can request case closure, but final approval must come from an administrator after all evidence has been verified and reports have been reviewed.</p>
+        </details>
+        <details class="help-faq-item">
+          <summary>Who decides which custodian handles my case?</summary>
+          <p>The system automatically assigns a custodian and storage location randomly when you create a case. This ensures fair distribution of cases among available custodians.</p>
         </details>
       </div>
     </div>
@@ -734,7 +756,7 @@
 
     <div class="help-section">
       <h3><i class='bx bx-box'></i> Custodian Permissions</h3>
-      <p>As a Custodian, you are responsible for the physical and digital storage of evidence. You manage storage locations and approve custody transfers to maintain the chain of custody.</p>
+      <p>As a Custodian, you are responsible for the physical and digital storage of evidence. You manage storage locations and approve custody transfers to maintain the chain of custody. Cases are automatically assigned to you when created.</p>
       <ul class="help-permissions">
         <li><i class='bx bx-check'></i> Create and manage storage locations</li>
         <li><i class='bx bx-check'></i> Approve or reject custody transfers</li>
@@ -743,6 +765,7 @@
         <li><i class='bx bx-check'></i> Update storage conditions and notes</li>
         <li><i class='bx bx-check'></i> Track evidence movement history</li>
         <li><i class='bx bx-check'></i> Request custody transfers</li>
+        <li><i class='bx bx-check'></i> Receive automatic case assignments</li>
       </ul>
       <div class="help-restrictions">
         <h4><i class='bx bx-block'></i> Restrictions</h4>
@@ -784,6 +807,41 @@
           <div>
             <strong>Conditions & Notes</strong>
             <p>Update storage conditions, environmental controls, and maintenance notes.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <h3><i class='bx bx-user-check'></i> Automatic Case Assignment</h3>
+      <p>Cases are automatically assigned to you:</p>
+      <div class="help-concept-list">
+        <div class="help-concept-item">
+          <div class="help-concept-icon">1</div>
+          <div>
+            <strong>Random Selection</strong>
+            <p>When a case is created, the system randomly selects a custodian from available custodians.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon">2</div>
+          <div>
+            <strong>Storage Assignment</strong>
+            <p>A storage location is also randomly assigned from available locations.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon">3</div>
+          <div>
+            <strong>Balanced Distribution</strong>
+            <p>This ensures fair workload distribution among all custodians.</p>
+          </div>
+        </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon">4</div>
+          <div>
+            <strong>Notification</strong>
+            <p>You are notified when a case is assigned to you.</p>
           </div>
         </div>
       </div>
@@ -848,6 +906,13 @@
             <p>All storage assignments and transfer approvals are logged for compliance and legal proceedings.</p>
           </div>
         </div>
+        <div class="help-concept-item">
+          <div class="help-concept-icon"><i class='bx bx-user-check'></i></div>
+          <div>
+            <strong>Automatic Assignment</strong>
+            <p>You receive case assignments automatically when new cases are created. This ensures balanced workload distribution.</p>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -873,6 +938,14 @@
         <details class="help-faq-item">
           <summary>What are the different storage types?</summary>
           <p>Physical (secure rooms, vaults, evidence lockers), Digital (servers, external drives, network storage), and Cloud (encrypted cloud storage platforms).</p>
+        </details>
+        <details class="help-faq-item">
+          <summary>How are cases assigned to me?</summary>
+          <p>When a new case is created, the system randomly selects a custodian and storage location from available resources. This ensures fair distribution of cases among all custodians.</p>
+        </details>
+        <details class="help-faq-item">
+          <summary>Can I transfer a case to another custodian?</summary>
+          <p>Contact an administrator to reassign a case if needed. The system handles initial assignment automatically, but administrators can make changes when necessary.</p>
         </details>
       </div>
     </div>
