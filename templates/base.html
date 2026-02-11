@@ -191,11 +191,11 @@
             <i class='bx bx-analyse'></i>
             <span>Evidence Analysis</span>
           </a>
-          <a href="{% url 'cases:case_list' %}" class="sidebar-link">
+          <a href="{% url 'auditor:integrity_check' %}" class="sidebar-link {% if '/auditor/integrity-check/' in request.path %}active{% endif %}">
             <i class='bx bx-check-shield'></i>
             <span>Integrity Verification</span>
           </a>
-          <a href="{% url 'cases:case_list' %}" class="sidebar-link">
+          <a href="{% url 'reports:dashboard' %}" class="sidebar-link {% if '/reports/' in request.path %}active{% endif %}">
             <i class='bx bx-file-blank'></i>
             <span>Analysis Reports</span>
           </a>

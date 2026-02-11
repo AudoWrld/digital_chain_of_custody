@@ -14,7 +14,6 @@ from datetime import timedelta
 @role_required("auditor")
 def auditor_dashboard(request):
     """Auditor dashboard - overview of all audit activities"""
-    # Get statistics
     total_cases = Case.objects.count()
     total_evidence = Evidence.objects.count()
     valid_evidence = Evidence.objects.filter(metadata_valid=True).count()
@@ -118,7 +117,7 @@ def case_audit_logs(request, case_id):
 
 
 @login_required
-@role_required("auditor")
+@role_required("auditor", "analyst")
 def chain_of_custody_report(request):
     """Chain of custody report - shows custody chain for all evidence"""
     # Get all evidence with their custody logs
@@ -146,7 +145,7 @@ def chain_of_custody_report(request):
 
 
 @login_required
-@role_required("auditor")
+@role_required("auditor", "analyst")
 def evidence_integrity_check(request):
     """Integrity check view - shows evidence integrity status"""
     # Get all evidence with integrity information
