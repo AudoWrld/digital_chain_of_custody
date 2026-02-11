@@ -44,16 +44,6 @@
       </div>
     </div>
 
-    <div class="stat-card stat-success">
-      <div class="stat-icon">
-        <i class='bx bx-time-five'></i>
-      </div>
-      <div class="stat-content">
-        <div class="stat-value">{{ pending_review|length }}</div>
-        <div class="stat-label">Pending Review</div>
-      </div>
-    </div>
-
     <div class="stat-card stat-secondary">
       <div class="stat-icon">
         <i class='bx bx-briefcase'></i>
@@ -79,7 +69,7 @@
     <div class="dashboard-section">
       <div class="section-header">
         <h2>My Recent Reports</h2>
-        <a href="#" class="view-all-link">View All</a>
+        <a href="{% url 'reports:my_reports' %}" class="view-all-link">View All</a>
       </div>
       {% if my_reports %}
       <div class="recent-list">
@@ -95,7 +85,7 @@
               <span class="date">{{ report.created_at|date:"M d, Y" }}</span>
             </div>
           </div>
-          <a href="{% url 'reports:view' report.id %}" class="recent-item-action">
+          <a href="{% url 'reports:evidence_reports' report.evidence.id %}" class="recent-item-action">
             <i class='bx bx-right-arrow-alt'></i>
           </a>
         </div>
@@ -151,7 +141,7 @@
     <div class="dashboard-section">
       <div class="section-header">
         <h2>Recent Evidence</h2>
-        <a href="#" class="view-all-link">View All</a>
+        <a href="{% url 'evidence:all_evidence' %}" class="view-all-link">View All</a>
       </div>
       {% if recent_evidence %}
       <div class="recent-list">
@@ -167,7 +157,7 @@
               <span class="date">{{ evidence.date_uploaded|date:"M d, Y" }}</span>
             </div>
           </div>
-          <a href="{% url 'evidence:view_evidence' evidence.id %}" class="recent-item-action">
+          <a href="{% url 'evidence:view' evidence.id %}" class="recent-item-action">
             <i class='bx bx-right-arrow-alt'></i>
           </a>
         </div>
@@ -196,14 +186,14 @@
           <div class="quick-action-title">View Cases</div>
           <div class="quick-action-description">Browse all cases</div>
         </a>
-        <a href="#" class="quick-action-card">
+        <a href="{% url 'reports:my_reports' %}" class="quick-action-card">
           <div class="quick-action-icon">
             <i class='bx bx-file-blank'></i>
           </div>
           <div class="quick-action-title">View Reports</div>
           <div class="quick-action-description">Browse all analysis reports</div>
         </a>
-        <a href="#" class="quick-action-card">
+        <a href="{% url 'evidence:all_evidence' %}" class="quick-action-card">
           <div class="quick-action-icon">
             <i class='bx bx-check-shield'></i>
           </div>
