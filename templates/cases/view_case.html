@@ -168,6 +168,9 @@
         <a href="{% url 'cases:request_case_closure' case.case_id %}" class="view-case-action-btn view-case-action-warning">Request Closure</a>
         {% endif %}
         <a href="{% url 'cases:case_report' case.case_id %}" class="view-case-action-btn view-case-action-secondary">Case Report</a>
+        {% if not case.closure_requested and case.case_status not in 'Closed,Archived,Withdrawn,Invalid' and not case.conclusion %}
+        <a href="{% url 'cases:request_case_closure' case.case_id %}" class="view-case-action-btn view-case-action-warning">Request Closure</a>
+        {% endif %}
         <a href="{% url 'cases:case_list' %}" class="view-case-action-btn view-case-action-secondary">Back to Cases</a>
       {% elif user.role == 'investigator' %}
         {% if not investigator_status or not investigator_status.accepted %}
@@ -181,7 +184,7 @@
         {% if case.case_status not in 'Closed,Archived,Withdrawn,Invalid' %}
         <a href="{% url 'cases:conclude_case' case.case_id %}" class="view-case-action-btn view-case-action-success">Conclude Case</a>
         {% endif %}
-        {% if not case.closure_requested %}
+        {% if not case.closure_requested and case.case_status not in 'Closed,Archived,Withdrawn,Invalid' and not case.conclusion %}
         <a href="{% url 'cases:request_case_closure' case.case_id %}" class="view-case-action-btn view-case-action-warning">Request Closure</a>
         {% endif %}
         {% endif %}
