@@ -1,0 +1,251 @@
+.user-case-reports-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+.user-case-reports-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.user-case-reports-title h1 {
+    margin: 0 0 8px 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.user-case-reports-subtitle {
+    font-size: 14px;
+    color: #64748b;
+}
+
+.user-case-reports-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.user-case-report-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    padding: 24px;
+    overflow: hidden;
+}
+
+.user-case-report-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.user-case-report-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.user-case-report-title h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.user-case-report-conclusion {
+    font-size: 14px;
+    color: #475569;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    border: 1px solid #e2e8f0;
+}
+
+.user-case-report-conclusion strong {
+    color: #1e293b;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.user-case-report-item {
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.user-case-report-item:last-child {
+    margin-bottom: 0;
+}
+
+.user-case-report-item-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 8px;
+}
+
+.user-case-report-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #64748b;
+}
+
+.user-case-report-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px dashed #e2e8f0;
+}
+
+.user-case-report-empty i {
+    font-size: 32px;
+    color: #cbd5e1;
+    margin-bottom: 8px;
+}
+
+.user-case-report-empty p {
+    margin: 0;
+    font-size: 14px;
+    color: #64748b;
+}
+
+.user-case-reports-empty {
+    text-align: center;
+    padding: 80px 24px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 2px dashed #e2e8f0;
+}
+
+.user-case-reports-empty i {
+    font-size: 64px;
+    color: #cbd5e1;
+    margin-bottom: 20px;
+}
+
+.user-case-reports-empty h3 {
+    margin: 0 0 8px 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.user-case-reports-empty p {
+    margin: 0 0 24px 0;
+    font-size: 14px;
+    color: #64748b;
+}
+
+.cases-status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.cases-status-badge.open {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.cases-status-badge.pending-admin-approval {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.cases-status-badge.approved-assigned {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.cases-status-badge.under-review {
+    background: #e0e7ff;
+    color: #4f46e5;
+}
+
+.cases-status-badge.closed {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.cases-status-badge.archived {
+    background: #e2e8f0;
+    color: #64748b;
+}
+
+.cases-status-badge.invalid {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.cases-status-badge.withdrawn {
+    background: #fef9c3;
+    color: #ca8a04;
+}
+
+.view-case-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+.view-case-action-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.view-case-action-btn-primary {
+    background: #3b82f6;
+    color: #ffffff;
+}
+
+.view-case-action-btn-secondary {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.view-case-action-btn-secondary:hover {
+    background: #e2e8f0;
+}
+
+.view-case-action-btn-success {
+    background: #10b981;
+    color: #ffffff;
+}
+
+.view-case-action-btn-warning {
+    background: #f59e0b;
+    color: #ffffff;
+}
+
+.view-case-action-btn-danger {
+    background: #ef4444;
+    color: #ffffff;
+}
