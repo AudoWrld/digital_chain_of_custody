@@ -167,7 +167,7 @@ def analyst_dashboard(request):
     
     pending_review = AnalysisReport.objects.filter(status='submitted').order_by('-created_at')
     
-    cases_in_analysis = Case.objects.filter(case_status='Approved & Assigned').order_by('-created_at')
+    cases_in_analysis = Case.objects.filter(case_status='Approved & Assigned').order_by('-date_created')
     
     recent_evidence = Evidence.objects.filter(
         case__case_status='Approved & Assigned'
