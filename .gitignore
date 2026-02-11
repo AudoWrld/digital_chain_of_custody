@@ -18,6 +18,9 @@ venv/
 # Media files
 media/
 
+# Static files
+staticfiles/
+
 # IDE specific files
 .idea/
 .vscode/
@@ -26,3 +29,6 @@ media/
 .env
 credentials.json
 token.pickle
+
+# Error logs
+error.log
