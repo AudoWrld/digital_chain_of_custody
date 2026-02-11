@@ -88,6 +88,8 @@ def create_case(request):
     return render(request, "cases/create_case.html", {"form": form})
 
 
+from reports.models import AnalysisReport
+
 @login_required
 def view_case(request, case_id):
     case = get_object_or_404(Case, case_id=case_id)
@@ -149,6 +151,9 @@ def view_case(request, case_id):
     case_category = case.get_category()
 
     media_files = case.evidence.all()
+    
+    for media in media_files:
+        media.has_analysis = AnalysisReport.objects.filter(evidence=media, status='submitted').exists()
 
     investigators = User.objects.filter(
         role="investigator", is_active=True, verified=True
