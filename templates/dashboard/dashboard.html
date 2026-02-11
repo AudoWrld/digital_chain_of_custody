@@ -333,7 +333,7 @@
             <div class="recent-item-title">{{ case.get_title }}</div>
             <div class="recent-item-meta">
               <span class="status-badge status-{{ case.case_status|lower }}">{{ case.case_status }}</span>
-              <span class="date">{{ case.created_at|date:"M d, Y" }}</span>
+              <span class="date">{{ case.date_created|date:"M d, Y" }}</span>
             </div>
           </div>
           <a href="{% url 'cases:view_case' case.id %}" class="recent-item-action">
