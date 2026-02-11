@@ -1,216 +1,70 @@
 {% extends 'base.html' %}
 {% load static %}
+
 {% block title %}My Reports - ChainProof{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/dashboard/dashboard.css' %}?v={{ STATIC_VERSION }}" />
-<link rel="stylesheet" href="{% static 'css/cases/case_list.css' %}?v={{ STATIC_VERSION }}" />
+<link rel="stylesheet" href="{% static 'css/reports/my_reports.css' %}?v={{ STATIC_VERSION }}" />
 {% endblock %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/auditor/chain_of_custody_report.css' %}?v={{ STATIC_VERSION }}" />
-<style>
-  .my-reports-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 28px;
-    padding: 0 4px;
-  }
-
-  .my-reports-title h1 {
-    margin: 0;
-    font-size: 26px;
-    font-weight: 700;
-    color: #1e293b;
-  }
-
-  .my-reports-count {
-    background: #3b82f6;
-    color: #ffffff;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 600;
-  }
-
-  .my-reports-card {
-    background: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-    overflow: hidden;
-    margin-bottom: 28px;
-  }
-
-  .my-reports-section-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 18px 24px;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    border-bottom: 2px solid #e2e8f0;
-  }
-
-  .my-reports-section-header i {
-    font-size: 22px;
-    color: #3b82f6;
-  }
-
-  .my-reports-section-title {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 600;
-    color: #1e293b;
-  }
-
-  .my-reports-count-badge {
-    margin-left: auto;
-    background: #e2e8f0;
-    color: #475569;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 600;
-  }
-
-  .my-reports-list {
-    padding: 0;
-  }
-
-  .my-report-item {
-    display: flex;
-    align-items: center;
-    padding: 18px 24px;
-    border-bottom: 1px solid #e2e8f0;
-    transition: background 0.2s;
-  }
-
-  .my-report-item:last-child {
-    border-bottom: none;
-  }
-
-  .my-report-item:hover {
-    background: #f8fafc;
-  }
-
-  .my-report-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 16px;
-  }
-
-  .my-report-icon i {
-    font-size: 20px;
-    color: #2563eb;
-  }
-
-  .my-report-content {
-    flex: 1;
-  }
-
-  .my-report-title {
-    font-size: 15px;
-    font-weight: 600;
-    color: #1e293b;
-    margin-bottom: 4px;
-  }
-
-  .my-report-meta {
-    font-size: 13px;
-    color: #64748b;
-  }
-
-  .my-report-meta a {
-    color: #3b82f6;
-    text-decoration: none;
-  }
-
-  .my-report-meta a:hover {
-    text-decoration: underline;
-  }
-
-  .my-report-status {
-    margin-left: auto;
-  }
-
-  .my-report-date {
-    font-size: 12px;
-    color: #64748b;
-    margin-top: 4px;
-    text-align: right;
-  }
-
-  .my-reports-empty {
-    text-align: center;
-    padding: 60px 24px;
-    background: #f8fafc;
-    border-radius: 12px;
-    border: 2px dashed #e2e8f0;
-  }
-
-  .my-reports-empty i {
-    font-size: 56px;
-    color: #cbd5e1;
-    margin-bottom: 20px;
-  }
-
-  .my-reports-empty p {
-    font-size: 15px;
-    color: #64748b;
-    margin: 0;
-  }
-</style>
-
-<div class="my-reports-header">
-  <div class="my-reports-title">
-    <h1>My Reports</h1>
-  </div>
-  <span class="my-reports-count">{{ total_count }} Reports Submitted</span>
-</div>
-
-{% if reports %}
-<div class="my-reports-card">
-  <div class="my-reports-section-header">
-    <i class='bx bx-file-alt'></i>
-    <h2 class="my-reports-section-title">Submitted Analysis Reports</h2>
-    <span class="my-reports-count-badge">{{ reports|length }} items</span>
-  </div>
-  <div class="my-reports-list">
-    {% for report in reports %}
-    <div class="my-report-item">
-      <div class="my-report-icon">
-        <i class='bx bx-file'></i>
-      </div>
-      <div class="my-report-content">
-        <div class="my-report-title">{{ report.title }}</div>
-        <div class="my-report-meta">
-          Case: <a href="{% url 'cases:view_case' report.case.case_id %}">{{ report.case.case_id }}</a>
-          {% if report.evidence %}
-          | Evidence: #{{ report.evidence.id }}
-          {% endif %}
+<div class="my-reports-container">
+    <div class="my-reports-header">
+        <div class="my-reports-title">
+            <h1>My Reports</h1>
         </div>
-      </div>
-      <div class="my-report-status">
-        <span class="cases-status-badge cases-status-approved">
-          <i class='bx bx-check'></i> {{ report.get_status_display }}
-        </span>
-      </div>
-      <div class="my-report-date">
-        {{ report.created_at|date:"M d, Y H:i" }}
-      </div>
+        <span class="my-reports-count">{{ total_count }} Reports Submitted</span>
     </div>
-    {% endfor %}
-  </div>
+
+    {% if reports %}
+    <div class="my-reports-card">
+        <div class="my-reports-section-header">
+            <i class='bx bx-file-alt'></i>
+            <h2 class="my-reports-section-title">Submitted Analysis Reports</h2>
+            <span class="my-reports-count-badge">{{ reports|length }} items</span>
+        </div>
+        <div class="my-reports-list">
+            {% for report in reports %}
+            <a href="{% url 'reports:evidence_reports' report.evidence.id %}" class="my-report-item">
+                <div class="my-report-icon">
+                    <i class='bx bx-file'></i>
+                </div>
+                <div class="my-report-content">
+                    <div class="my-report-title">{{ report.title }}</div>
+                    <div class="my-report-meta">
+                        <span>Case: <a href="{% url 'cases:view_case' report.case.case_id %}">{{ report.case.case_id }}</a></span>
+                        {% if report.evidence %}
+                        <span>| Evidence: #{{ report.evidence.id }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="my-report-actions">
+                    <span class="cases-status-badge cases-status-{{ report.status }}">
+                        {% if report.status == 'draft' %}
+                            <i class='bx bx-pencil'></i>
+                        {% elif report.status == 'submitted' %}
+                            <i class='bx bx-send'></i>
+                        {% elif report.status == 'reviewed' %}
+                            <i class='bx bx-check-circle'></i>
+                        {% elif report.status == 'approved' %}
+                            <i class='bx bx-award'></i>
+                        {% endif %}
+                        {{ report.get_status_display }}
+                    </span>
+                    <span class="my-report-date">{{ report.created_at|date:"M d, Y H:i" }}</span>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="my-reports-empty">
+        <i class='bx bx-file-blank'></i>
+        <p>No reports submitted yet. Analyze evidence to create reports.</p>
+        <a href="{% url 'evidence:all_evidence' %}" class="dashboard-create-btn">
+            <i class='bx bx-search'></i> Browse Evidence
+        </a>
+    </div>
+    {% endif %}
 </div>
-{% else %}
-<div class="my-reports-empty">
-  <i class='bx bx-file-blank'></i>
-  <p>No reports submitted yet. Analyze evidence to create reports.</p>
-</div>
-{% endif %}
 {% endblock %}
