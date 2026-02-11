@@ -39,7 +39,6 @@
 
 .integrity-btn:hover {
     background: #2563eb;
-    transform: translateY(-1px);
 }
 
 .integrity-btn-secondary {
@@ -71,7 +70,6 @@
 }
 
 .integrity-stat-card:hover {
-    transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
@@ -336,7 +334,6 @@
 
 .integrity-view-history-btn:hover {
     background: #2563eb;
-    transform: translateY(-1px);
 }
 
 .integrity-upload-date {
@@ -344,7 +341,6 @@
     color: #64748b;
 }
 
-/* Empty State */
 .integrity-empty-state {
     text-align: center;
     padding: 60px 24px;

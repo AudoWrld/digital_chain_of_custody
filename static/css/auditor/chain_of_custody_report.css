@@ -39,7 +39,6 @@
 
 .coc-btn:hover {
     background: #2563eb;
-    transform: translateY(-1px);
 }
 
 .coc-btn-secondary {
@@ -74,7 +73,6 @@
 }
 
 .coc-stat-card:hover {
-    transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
@@ -292,7 +290,6 @@
 
 .coc-action-btn:hover {
     background: #2563eb;
-    transform: translateY(-1px);
 }
 
 .coc-empty-state {
