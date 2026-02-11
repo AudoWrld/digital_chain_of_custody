@@ -58,6 +58,7 @@ def upload_evidence(request, case_id):
                         user=request.user,
                         action="stored",
                         details=f"Evidence {evidence.original_filename} stored in {case_storage.storage_name}",
+                        to_location=storage_location,
                     )
 
             if not evidence.metadata_valid:
@@ -216,7 +217,7 @@ def analyze_evidence(request, evidence_id):
 
 
 @login_required
-@role_required("analyst", "admin")
+@role_required("analyst", "admin", "custodian")
 def verify_evidence_integrity(request, evidence_id):
     evidence = get_object_or_404(Evidence, id=evidence_id)
 

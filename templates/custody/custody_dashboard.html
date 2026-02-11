@@ -13,26 +13,6 @@
   </div>
 
   <div class="stats-grid">
-    <div class="stat-card stat-primary">
-      <div class="stat-icon">
-        <i class='bx bx-transfer'></i>
-      </div>
-      <div class="stat-content">
-        <div class="stat-value">{{ pending_transfers_count }}</div>
-        <div class="stat-label">Pending Transfers</div>
-      </div>
-    </div>
-
-    <div class="stat-card stat-success">
-      <div class="stat-icon">
-        <i class='bx bx-history'></i>
-      </div>
-      <div class="stat-content">
-        <div class="stat-value">{{ my_transfers_count }}</div>
-        <div class="stat-label">My Transfers</div>
-      </div>`
-    </div>
-
     <div class="stat-card stat-info">
       <div class="stat-icon">
         <i class='bx bx-hdd'></i>
@@ -55,72 +35,6 @@
   </div>
 
   <div class="dashboard-content" style="margin-top: 24px;">
-    <div class="dashboard-section">
-      <div class="section-header">
-        <h2>Pending Transfers</h2>
-        <a href="{% url 'custody:case_storages' %}" class="view-all-link">View All</a>
-      </div>
-      <div class="recent-list">
-        {% if pending_transfers %}
-          {% for transfer in pending_transfers %}
-          <div class="recent-item">
-            <div class="recent-item-icon">
-              <i class='bx bx-transfer'></i>
-            </div>
-            <div class="recent-item-content">
-              <div class="recent-item-title">{{ transfer.evidence.description }}</div>
-              <div class="recent-item-meta">
-                <span class="user">From: {{ transfer.from_user.get_full_name|default:transfer.from_user.username }}</span>
-                <span class="user">To: {{ transfer.to_user.get_full_name|default:transfer.to_user.username }}</span>
-                <span class="date">{{ transfer.created_at|date:"M d, Y H:i" }}</span>
-              </div>
-            </div>
-            <a href="{% url 'custody:approve_transfer' transfer.id %}" class="recent-item-action">
-              <i class='bx bx-right-arrow-alt'></i>
-            </a>
-          </div>
-          {% endfor %}
-        {% else %}
-          <div class="empty-state">
-            <i class='bx bx-check-circle'></i>
-            <p>No pending transfers</p>
-          </div>
-        {% endif %}
-      </div>
-    </div>
-
-    <div class="dashboard-section">
-      <div class="section-header">
-        <h2>My Transfers</h2>
-        <a href="{% url 'custody:case_storages' %}" class="view-all-link">View All</a>
-      </div>
-      <div class="recent-list">
-        {% if my_transfers %}
-          {% for transfer in my_transfers %}
-          <div class="recent-item">
-            <div class="recent-item-icon">
-              <i class='bx bx-history'></i>
-            </div>
-            <div class="recent-item-content">
-              <div class="recent-item-title">{{ transfer.evidence.description }}</div>
-              <div class="recent-item-meta">
-                <span class="user">From: {{ transfer.from_user.get_full_name|default:transfer.from_user.username }}</span>
-                <span class="user">To: {{ transfer.to_user.get_full_name|default:transfer.to_user.username }}</span>
-                <span class="status-badge status-{{ transfer.status }}">{{ transfer.status|title }}</span>
-                <span class="date">{{ transfer.created_at|date:"M d, Y H:i" }}</span>
-              </div>
-            </div>
-          </div>
-          {% endfor %}
-        {% else %}
-          <div class="empty-state">
-            <i class='bx bx-history'></i>
-            <p>No transfers found</p>
-          </div>
-        {% endif %}
-      </div>
-    </div>
-
     <div class="dashboard-section">
       <div class="section-header">
         <h2>My Case Storages</h2>
@@ -228,23 +142,6 @@
           <div class="quick-action-title">Manage Case Storages</div>
           <div class="quick-action-description">View assigned case storages</div>
         </a>
-
-        <a href="{% url 'cases:case_list' %}" class="quick-action-card">
-          <div class="quick-action-icon">
-            <i class='bx bx-folder'></i>
-          </div>
-          <div class="quick-action-title">View Cases</div>
-          <div class="quick-action-description">Browse all cases</div>
-        </a>
-
-        <a href="{% url 'cases:case_list' %}?stage=analysis" class="quick-action-card">
-          <div class="quick-action-icon">
-            <i class='bx bx-search'></i>
-          </div>
-          <div class="quick-action-title">Cases in Analysis</div>
-          <div class="quick-action-description">View analysis cases</div>
-        </a>
-
         <a href="{% url 'custody:case_storages' %}" class="quick-action-card">
           <div class="quick-action-icon">
             <i class='bx bx-list-check'></i>
