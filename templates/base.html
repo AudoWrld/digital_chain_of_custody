@@ -179,7 +179,7 @@
         
         {% elif user.role == 'analyst' %}
         <nav class="sidebar-section">
-          <a href="{% url 'reports:dashboard' %}" class="sidebar-link {% if '/reports/' in request.path %}active{% endif %}">
+          <a href="{% url 'reports:dashboard' %}" class="sidebar-link {% if request.path == '/reports/dashboard/' %}active{% endif %}">
             <i class='bx bx-home'></i>
             <span>Dashboard</span>
           </a>
@@ -191,7 +191,7 @@
             <i class='bx bx-analyse'></i>
             <span>Evidence Analysis</span>
           </a>
-          <a href="{% url 'reports:my_reports' %}" class="sidebar-link {% if '/reports/my-reports' in request.path %}active{% endif %}">
+          <a href="{% url 'reports:my_reports' %}" class="sidebar-link {% if '/reports/' in request.path and '/reports/dashboard/' not in request.path %}active{% endif %}">
             <i class='bx bx-file-blank'></i>
             <span>Analysis Reports</span>
           </a>
