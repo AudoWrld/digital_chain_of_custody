@@ -131,7 +131,7 @@
             <i class='bx bx-archive'></i>
             <span>My Evidence</span>
           </a>
-          <a href="#" class="sidebar-link">
+          <a href="{% url 'reports:user_case_reports' %}" class="sidebar-link {% if '/reports/user-case-reports/' in request.path %}active{% endif %}">
             <i class='bx bx-file-blank'></i>
             <span>Case Reports</span>
           </a>

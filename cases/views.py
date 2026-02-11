@@ -740,3 +740,62 @@ def mark_under_review(request, case_id):
     
     messages.success(request, "Case marked as under review")
     return redirect("cases:view_case", case_id=case.case_id)
+
+
+@login_required
+@role_required('investigator')
+def conclude_case(request, case_id):
+    case = get_object_or_404(Case, case_id=case_id)
+    
+    if request.user not in case.assigned_investigators.all():
+        return HttpResponseForbidden("You are not assigned to this case")
+    
+    if case.case_status == "Closed":
+        return HttpResponseForbidden("Cannot conclude a closed case")
+    
+    if request.method == 'POST':
+        conclusion = request.POST.get('conclusion', '')
+        final_report = request.POST.get('final_report', '')
+        
+        case.conclusion = conclusion
+        case.final_report = final_report
+        case.case_concluded_by = request.user
+        case.case_concluded_at = timezone.now()
+        case.case_status = "Closed"
+        case.save()
+        
+        CaseAuditLog.log_action(
+            user=request.user,
+            case=case,
+            action="Case concluded by investigator",
+            details=f"Conclusion: {conclusion[:200]}"
+        )
+        
+        messages.success(request, "Case has been concluded and closed")
+        return redirect("cases:view_case", case_id=case.case_id)
+    
+    return render(request, 'cases/conclude_case.html', {'case': case})
+
+
+@login_required
+def case_report(request, case_id):
+    case = get_object_or_404(Case, case_id=case_id)
+    
+    # Check access
+    if (
+        request.user != case.created_by
+        and request.user not in case.assigned_investigators.all()
+        and not request.user.is_staff
+        and request.user.role not in ('analyst', 'auditor')
+    ):
+        return HttpResponseForbidden("Not authorized to view this case report")
+    
+    # Get all reports for this case
+    from reports.models import AnalysisReport
+    reports = AnalysisReport.objects.filter(case=case).select_related('evidence', 'created_by').order_by('-created_at')
+    
+    context = {
+        'case': case,
+        'reports': reports,
+    }
+    return render(request, 'cases/case_report.html', context)

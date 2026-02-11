@@ -41,6 +41,11 @@ urlpatterns = [
     path(
         "<str:case_id>/under-review/", views.mark_under_review, name="mark_under_review"
     ),
+    path(
+        "<str:case_id>/conclude/", views.conclude_case, name="conclude_case"
+    ),
     # --- AUDIT LOGS ---
     path("<str:case_id>/audit/", views.view_case_audit_log, name="view_case_audit_log"),
+    # --- CASE REPORTS ---
+    path("<str:case_id>/report/", views.case_report, name="case_report"),
 ]

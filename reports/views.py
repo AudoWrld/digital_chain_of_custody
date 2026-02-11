@@ -194,3 +194,22 @@ def my_reports(request):
         'total_count': total_count,
     }
     return render(request, 'reports/my_reports.html', context)
+
+
+@login_required
+@role_required('regular_user')
+def user_case_reports(request):
+    """View all case reports for regular user's cases"""
+    # Get all cases created by this user
+    cases = Case.objects.filter(created_by=request.user).order_by('-date_created')
+    
+    # Get all reports for these cases
+    reports = AnalysisReport.objects.filter(
+        case__in=cases
+    ).select_related('case', 'evidence', 'created_by').order_by('-created_at')
+    
+    context = {
+        'cases': cases,
+        'reports': reports,
+    }
+    return render(request, 'reports/user_case_reports.html', context)

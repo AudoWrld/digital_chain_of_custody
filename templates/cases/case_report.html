@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Case Report - {{ case.case_id }} - ChainProof{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard/dashboard.css' %}?v={{ STATIC_VERSION }}" />
+<link rel="stylesheet" href="{% static 'css/cases/case_list.css' %}?v={{ STATIC_VERSION }}" />
+{% endblock %}
+
+{% block content %}
+<div class="case-report-container">
+    <div class="case-report-header">
+        <div class="case-report-title">
+            <h1>Case Report</h1>
+            <p class="case-report-subtitle">{{ case.case_id }} - {{ case.get_title }}</p>
+        </div>
+        <div class="case-report-actions">
+            <a href="{% url 'cases:view_case' case.case_id %}" class="dashboard-create-btn" style="background: #64748b;">
+                <i class='bx bx-arrow-back'></i> Back to Case
+            </a>
+        </div>
+    </div>
+
+    <div class="case-report-section">
+        <h2 class="case-report-section-title">Case Details</h2>
+        <div class="case-report-details">
+            <div class="case-report-detail-item">
+                <span class="case-report-detail-label">Status</span>
+                <span class="case-report-detail-value">
+                    <span class="cases-status-badge cases-status-{{ case.case_status|lower }}">
+                        {{ case.get_case_status_display }}
+                    </span>
+                </span>
+            </div>
+            <div class="case-report-detail-item">
+                <span class="case-report-detail-label">Category</span>
+                <span class="case-report-detail-value">{{ case.get_category }}</span>
+            </div>
+            <div class="case-report-detail-item">
+                <span class="case-report-detail-label">Created By</span>
+                <span class="case-report-detail-value">{{ case.created_by.get_full_name|default:case.created_by.username }}</span>
+            </div>
+            <div class="case-report-detail-item">
+                <span class="case-report-detail-label">Date Created</span>
+                <span class="case-report-detail-value">{{ case.date_created|date:"F d, Y g:i A" }}</span>
+            </div>
+        </div>
+    </div>
+
+    {% if case.conclusion %}
+    <div class="case-report-section">
+        <h2 class="case-report-section-title">Investigation Conclusion</h2>
+        <div class="case-report-conclusion">
+            {{ case.conclusion|linebreaks }}
+        </div>
+        {% if case.case_concluded_by %}
+        <div class="case-report-meta">
+            Concluded by {{ case.case_concluded_by.get_full_name|default:case.case_concluded_by.username }} on {{ case.case_concluded_at|date:"F d, Y g:i A" }}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% if case.final_report %}
+    <div class="case-report-section">
+        <h2 class="case-report-section-title">Final Report</h2>
+        <div class="case-report-final-report">
+            {{ case.final_report|linebreaks }}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="case-report-section">
+        <h2 class="case-report-section-title">Analysis Reports ({{ reports|length }})</h2>
+        {% if reports %}
+        <div class="case-report-reports">
+            {% for report in reports %}
+            <div class="case-report-report-card">
+                <div class="case-report-report-header">
+                    <h3>{{ report.title }}</h3>
+                    <span class="cases-status-badge cases-status-{{ report.status }}">{{ report.get_status_display }}</span>
+                </div>
+                <div class="case-report-report-meta">
+                    <span>By {{ report.created_by.get_full_name|default:report.created_by.username }}</span>
+                    <span>{{ report.created_at|date:"F d, Y g:i A" }}</span>
+                </div>
+                {% if report.findings %}
+                <div class="case-report-report-findings">
+                    <strong>Findings:</strong>
+                    {{ report.findings|linebreaks }}
+                </div>
+                {% endif %}
+                {% if report.recommendations %}
+                <div class="case-report-report-recommendations">
+                    <strong>Recommendations:</strong>
+                    {{ report.recommendations|linebreaks }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="case-report-empty">
+            <i class='bx bx-file-blank'></i>
+            <p>No analysis reports have been submitted for this case.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

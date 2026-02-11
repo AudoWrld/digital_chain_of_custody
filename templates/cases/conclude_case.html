@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Conclude Case - {{ case.case_id }} - ChainProof{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/cases/create_case.css' %}?v={{ STATIC_VERSION }}" />
+{% endblock %}
+
+{% block content %}
+<div class="create-case-container">
+    <div class="create-case-header">
+        <h1>Conclude Case</h1>
+        <p class="create-case-subtitle">{{ case.case_id }} - {{ case.get_title }}</p>
+    </div>
+
+    <form method="POST" class="create-case-form">
+        {% csrf_token %}
+        
+        <div class="create-case-section">
+            <h2 class="create-case-section-title">Case Investigation Conclusion</h2>
+            
+            <div class="create-case-field">
+                <label for="conclusion">Investigation Conclusion *</label>
+                <textarea 
+                    id="conclusion" 
+                    name="conclusion" 
+                    class="create-case-input" 
+                    rows="6" 
+                    placeholder="Provide a comprehensive conclusion of your investigation findings..."
+                    required
+                ></textarea>
+            </div>
+            
+            <div class="create-case-field">
+                <label for="final_report">Final Report</label>
+                <textarea 
+                    id="final_report" 
+                    name="final_report" 
+                    class="create-case-input" 
+                    rows="10" 
+                    placeholder="Enter the detailed final report with recommendations, findings, and conclusions..."
+                ></textarea>
+            </div>
+            
+            <div class="create-case-field">
+                <div class="create-case-info-box">
+                    <i class='bx bx-info-circle'></i>
+                    <p>Once you conclude this case, it will be marked as <strong>Closed</strong>. This action cannot be undone, and no further modifications can be made to the case.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="create-case-actions">
+            <a href="{% url 'cases:view_case' case.case_id %}" class="create-case-btn create-case-btn-secondary">Cancel</a>
+            <button type="submit" class="create-case-btn create-case-btn-primary">
+                <i class='bx bx-check-circle'></i>
+                Conclude Case
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

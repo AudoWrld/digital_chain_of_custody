@@ -97,6 +97,12 @@ class Case(models.Model):
         settings.AUTH_USER_MODEL, related_name="assigned_cases", blank=True
     )
     closure_requested = models.BooleanField(default=False)
+    final_report = models.TextField(blank=True, null=True)
+    conclusion = models.TextField(blank=True, null=True)
+    case_concluded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="concluded_cases"
+    )
+    case_concluded_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         title_preview = (
@@ -181,6 +187,8 @@ class Case(models.Model):
             "case_description",
             "case_category",
             "case_status_notes",
+            "final_report",
+            "conclusion",
         ]:
             value = getattr(self, field_name)
             if isinstance(value, str) and value:
@@ -219,6 +227,12 @@ class Case(models.Model):
 
     def get_status_notes(self):
         return self.decrypt_field(self.case_status_notes)
+
+    def get_final_report(self):
+        return self.decrypt_field(self.final_report)
+
+    def get_conclusion(self):
+        return self.decrypt_field(self.conclusion)
 
 
 class AssignmentRequest(models.Model):

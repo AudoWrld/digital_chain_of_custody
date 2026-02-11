@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Case Reports - ChainProof{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard/dashboard.css' %}?v={{ STATIC_VERSION }}" />
+<link rel="stylesheet" href="{% static 'css/cases/case_list.css' %}?v={{ STATIC_VERSION }}" />
+{% endblock %}
+
+{% block content %}
+<div class="case-reports-container">
+    <div class="case-reports-header">
+        <div class="case-reports-title">
+            <h1>Case Reports</h1>
+            <p class="case-reports-subtitle">View all analysis reports for your cases</p>
+        </div>
+    </div>
+
+    {% if cases %}
+    <div class="case-reports-sections">
+        {% for case in cases %}
+        <div class="case-report-card">
+            <div class="case-report-header">
+                <div class="case-report-title">
+                    <h2>{{ case.case_id }} - {{ case.get_title }}</h2>
+                    <span class="cases-status-badge cases-status-{{ case.case_status|lower }}">
+                        {{ case.get_case_status_display }}
+                    </span>
+                </div>
+                <a href="{% url 'cases:case_report' case.case_id %}" class="view-case-action-btn view-case-action-secondary">View Full Report</a>
+            </div>
+            
+            {% if case.conclusion %}
+            <div class="case-report-conclusion">
+                <strong>Conclusion:</strong> {{ case.conclusion|truncatewords:50 }}
+            </div>
+            {% endif %}
+            
+            {% for report in reports %}
+            {% if report.case.id == case.id %}
+            <div class="case-report-item">
+                <div class="case-report-item-title">{{ report.title }}</div>
+                <div class="case-report-meta">
+                    <span>By {{ report.created_by.get_full_name|default:report.created_by.username }}</span>
+                    <span>{{ report.created_at|date:"F d, Y" }}</span>
+                </div>
+            </div>
+            {% endif %}
+            {% empty %}
+            <div class="case-report-empty">
+                <i class='bx bx-file-blank'></i>
+                <p>No analysis reports for this case yet.</p>
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="case-reports-empty">
+        <i class='bx bx-briefcase'></i>
+        <h3>No Cases Yet</h3>
+        <p>You haven't created any cases yet.</p>
+        <a href="{% url 'cases:create_case' %}" class="dashboard-create-btn">
+            <i class='bx bx-plus'></i> Create Case
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
