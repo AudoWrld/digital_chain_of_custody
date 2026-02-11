@@ -154,7 +154,7 @@
       {% if user.role == 'analyst' %}
       <a href="{% url 'evidence:analyze' evidence.id %}" class="view-case-action-btn view-case-action-primary">Analyze</a>
       {% endif %}
-      {% if user.is_staff %}
+      {% if user.is_staff or user.role == 'analyst' %}
       <a href="{% url 'evidence:verify' evidence.id %}" class="view-case-action-btn view-case-action-primary">Verify Integrity</a>
       {% endif %}
     </div>
