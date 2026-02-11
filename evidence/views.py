@@ -194,27 +194,50 @@ def case_evidence_list_api(request, case_id):
 @role_required("analyst")
 def analyze_evidence(request, evidence_id):
     evidence = get_object_or_404(Evidence, id=evidence_id)
+    
+    # Check if analyst has already submitted an analysis for this evidence
+    from reports.models import AnalysisReport
+    existing_report = AnalysisReport.objects.filter(
+        evidence=evidence, 
+        created_by=request.user,
+        status='submitted'
+    ).first()
+    
+    if existing_report:
+        messages.info(request, "You have already submitted an analysis for this evidence.")
+        return redirect("evidence:view", evidence_id=evidence.id)
 
     if request.method == "POST":
         notes = request.POST.get("notes", "")
         findings = request.POST.get("findings", "")
-
+        
+        # Create AnalysisReport instead of just logging
+        report = AnalysisReport.objects.create(
+            case=evidence.case,
+            evidence=evidence,
+            created_by=request.user,
+            title=f"Analysis: {evidence.description[:100]}",
+            content=notes,
+            findings=findings,
+            status='submitted'
+        )
+        
         EvidenceAuditLog.log_action(
             user=request.user,
             evidence=evidence,
             action="Evidence Analyzed",
-            details=f"Notes: {notes}, Findings: {findings}",
+            details=f"Analysis report submitted. Findings: {findings[:200]}",
         )
 
         CustodyLog.log_action(
             evidence=evidence,
             case=evidence.case,
             user=request.user,
-            action="verified",
-            details=f"Evidence analyzed by {request.user.get_full_name()}. Findings: {findings}",
+            action="analyzed",
+            details=f"Evidence analyzed by {request.user.get_full_name()}. Report ID: {report.id}",
         )
 
-        messages.success(request, "Evidence analysis logged")
+        messages.success(request, "Analysis report submitted successfully!")
         return redirect("evidence:view", evidence_id=evidence.id)
 
     return render(request, "evidence/analyze_evidence.html", {"evidence": evidence})

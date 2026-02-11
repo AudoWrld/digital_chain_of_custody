@@ -164,6 +164,7 @@ def analyst_dashboard(request):
     my_reports = AnalysisReport.objects.filter(created_by=request.user).order_by('-created_at')
     draft_reports = my_reports.filter(status='draft')
     submitted_reports = my_reports.filter(status='submitted')
+    total_submitted = submitted_reports.count()
     
     pending_review = AnalysisReport.objects.filter(status='submitted').order_by('-created_at')
     
@@ -177,8 +178,27 @@ def analyst_dashboard(request):
         'my_reports': my_reports[:10],
         'draft_reports': draft_reports,
         'submitted_reports': submitted_reports,
+        'total_submitted': total_submitted,
         'pending_review': pending_review[:10],
         'cases_in_analysis': cases_in_analysis[:10],
         'recent_evidence': recent_evidence,
     }
     return render(request, 'reports/analyst_dashboard.html', context)
+
+
+@login_required
+@role_required('analyst')
+def my_reports(request):
+    """View all reports submitted by the analyst"""
+    reports = AnalysisReport.objects.filter(
+        created_by=request.user,
+        status='submitted'
+    ).select_related('case', 'evidence').order_by('-created_at')
+    
+    total_count = reports.count()
+    
+    context = {
+        'reports': reports,
+        'total_count': total_count,
+    }
+    return render(request, 'reports/my_reports.html', context)
