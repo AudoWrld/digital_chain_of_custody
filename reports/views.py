@@ -167,10 +167,10 @@ def analyst_dashboard(request):
     
     pending_review = AnalysisReport.objects.filter(status='submitted').order_by('-created_at')
     
-    cases_in_analysis = Case.objects.filter(stage='analysis').order_by('-created_at')
+    cases_in_analysis = Case.objects.filter(case_status='Approved & Assigned').order_by('-created_at')
     
     recent_evidence = Evidence.objects.filter(
-        case__stage='analysis'
+        case__case_status='Approved & Assigned'
     ).select_related('case', 'uploaded_by').order_by('-date_uploaded')[:10]
     
     context = {
