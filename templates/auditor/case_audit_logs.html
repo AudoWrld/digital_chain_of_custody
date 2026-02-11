@@ -98,7 +98,7 @@
   <div class="case-info-grid">
     <div class="case-info-item">
       <span class="case-info-label">Case Title</span>
-      <span class="case-info-value">{{ case.get_title }}</span>
+      <span class="case-info-value">{{ case.get_title|truncatechars:40 }}</span>
     </div>
     <div class="case-info-item">
       <span class="case-info-label">Status</span>
