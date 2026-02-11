@@ -31,6 +31,9 @@ def case_list(request):
             "encryption_key"
         ).order_by('-date_created')
         is_superuser = False
+    elif request.user.role in ("analyst", "auditor"):
+        cases = Case.objects.all().select_related("encryption_key").order_by('-date_created')
+        is_superuser = False
     else:
         return HttpResponseForbidden("You do not have permission to view cases.")
 
@@ -89,10 +92,12 @@ def create_case(request):
 def view_case(request, case_id):
     case = get_object_or_404(Case, case_id=case_id)
 
+    # Allow case creator, assigned investigators, staff, analysts, and auditors
     if (
         request.user != case.created_by
         and request.user not in case.assigned_investigators.all()
         and not request.user.is_staff
+        and request.user.role not in ('analyst', 'auditor')
     ):
         return HttpResponseForbidden("You are not allowed to view this case!")
 
