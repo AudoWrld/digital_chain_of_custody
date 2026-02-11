@@ -8,24 +8,21 @@ urlpatterns = [
     path("", include("main.urls")),
     path("accounts/", include("accounts.urls")),
     path("dashboard/", include("dashboard.urls")),
-    path('cases/', include('cases.urls')), 
+    path("cases/", include("cases.urls")),
     path("custody/", include("custody.urls")),
     path("evidence/", include("evidence.urls")),
     path("reports/", include("reports.urls")),
     path("auditor/", include("auditor.urls")),
 ]
 
-
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-if not settings.DEBUG:
+else:
     urlpatterns += [
         re_path(
             r"^media/(?P<path>.*)$",
             serve,
-            {
-                "document_root": settings.MEDIA_ROOT,
-            },
+            {"document_root": settings.MEDIA_ROOT},
         ),
     ]
