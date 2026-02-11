@@ -137,7 +137,7 @@
           {% if user.role == 'analyst' %}
           <a href="{% url 'evidence:analyze' media.id %}" class="evidence-btn evidence-btn-secondary">Analyze</a>
           {% endif %}
-          {% if user.is_staff %}
+          {% if user.is_staff or user.role == 'analyst' %}
           <a href="{% url 'evidence:verify' media.id %}" class="evidence-btn evidence-btn-secondary">Verify Integrity</a>
           {% endif %}
         </div>
@@ -181,6 +181,9 @@
         <a href="{% url 'cases:request_case_closure' case.case_id %}" class="view-case-action-btn view-case-action-warning">Request Closure</a>
         {% endif %}
         {% endif %}
+        <a href="{% url 'cases:case_list' %}" class="view-case-action-btn view-case-action-secondary">Back to Cases</a>
+      {% elif user.role in 'analyst,auditor' %}
+        <a href="{% url 'auditor:auditor_case_audit_logs' case.case_id %}" class="view-case-action-btn view-case-action-secondary">Case Audit Log</a>
         <a href="{% url 'cases:case_list' %}" class="view-case-action-btn view-case-action-secondary">Back to Cases</a>
       {% else %}
         {% if case.case_status not in 'Closed,Archived,Withdrawn,Invalid' %}

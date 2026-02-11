@@ -332,7 +332,7 @@ def download_evidence_file(request, evidence_id):
 
 
 @login_required
-@role_required("admin", "auditor")
+@role_required("admin", "auditor", "analyst")
 def all_evidence(request):
     evidence_list = Evidence.objects.select_related('case', 'uploaded_by').all().order_by("-date_uploaded")
     
