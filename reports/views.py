@@ -59,18 +59,14 @@ def edit_analysis_report(request, report_id):
     
     if report.created_by != request.user and not request.user.is_superuser:
         messages.error(request, 'You can only edit your own reports')
-        return redirect('reports:view_report', report_id=report.id)
-    
-    if report.status != 'draft':
-        messages.error(request, 'You can only edit draft reports')
-        return redirect('reports:view_report', report_id=report.id)
+        return redirect('reports:evidence_reports', evidence_id=report.evidence.id) if report.evidence else redirect('reports:case_reports', case_id=report.case.case_id)
     
     if request.method == 'POST':
         form = AnalysisReportCreateForm(request.POST, case=report.case, evidence=report.evidence, instance=report)
         if form.is_valid():
             form.save()
             messages.success(request, 'Analysis report updated successfully')
-            return redirect('reports:view_report', report_id=report.id)
+            return redirect('reports:evidence_reports', evidence_id=report.evidence.id) if report.evidence else redirect('reports:case_reports', case_id=report.case.case_id)
     else:
         form = AnalysisReportCreateForm(case=report.case, evidence=report.evidence, instance=report)
     
@@ -90,17 +86,13 @@ def submit_analysis_report(request, report_id):
     
     if report.created_by != request.user and not request.user.is_superuser:
         messages.error(request, 'You can only submit your own reports')
-        return redirect('reports:view_report', report_id=report.id)
-    
-    if report.status != 'draft':
-        messages.error(request, 'You can only submit draft reports')
-        return redirect('reports:view_report', report_id=report.id)
+        return redirect('reports:evidence_reports', evidence_id=report.evidence.id) if report.evidence else redirect('reports:case_reports', case_id=report.case.case_id)
     
     report.status = 'submitted'
     report.save()
     
     messages.success(request, 'Analysis report submitted successfully')
-    return redirect('reports:view_report', report_id=report.id)
+    return redirect('reports:evidence_reports', evidence_id=report.evidence.id) if report.evidence else redirect('reports:case_reports', case_id=report.case.case_id)
 
 
 @login_required
@@ -110,7 +102,7 @@ def review_analysis_report(request, report_id):
     
     if report.status not in ['submitted', 'reviewed']:
         messages.error(request, 'You can only review submitted reports')
-        return redirect('reports:view_report', report_id=report.id)
+        return redirect('reports:evidence_reports', evidence_id=report.evidence.id) if report.evidence else redirect('reports:case_reports', case_id=report.case.case_id)
     
     if request.method == 'POST':
         form = AnalysisReportReviewForm(request.POST, instance=report)
@@ -121,7 +113,7 @@ def review_analysis_report(request, report_id):
             report.save()
             
             messages.success(request, 'Analysis report reviewed successfully')
-            return redirect('reports:view_report', report_id=report.id)
+            return redirect('reports:evidence_reports', evidence_id=report.evidence.id) if report.evidence else redirect('reports:case_reports', case_id=report.case.case_id)
     else:
         form = AnalysisReportReviewForm(instance=report)
     
