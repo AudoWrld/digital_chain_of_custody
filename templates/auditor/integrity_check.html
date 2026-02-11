@@ -1,100 +1,118 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+{% block title %}Integrity Check - ChainProof{% endblock %}
 {% load static %}
 
-{% block title %}Integrity Check - ChainProof{% endblock %}
-
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/evidence/verify_evidence.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/auditor/integrity_check.css' %}?v={{ STATIC_VERSION }}">
 {% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <h1>Evidence Integrity Check</h1>
-    <div class="header-actions">
-        <a href="{% url 'auditor:dashboard' %}" class="btn btn-secondary">
-            <i class='bx bx-arrow-back'></i> Back to Dashboard
-        </a>
-        <a href="{% url 'auditor:chain_of_custody' %}" class="btn btn-primary">
+<div class="integrity-page-header">
+    <div class="integrity-page-title">
+        <h1>Evidence Integrity Check</h1>
+    </div>
+    <div class="integrity-page-actions">
+        <a href="{% url 'auditor:chain_of_custody' %}" class="integrity-btn integrity-btn-secondary">
             <i class='bx bx-transfer'></i> Chain of Custody
         </a>
     </div>
 </div>
 
-<div class="stats-row">
-    <div class="stat-card">
-        <div class="stat-value">{{ total_evidence }}</div>
-        <div class="stat-label">Total Evidence</div>
+<div class="integrity-stats-row">
+    <div class="integrity-stat-card">
+        <div class="integrity-stat-value">{{ total_evidence }}</div>
+        <div class="integrity-stat-label">Total Evidence</div>
     </div>
-    <div class="stat-card success">
-        <div class="stat-value">{{ valid_evidence }}</div>
-        <div class="stat-label">Valid Integrity</div>
+    <div class="integrity-stat-card">
+        <div class="integrity-stat-value">{{ valid_evidence }}</div>
+        <div class="integrity-stat-label">Valid Integrity</div>
     </div>
-    <div class="stat-card danger">
-        <div class="stat-value">{{ invalid_evidence }}</div>
-        <div class="stat-label">Integrity Issues</div>
+    <div class="integrity-stat-card">
+        <div class="integrity-stat-value">{{ invalid_evidence }}</div>
+        <div class="integrity-stat-label">Integrity Issues</div>
     </div>
-    <div class="stat-card info">
-        <div class="stat-value">{{ pending_verification }}</div>
-        <div class="stat-label">Pending Verification</div>
+    <div class="integrity-stat-card">
+        <div class="integrity-stat-value">{{ pending_verification }}</div>
+        <div class="integrity-stat-label">Pending Verification</div>
     </div>
 </div>
 
-<div class="integrity-list">
-    {% for evidence in evidence_list %}
-    <div class="integrity-card {% if not evidence.metadata_valid %}has-issues{% endif %}">
-        <div class="integrity-header">
-            <div class="evidence-id">#{{ evidence.id }}</div>
-            <div class="integrity-status">
-                {% if evidence.metadata_valid %}
-                <span class="status-valid"><i class='bx bx-check-circle'></i> Valid</span>
-                {% else %}
-                <span class="status-invalid"><i class='bx bx-error-circle'></i> Issues Found</span>
-                {% endif %}
-            </div>
-        </div>
-        
-        <div class="integrity-body">
-            <div class="evidence-info">
-                <h3>{{ evidence.description|truncatechars:100 }}</h3>
-                <p class="case-link">Case: <a href="{% url 'auditor:auditor_case_audit_logs' evidence.case.case_id %}">{{ evidence.case.case_id }}</a></p>
-                <p class="file-info">{{ evidence.original_filename }} ({{ evidence.media_type }})</p>
+{% if evidence_list %}
+<div class="integrity-evidence-section">
+    <div class="integrity-section-header">
+        <i class='bx bx-shield-check'></i>
+        <h2 class="integrity-section-title">Evidence Details</h2>
+        <span class="integrity-section-count">{{ evidence_list|length }} items</span>
+    </div>
+    <div class="integrity-evidence-list">
+        {% for evidence in evidence_list %}
+        <div class="integrity-evidence-card {% if not evidence.metadata_valid %}has-issues{% endif %}">
+            <div class="integrity-evidence-header">
+                <span class="integrity-evidence-id">#{{ evidence.id }}</span>
+                <span class="integrity-status-badge {% if evidence.metadata_valid %}integrity-status-valid{% else %}integrity-status-issues{% endif %}">
+                    {% if evidence.metadata_valid %}
+                    <i class='bx bx-check-circle'></i> Valid
+                    {% else %}
+                    <i class='bx bx-error-circle'></i> Issues Found
+                    {% endif %}
+                </span>
             </div>
             
-            <div class="hash-info">
-                <div class="hash-row">
-                    <span class="hash-label">SHA256:</span>
-                    <span class="hash-value" title="{{ evidence.sha256_hash }}">{{ evidence.sha256_hash }}</span>
+            <div class="integrity-evidence-meta">
+                <div class="integrity-meta-item">
+                    <span class="integrity-meta-label">Case</span>
+                    <span class="integrity-meta-value">
+                        <a href="{% url 'auditor:auditor_case_audit_logs' evidence.case.case_id %}">{{ evidence.case.case_id }}</a>
+                    </span>
                 </div>
-                <div class="hash-row">
-                    <span class="hash-label">MD5:</span>
-                    <span class="hash-value" title="{{ evidence.md5_hash }}">{{ evidence.md5_hash }}</span>
+                <div class="integrity-meta-item">
+                    <span class="integrity-meta-label">Description</span>
+                    <span class="integrity-meta-value">{{ evidence.description|truncatechars:50 }}</span>
                 </div>
+                <div class="integrity-meta-item">
+                    <span class="integrity-meta-label">File Info</span>
+                    <span class="integrity-meta-value">{{ evidence.original_filename }} ({{ evidence.media_type }})</span>
+                </div>
+                <div class="integrity-meta-item">
+                    <span class="integrity-meta-label">Uploaded By</span>
+                    <span class="integrity-meta-value">{{ evidence.uploaded_by.get_full_name|default:evidence.uploaded_by.username }}</span>
+                </div>
+            </div>
+            
+            <div class="integrity-hash-display">
+                <span class="integrity-hash-label">SHA256:</span>{{ evidence.sha256_hash }}
+            </div>
+            <div class="integrity-hash-display">
+                <span class="integrity-hash-label">MD5:</span>{{ evidence.md5_hash }}
             </div>
             
             {% if evidence.metadata_issues %}
-            <div class="issues-list">
-                <h4><i class='bx bx-error'></i> Metadata Issues:</h4>
-                <ul>
+            <div class="integrity-issues-display">
+                <div class="integrity-issues-title">
+                    <i class='bx bx-error'></i> Metadata Issues
+                </div>
+                <ul class="integrity-issues-list">
                     {% for issue in evidence.metadata_issues %}
                     <li>{{ issue }}</li>
                     {% endfor %}
                 </ul>
             </div>
             {% endif %}
+            
+            <div class="integrity-evidence-footer">
+                <a href="{% url 'auditor:evidence_custody_history' evidence.id %}" class="integrity-view-history-btn">
+                    <i class='bx bx-history'></i> View History
+                </a>
+                <span class="integrity-upload-date">Uploaded {{ evidence.date_uploaded|date:"M d, Y H:i" }}</span>
+            </div>
         </div>
-        
-        <div class="integrity-footer">
-            <a href="{% url 'auditor:evidence_custody_history' evidence.id %}" class="btn btn-sm">
-                <i class='bx bx-history'></i> View History
-            </a>
-            <span class="upload-date">Uploaded {{ evidence.date_uploaded|date:"M d, Y H:i" }}</span>
-        </div>
+        {% endfor %}
     </div>
-    {% empty %}
-    <div class="empty-state">
-        <i class='bx bx-archive'></i>
-        <p>No evidence found in the system.</p>
-    </div>
-    {% endfor %}
 </div>
+{% else %}
+<div class="integrity-empty-state">
+    <i class='bx bx-archive'></i>
+    <p>No evidence found in the system.</p>
+</div>
+{% endif %}
 {% endblock %}

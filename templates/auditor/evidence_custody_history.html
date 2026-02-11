@@ -1,276 +1,168 @@
 {% extends 'base.html' %}
 {% block title %}Custody History - Evidence #{{ evidence.id }} - ChainProof{% endblock %}
 {% load static %}
-{% load case_extras %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/auditor/integrity_check.css' %}?v={{ STATIC_VERSION }}">
+{% endblock %}
+
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/cases/case_list.css' %}?v={{ STATIC_VERSION }}" />
-<style>
-  .evidence-detail-section {
-    background: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    margin-bottom: 24px;
-  }
-
-  .evidence-detail-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: #1e293b;
-    margin-bottom: 16px;
-    padding-bottom: 12px;
-    border-bottom: 2px solid #e2e8f0;
-  }
-
-  .evidence-detail-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
-  }
-
-  .evidence-detail-item {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .evidence-detail-label {
-    font-size: 12px;
-    font-weight: 600;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .evidence-detail-value {
-    font-size: 14px;
-    color: #1e293b;
-    font-weight: 500;
-    word-break: break-all;
-  }
-
-  .evidence-detail-value a {
-    color: #3b82f6;
-    text-decoration: none;
-  }
-
-  .evidence-detail-value a:hover {
-    text-decoration: underline;
-  }
-
-  .hash-display {
-    background: #f8fafc;
-    border-radius: 8px;
-    padding: 16px;
-    margin-top: 12px;
-  }
-
-  .hash-row {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 8px;
-  }
-
-  .hash-row:last-child {
-    margin-bottom: 0;
-  }
-
-  .hash-label {
-    font-size: 12px;
-    font-weight: 600;
-    color: #64748b;
-    min-width: 60px;
-  }
-
-  .hash-value {
-    font-family: monospace;
-    font-size: 11px;
-    color: #475569;
-    word-break: break-all;
-  }
-
-  .audit-section {
-    background: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    margin-bottom: 24px;
-    overflow: hidden;
-  }
-
-  .audit-section-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 16px 20px;
-    background: #f8fafc;
-    border-bottom: 2px solid #e2e8f0;
-  }
-
-  .audit-section-header i {
-    font-size: 20px;
-    color: #3b82f6;
-  }
-
-  .audit-section-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: #1e293b;
-    margin: 0;
-  }
-
-  .audit-section-count {
-    margin-left: auto;
-    background: #e2e8f0;
-    color: #475569;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-  }
-
-  .audit-table-wrapper {
-    overflow-x: auto;
-  }
-</style>
-
-<div class="cases-page-header">
-  <div class="cases-page-title">
-    <h1>Custody History: Evidence #{{ evidence.id }}</h1>
-  </div>
-  <div class="cases-page-actions">
-    <a href="{% url 'auditor:chain_of_custody' %}" class="cases-create-btn" style="background: #64748b;">
-      <i class='bx bx-arrow-back'></i> Back to Chain of Custody
-    </a>
-    <a href="{% url 'auditor:integrity_check' %}" class="cases-create-btn">
-      <i class='bx bx-check-shield'></i> Integrity Check
-    </a>
-  </div>
+<div class="integrity-page-header">
+    <div class="integrity-page-title">
+        <h1>Custody History: Evidence #{{ evidence.id }}</h1>
+    </div>
+    <div class="integrity-page-actions">
+        <a href="{% url 'auditor:chain_of_custody' %}" class="integrity-btn integrity-btn-secondary">
+            <i class='bx bx-arrow-back'></i> Back to Chain of Custody
+        </a>
+        <a href="{% url 'auditor:integrity_check' %}" class="integrity-btn">
+            <i class='bx bx-check-shield'></i> Integrity Check
+        </a>
+    </div>
 </div>
 
-<div class="evidence-detail-section">
-  <h2 class="evidence-detail-title">Evidence Information</h2>
-  <div class="evidence-detail-grid">
-    <div class="evidence-detail-item">
-      <span class="evidence-detail-label">Case</span>
-      <span class="evidence-detail-value">
-        <a href="{% url 'auditor:auditor_case_audit_logs' evidence.case.case_id %}">{{ evidence.case.case_id }}</a>
-      </span>
+<div class="integrity-evidence-section">
+    <div class="integrity-section-header">
+        <i class='bx bx-file'></i>
+        <h2 class="integrity-section-title">Evidence Information</h2>
     </div>
-    <div class="evidence-detail-item">
-      <span class="evidence-detail-label">Description</span>
-      <span class="evidence-detail-value">{{ evidence.description }}</span>
+    <div class="integrity-evidence-list">
+        <div class="integrity-evidence-card">
+            <div class="integrity-evidence-header">
+                <span class="integrity-evidence-id">#{{ evidence.id }}</span>
+                <span class="integrity-status-badge {% if evidence.metadata_valid %}integrity-status-valid{% else %}integrity-status-issues{% endif %}">
+                    {% if evidence.metadata_valid %}
+                    <i class='bx bx-check'></i> Valid
+                    {% else %}
+                    <i class='bx bx-x'></i> Invalid
+                    {% endif %}
+                </span>
+            </div>
+            
+            <div class="integrity-evidence-meta">
+                <div class="integrity-meta-item">
+                    <span class="integrity-meta-label">Case</span>
+                    <span class="integrity-meta-value">
+                        <a href="{% url 'auditor:auditor_case_audit_logs' evidence.case.case_id %}">{{ evidence.case.case_id }}</a>
+                    </span>
+                </div>
+                <div class="integrity-meta-item">
+                    <span class="integrity-meta-label">Description</span>
+                    <span class="integrity-meta-value">{{ evidence.description }}</span>
+                </div>
+                <div class="integrity-meta-item">
+                    <span class="integrity-meta-label">Original Filename</span>
+                    <span class="integrity-meta-value">{{ evidence.original_filename }}</span>
+                </div>
+                <div class="integrity-meta-item">
+                    <span class="integrity-meta-label">Media Type</span>
+                    <span class="integrity-meta-value">{{ evidence.media_type }}</span>
+                </div>
+                <div class="integrity-meta-item">
+                    <span class="integrity-meta-label">Uploaded By</span>
+                    <span class="integrity-meta-value">{{ evidence.uploaded_by.get_full_name|default:evidence.uploaded_by.username }}</span>
+                </div>
+                <div class="integrity-meta-item">
+                    <span class="integrity-meta-label">Upload Date</span>
+                    <span class="integrity-meta-value">{{ evidence.date_uploaded|date:"M d, Y H:i:s" }}</span>
+                </div>
+            </div>
+            
+            <div class="integrity-hash-display">
+                <span class="integrity-hash-label">SHA256:</span>{{ evidence.sha256_hash }}
+            </div>
+            <div class="integrity-hash-display">
+                <span class="integrity-hash-label">MD5:</span>{{ evidence.md5_hash }}
+            </div>
+            
+            {% if evidence.metadata_issues %}
+            <div class="integrity-issues-display">
+                <div class="integrity-issues-title">
+                    <i class='bx bx-error'></i> Metadata Issues
+                </div>
+                <ul class="integrity-issues-list">
+                    {% for issue in evidence.metadata_issues %}
+                    <li>{{ issue }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
     </div>
-    <div class="evidence-detail-item">
-      <span class="evidence-detail-label">Original Filename</span>
-      <span class="evidence-detail-value">{{ evidence.original_filename }}</span>
-    </div>
-    <div class="evidence-detail-item">
-      <span class="evidence-detail-label">Media Type</span>
-      <span class="evidence-detail-value">{{ evidence.media_type }}</span>
-    </div>
-    <div class="evidence-detail-item">
-      <span class="evidence-detail-label">Uploaded By</span>
-      <span class="evidence-detail-value">{{ evidence.uploaded_by.get_full_name|default:evidence.uploaded_by.username }}</span>
-    </div>
-    <div class="evidence-detail-item">
-      <span class="evidence-detail-label">Upload Date</span>
-      <span class="evidence-detail-value">{{ evidence.date_uploaded|date:"M d, Y H:i:s" }}</span>
-    </div>
-    <div class="evidence-detail-item">
-      <span class="evidence-detail-label">Metadata Status</span>
-      <span class="evidence-detail-value">
-        {% if evidence.metadata_valid %}
-        <span class="cases-status-badge cases-status-approved"><i class='bx bx-check'></i> Valid</span>
-        {% else %}
-        <span class="cases-status-badge cases-status-invalid"><i class='bx bx-x'></i> Invalid</span>
-        {% endif %}
-      </span>
-    </div>
-  </div>
-  
-  <div class="hash-display">
-    <div class="hash-row">
-      <span class="hash-label">SHA256:</span>
-      <span class="hash-value">{{ evidence.sha256_hash }}</span>
-    </div>
-    <div class="hash-row">
-      <span class="hash-label">MD5:</span>
-      <span class="hash-value">{{ evidence.md5_hash }}</span>
-    </div>
-  </div>
 </div>
 
 {% if custody_logs %}
-<div class="audit-section">
-  <div class="audit-section-header">
-    <i class='bx bx-transfer'></i>
-    <h2 class="audit-section-title">Custody Transfer History</h2>
-    <span class="audit-section-count">{{ custody_logs|length }} entries</span>
-  </div>
-  <div class="audit-table-wrapper">
-    <table class="cases-data-table">
-      <thead class="cases-table-head">
-        <tr>
-          <th class="cases-table-header">Timestamp</th>
-          <th class="cases-table-header">User</th>
-          <th class="cases-table-header">Action</th>
-          <th class="cases-table-header">From Location</th>
-          <th class="cases-table-header">To Location</th>
-          <th class="cases-table-header">Details</th>
-        </tr>
-      </thead>
-      <tbody class="cases-table-body">
-        {% for log in custody_logs %}
-        <tr class="cases-table-row">
-          <td class="cases-table-cell">{{ log.timestamp|date:"M d, Y H:i:s" }}</td>
-          <td class="cases-table-cell">{{ log.user.get_full_name|default:log.user.username }}</td>
-          <td class="cases-table-cell">{{ log.action }}</td>
-          <td class="cases-table-cell">{{ log.from_location.name|default:"-" }}</td>
-          <td class="cases-table-cell">{{ log.to_location.name|default:"-" }}</td>
-          <td class="cases-table-cell">{{ log.details|truncatechars:50 }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+<div class="integrity-evidence-section">
+    <div class="integrity-section-header">
+        <i class='bx bx-transfer'></i>
+        <h2 class="integrity-section-title">Custody Transfer History</h2>
+        <span class="integrity-section-count">{{ custody_logs|length }} entries</span>
+    </div>
+    <div class="integrity-evidence-list">
+        <table class="coc-table" style="margin: 0;">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>User</th>
+                    <th>Action</th>
+                    <th>From Location</th>
+                    <th>To Location</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in custody_logs %}
+                <tr>
+                    <td>{{ log.timestamp|date:"M d, Y H:i:s" }}</td>
+                    <td>{{ log.user.get_full_name|default:log.user.username }}</td>
+                    <td>{{ log.action }}</td>
+                    <td>{{ log.from_location.name|default:"-" }}</td>
+                    <td>{{ log.to_location.name|default:"-" }}</td>
+                    <td>{{ log.details|truncatechars:50 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endif %}
 
 {% if audit_logs %}
-<div class="audit-section">
-  <div class="audit-section-header">
-    <i class='bx bx-history'></i>
-    <h2 class="audit-section-title">Audit Log</h2>
-    <span class="audit-section-count">{{ audit_logs|length }} entries</span>
-  </div>
-  <div class="audit-table-wrapper">
-    <table class="cases-data-table">
-      <thead class="cases-table-head">
-        <tr>
-          <th class="cases-table-header">Timestamp</th>
-          <th class="cases-table-header">User</th>
-          <th class="cases-table-header">Action</th>
-          <th class="cases-table-header">Details</th>
-        </tr>
-      </thead>
-      <tbody class="cases-table-body">
-        {% for log in audit_logs %}
-        <tr class="cases-table-row">
-          <td class="cases-table-cell">{{ log.timestamp|date:"M d, Y H:i:s" }}</td>
-          <td class="cases-table-cell">{{ log.user.get_full_name|default:log.user.username }}</td>
-          <td class="cases-table-cell">{{ log.action }}</td>
-          <td class="cases-table-cell">{{ log.details|truncatechars:80 }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+<div class="integrity-evidence-section">
+    <div class="integrity-section-header">
+        <i class='bx bx-history'></i>
+        <h2 class="integrity-section-title">Audit Log</h2>
+        <span class="integrity-section-count">{{ audit_logs|length }} entries</span>
+    </div>
+    <div class="integrity-evidence-list">
+        <table class="coc-table" style="margin: 0;">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>User</th>
+                    <th>Action</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in audit_logs %}
+                <tr>
+                    <td>{{ log.timestamp|date:"M d, Y H:i:s" }}</td>
+                    <td>{{ log.user.get_full_name|default:log.user.username }}</td>
+                    <td>{{ log.action }}</td>
+                    <td>{{ log.details|truncatechars:80 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endif %}
 
 {% if not custody_logs and not audit_logs %}
-<div class="cases-empty-state">
-  <p>No logs found for this evidence.</p>
+<div class="integrity-empty-state">
+    <i class='bx bx-history'></i>
+    <p>No logs found for this evidence.</p>
 </div>
 {% endif %}
 {% endblock %}
