@@ -93,6 +93,10 @@ def view_evidence(request, evidence_id):
     if request.user.role == 'auditor':
         return HttpResponseForbidden("Auditors cannot view evidence content. Please use the audit view.")
     
+    # Check if evidence has already been analyzed
+    from reports.models import AnalysisReport
+    has_analysis = AnalysisReport.objects.filter(evidence=evidence, status='submitted').exists()
+    
     audit_logs = EvidenceAuditLog.objects.filter(evidence=evidence).order_by(
         "-timestamp"
     )
@@ -108,7 +112,7 @@ def view_evidence(request, evidence_id):
     return render(
         request,
         "evidence/view_evidence.html",
-        {"evidence": evidence, "audit_logs": audit_logs},
+        {"evidence": evidence, "audit_logs": audit_logs, "has_analysis": has_analysis},
     )
 
 
