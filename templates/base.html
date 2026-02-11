@@ -179,11 +179,11 @@
         
         {% elif user.role == 'analyst' %}
         <nav class="sidebar-section">
-          <a href="{% url 'reports:dashboard' %}" class="sidebar-link {% if request.path == '/reports/dashboard' %}active{% endif %}">
+          <a href="{% url 'reports:dashboard' %}" class="sidebar-link {% if '/reports/' in request.path %}active{% endif %}">
             <i class='bx bx-home'></i>
             <span>Dashboard</span>
           </a>
-          <a href="{% url 'evidence:all_evidence' %}" class="sidebar-link {% if request.path == '/evidence/all' %}active{% endif %}">
+          <a href="{% url 'evidence:all_evidence' %}" class="sidebar-link {% if '/evidence/all' in request.path %}active{% endif %}">
             <i class='bx bx-archive'></i>
             <span>All Evidence</span>
           </a>
