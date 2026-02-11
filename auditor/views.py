@@ -17,6 +17,8 @@ def auditor_dashboard(request):
     # Get statistics
     total_cases = Case.objects.count()
     total_evidence = Evidence.objects.count()
+    valid_evidence = Evidence.objects.filter(metadata_valid=True).count()
+    invalid_evidence = Evidence.objects.filter(metadata_valid=False).count()
     
     # Recent audit logs
     recent_audit_logs = EvidenceAuditLog.objects.select_related(
@@ -31,6 +33,8 @@ def auditor_dashboard(request):
     context = {
         'total_cases': total_cases,
         'total_evidence': total_evidence,
+        'valid_evidence': valid_evidence,
+        'invalid_evidence': invalid_evidence,
         'recent_audit_logs': recent_audit_logs,
         'recent_cases': recent_cases,
     }

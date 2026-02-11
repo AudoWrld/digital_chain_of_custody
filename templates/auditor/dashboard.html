@@ -1,135 +1,145 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+{% block title %}Auditor Dashboard{% endblock %}
+
 {% load static %}
 {% load case_extras %}
-
-{% block title %}Auditor Dashboard - ChainProof{% endblock %}
-
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/dashboard/dashboard.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/dashboard/dashboard.css' %}?v={{ STATIC_VERSION }}" />
 {% endblock %}
 
 {% block content %}
-<div class="dashboard-header">
-    <h1>Auditor Dashboard</h1>
-    <p class="subtitle">Overview of audit activities and system integrity</p>
-</div>
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1>Welcome back, {{ user.first_name }}!</h1>
+    <p class="dashboard-subtitle">
+      Audit Dashboard
+    </p>
+  </div>
 
-<div class="dashboard-stats">
-    <div class="stat-card">
-        <div class="stat-icon">
-            <i class='bx bx-briefcase'></i>
-        </div>
-        <div class="stat-content">
-            <div class="stat-value">{{ total_cases }}</div>
-            <div class="stat-label">Total Cases</div>
-        </div>
+  <div class="stats-grid">
+    <div class="stat-card stat-primary">
+      <div class="stat-icon">
+        <i class='bx bx-briefcase'></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ total_cases }}</div>
+        <div class="stat-label">Total Cases</div>
+      </div>
     </div>
-    
-    <div class="stat-card">
-        <div class="stat-icon">
-            <i class='bx bx-archive'></i>
-        </div>
-        <div class="stat-content">
-            <div class="stat-value">{{ total_evidence }}</div>
-            <div class="stat-label">Total Evidence</div>
-        </div>
-    </div>
-    
-    <div class="stat-card">
-        <div class="stat-icon">
-            <i class='bx bx-history'></i>
-        </div>
-        <div class="stat-content">
-            <div class="stat-value">{{ recent_audit_logs|length }}</div>
-            <div class="stat-label">Recent Activities</div>
-        </div>
-    </div>
-    
-    <div class="stat-card">
-        <div class="stat-icon">
-            <i class='bx bx-check-shield'></i>
-        </div>
-        <div class="stat-content">
-            <div class="stat-value"><a href="{% url 'auditor:integrity_check' %}">View</a></div>
-            <div class="stat-label">Integrity Status</div>
-        </div>
-    </div>
-</div>
 
-<div class="dashboard-grid">
-    <div class="dashboard-section">
-        <h2>Recent Audit Activities</h2>
-        <div class="activity-list">
-            {% for log in recent_audit_logs %}
-            <div class="activity-item">
-                <div class="activity-icon">
-                    <i class='bx bx-history'></i>
-                </div>
-                <div class="activity-content">
-                    <div class="activity-title">{{ log.action }}</div>
-                    <div class="activity-meta">
-                        {% if log.evidence %}
-                        <span class="activity-case">Case: {{ log.evidence.case.case_id }}</span>
-                        {% endif %}
-                        <span class="activity-user">By: {{ log.user.get_full_name|default:log.user.username }}</span>
-                        <span class="activity-time">{{ log.timestamp|timesince }} ago</span>
-                    </div>
-                </div>
-            </div>
-            {% empty %}
-            <div class="empty-state">
-                <p>No recent audit activities found.</p>
-            </div>
-            {% endfor %}
-        </div>
+    <div class="stat-card stat-secondary">
+      <div class="stat-icon">
+        <i class='bx bx-archive'></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ total_evidence|default:"0" }}</div>
+        <div class="stat-label">Total Evidence</div>
+      </div>
     </div>
-    
+
+    <div class="stat-card stat-success">
+      <div class="stat-icon">
+        <i class='bx bx-check-circle'></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ valid_evidence|default:"0" }}</div>
+        <div class="stat-label">Valid Evidence</div>
+      </div>
+    </div>
+
+    <div class="stat-card stat-danger">
+      <div class="stat-icon">
+        <i class='bx bx-x-circle'></i>
+      </div>
+      <div class="stat-content">
+        <div class="stat-value">{{ invalid_evidence|default:"0" }}</div>
+        <div class="stat-label">Invalid Evidence</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-content" style="margin-top: 24px;">
+    {% if recent_cases %}
     <div class="dashboard-section">
+      <div class="section-header">
         <h2>Recent Cases</h2>
-        <div class="case-list">
-            {% for case in recent_cases %}
-            <div class="case-item">
-                <div class="case-info">
-                    <div class="case-id">{{ case.case_id }}</div>
-                    <div class="case-title">{{ case.title }}</div>
-                    <div class="case-meta">
-                        <span class="case-status badge badge-{{ case.case_status|slugify_status }}">{{ case.case_status }}</span>
-                        <span class="case-date">{{ case.date_created|date:"M d, Y" }}</span>
-                    </div>
-                </div>
-                <div class="case-actions">
-                    <a href="{% url 'auditor:auditor_case_audit_logs' case.case_id %}" class="btn btn-sm">
-                        <i class='bx bx-list-check'></i> Audit Logs
-                    </a>
-                    <a href="{% url 'auditor:case_integrity_report' case.case_id %}" class="btn btn-sm">
-                        <i class='bx bx-check-shield'></i> Integrity
-                    </a>
-                </div>
+        <a href="{% url 'cases:case_list' %}" class="view-all-link">View All</a>
+      </div>
+      <div class="recent-list">
+        {% for case in recent_cases %}
+        <div class="recent-item">
+          <div class="recent-item-icon">
+            <i class='bx bx-briefcase'></i>
+          </div>
+          <div class="recent-item-content">
+            <div class="recent-item-title">{{ case.get_title }}</div>
+            <div class="recent-item-meta">
+              <span class="status-badge status-{{ case.case_status|slugify_status }}">{{ case.case_status }}</span>
+              <span class="date">{{ case.date_created|date:"M d, Y" }}</span>
             </div>
-            {% empty %}
-            <div class="empty-state">
-                <p>No recent cases found.</p>
-            </div>
-            {% endfor %}
+          </div>
+          <a href="{% url 'auditor:auditor_case_audit_logs' case.case_id %}" class="recent-item-action">
+            <i class='bx bx-list-check'></i>
+          </a>
         </div>
+        {% endfor %}
+      </div>
     </div>
-</div>
+    {% endif %}
 
-<div class="quick-links">
-    <h2>Quick Links</h2>
-    <div class="links-grid">
-        <a href="{% url 'auditor:audit_logs' %}" class="quick-link">
+    {% if recent_audit_logs %}
+    <div class="dashboard-section">
+      <div class="section-header">
+        <h2>Recent Activity</h2>
+        <a href="{% url 'auditor:audit_logs' %}" class="view-all-link">View All</a>
+      </div>
+      <div class="recent-list">
+        {% for log in recent_audit_logs %}
+        <div class="recent-item">
+          <div class="recent-item-icon">
             <i class='bx bx-history'></i>
-            <span>All Audit Logs</span>
-        </a>
-        <a href="{% url 'auditor:chain_of_custody' %}" class="quick-link">
-            <i class='bx bx-transfer'></i>
-            <span>Chain of Custody</span>
-        </a>
-        <a href="{% url 'auditor:integrity_check' %}" class="quick-link">
-            <i class='bx bx-check-shield'></i>
-            <span>Integrity Check</span>
-        </a>
+          </div>
+          <div class="recent-item-content">
+            <div class="recent-item-title">{{ log.action }}</div>
+            <div class="recent-item-meta">
+              <span class="user">{{ log.user.get_full_name|default:log.user.username }}</span>
+              <span class="date">{{ log.timestamp|date:"M d, Y H:i" }}</span>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
     </div>
+    {% endif %}
+
+    <div class="dashboard-section">
+      <div class="section-header">
+        <h2>Quick Actions</h2>
+      </div>
+      <div class="quick-actions">
+        <a href="{% url 'auditor:audit_logs' %}" class="quick-action-card">
+          <div class="quick-action-icon">
+            <i class='bx bx-list-check'></i>
+          </div>
+          <div class="quick-action-title">Audit Logs</div>
+          <div class="quick-action-description">View all system audit logs</div>
+        </a>
+        <a href="{% url 'auditor:chain_of_custody' %}" class="quick-action-card">
+          <div class="quick-action-icon">
+            <i class='bx bx-transfer'></i>
+          </div>
+          <div class="quick-action-title">Chain of Custody</div>
+          <div class="quick-action-description">View evidence custody reports</div>
+        </a>
+        <a href="{% url 'auditor:integrity_check' %}" class="quick-action-card">
+          <div class="quick-action-icon">
+            <i class='bx bx-check-shield'></i>
+          </div>
+          <div class="quick-action-title">Integrity Checks</div>
+          <div class="quick-action-description">Verify evidence integrity</div>
+        </a>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

@@ -1,0 +1,410 @@
+/* Auditor Integrity Check Page Styles */
+
+/* Page Header */
+.integrity-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+    padding: 0 4px;
+}
+
+.integrity-page-title h1 {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.integrity-page-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.integrity-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: #3b82f6;
+    color: #ffffff;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.integrity-btn:hover {
+    background: #2563eb;
+}
+
+.integrity-btn-secondary {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+.integrity-btn-secondary:hover {
+    background: #e2e8f0;
+    color: #1e293b;
+}
+
+/* Stats Row */
+.integrity-stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 28px;
+}
+
+.integrity-stat-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e2e8f0;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.integrity-stat-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.integrity-stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 4px;
+}
+
+.integrity-stat-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.integrity-stat-card:nth-child(1) .integrity-stat-value { color: #3b82f6; }
+.integrity-stat-card:nth-child(2) .integrity-stat-value { color: #10b981; }
+.integrity-stat-card:nth-child(3) .integrity-stat-value { color: #ef4444; }
+.integrity-stat-card:nth-child(4) .integrity-stat-value { color: #f59e0b; }
+
+/* Evidence Section */
+.integrity-evidence-section {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    margin-bottom: 28px;
+}
+
+.integrity-section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px 24px;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.integrity-section-header i {
+    font-size: 24px;
+    color: #3b82f6;
+}
+
+.integrity-section-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.integrity-section-count {
+    margin-left: auto;
+    background: #e2e8f0;
+    color: #475569;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* Evidence Cards */
+.integrity-evidence-list {
+    padding: 20px 24px;
+}
+
+.integrity-evidence-card {
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 16px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s ease;
+}
+
+.integrity-evidence-card:last-child {
+    margin-bottom: 0;
+}
+
+.integrity-evidence-card:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.integrity-evidence-card.has-issues {
+    background: #fffbeb;
+    border-color: #fde68a;
+}
+
+.integrity-evidence-card.has-issues:hover {
+    border-color: #fcd34d;
+    box-shadow: 0 2px 8px rgba(251, 191, 36, 0.15);
+}
+
+.integrity-evidence-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.integrity-evidence-id {
+    font-size: 15px;
+    font-weight: 700;
+    color: #475569;
+}
+
+.integrity-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.integrity-status-valid {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.integrity-status-issues {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.integrity-evidence-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.integrity-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.integrity-meta-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.integrity-meta-value {
+    font-size: 14px;
+    color: #1e293b;
+    font-weight: 500;
+}
+
+.integrity-meta-value a {
+    color: #3b82f6;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.integrity-meta-value a:hover {
+    color: #2563eb;
+    text-decoration: underline;
+}
+
+/* Hash Display */
+.integrity-hash-display {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-top: 12px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 11px;
+    color: #475569;
+    word-break: break-all;
+    border: 1px solid #e2e8f0;
+}
+
+.integrity-hash-label {
+    font-weight: 700;
+    color: #64748b;
+    margin-right: 8px;
+}
+
+/* Issues Display */
+.integrity-issues-display {
+    margin-top: 16px;
+    padding: 16px;
+    background: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.integrity-issues-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #dc2626;
+    margin-bottom: 12px;
+}
+
+.integrity-issues-title i {
+    font-size: 18px;
+}
+
+.integrity-issues-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.integrity-issues-list li {
+    font-size: 13px;
+    color: #991b1b;
+    padding: 6px 0;
+    padding-left: 20px;
+    position: relative;
+    border-bottom: 1px dashed #fecaca;
+}
+
+.integrity-issues-list li:last-child {
+    border-bottom: none;
+}
+
+.integrity-issues-list li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #dc2626;
+    font-weight: bold;
+}
+
+/* Evidence Footer */
+.integrity-evidence-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.integrity-view-history-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: #3b82f6;
+    color: #ffffff;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.integrity-view-history-btn:hover {
+    background: #2563eb;
+}
+
+.integrity-upload-date {
+    font-size: 13px;
+    color: #64748b;
+}
+
+.integrity-empty-state {
+    text-align: center;
+    padding: 60px 24px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 2px dashed #e2e8f0;
+}
+
+.integrity-empty-state i {
+    font-size: 56px;
+    color: #cbd5e1;
+    margin-bottom: 20px;
+}
+
+.integrity-empty-state p {
+    font-size: 15px;
+    color: #64748b;
+    margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .integrity-stats-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .integrity-page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .integrity-page-actions {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .integrity-btn {
+        justify-content: center;
+    }
+
+    .integrity-stats-row {
+        grid-template-columns: 1fr;
+    }
+
+    .integrity-evidence-meta {
+        grid-template-columns: 1fr;
+    }
+
+    .integrity-evidence-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .integrity-evidence-footer {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .integrity-view-history-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}

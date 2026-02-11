@@ -1,81 +1,116 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+{% block title %}Chain of Custody Report - ChainProof{% endblock %}
 {% load static %}
 
-{% block title %}Chain of Custody Report - ChainProof{% endblock %}
-
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/evidence/evidence_list.css' %}?v={{ STATIC_VERSION }}">
+<link rel="stylesheet" href="{% static 'css/auditor/chain_of_custody_report.css' %}?v={{ STATIC_VERSION }}">
 {% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <h1>Chain of Custody Report</h1>
-    <div class="header-actions">
-        <a href="{% url 'auditor:dashboard' %}" class="btn btn-secondary">
+<div class="coc-page-header">
+    <div class="coc-page-title">
+        <h1>Chain of Custody Report</h1>
+    </div>
+    <div class="coc-page-actions">
+        <a href="{% url 'auditor:dashboard' %}" class="coc-btn coc-btn-secondary">
             <i class='bx bx-arrow-back'></i> Back to Dashboard
         </a>
     </div>
 </div>
 
-<div class="stats-row">
-    <div class="stat-card">
-        <div class="stat-value">{{ total_evidence }}</div>
-        <div class="stat-label">Total Evidence</div>
+<div class="coc-stats-row">
+    <div class="coc-stat-card">
+        <div class="coc-stat-icon">
+            <i class='bx bx-archive'></i>
+        </div>
+        <div class="coc-stat-content">
+            <div class="coc-stat-value">{{ total_evidence }}</div>
+            <div class="coc-stat-label">Total Evidence</div>
+        </div>
     </div>
-    <div class="stat-card success">
-        <div class="stat-value">{{ evidence_with_valid_metadata }}</div>
-        <div class="stat-label">Valid Metadata</div>
+    <div class="coc-stat-card">
+        <div class="coc-stat-icon">
+            <i class='bx bx-check-circle'></i>
+        </div>
+        <div class="coc-stat-content">
+            <div class="coc-stat-value">{{ evidence_with_valid_metadata }}</div>
+            <div class="coc-stat-label">Valid Metadata</div>
+        </div>
     </div>
-    <div class="stat-card warning">
-        <div class="stat-value">{{ evidence_with_issues }}</div>
-        <div class="stat-label">Metadata Issues</div>
+    <div class="coc-stat-card">
+        <div class="coc-stat-icon">
+            <i class='bx bx-error'></i>
+        </div>
+        <div class="coc-stat-content">
+            <div class="coc-stat-value">{{ evidence_with_issues }}</div>
+            <div class="coc-stat-label">Metadata Issues</div>
+        </div>
     </div>
 </div>
 
-<div class="evidence-list-container">
-    <table class="evidence-table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Case</th>
-                <th>Description</th>
-                <th>Media Type</th>
-                <th>SHA256 Hash</th>
-                <th>Uploaded By</th>
-                <th>Date</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for evidence in evidence_list %}
-            <tr>
-                <td>{{ evidence.id }}</td>
-                <td><a href="{% url 'auditor:auditor_case_audit_logs' evidence.case.case_id %}">{{ evidence.case.case_id }}</a></td>
-                <td>{{ evidence.description|truncatechars:50 }}</td>
-                <td>{{ evidence.media_type }}</td>
-                <td class="hash-cell" title="{{ evidence.sha256_hash }}">{{ evidence.sha256_hash|truncatechars:16 }}...</td>
-                <td>{{ evidence.uploaded_by.get_full_name|default:evidence.uploaded_by.username }}</td>
-                <td>{{ evidence.date_uploaded|date:"M d, Y" }}</td>
-                <td>
-                    {% if evidence.metadata_valid %}
-                    <span class="badge badge-valid"><i class='bx bx-check'></i> Valid</span>
-                    {% else %}
-                    <span class="badge badge-invalid"><i class='bx bx-x'></i> Invalid</span>
-                    {% endif %}
-                </td>
-                <td>
-                    <a href="{% url 'auditor:evidence_custody_history' evidence.id %}" class="btn btn-sm">
-                        <i class='bx bx-history'></i> History
-                    </a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="9" class="empty">No evidence found.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+{% if evidence_list %}
+<div class="coc-report-section">
+    <div class="coc-report-header">
+        <i class='bx bx-transfer-alt'></i>
+        <h2 class="coc-report-title">Evidence Overview</h2>
+    </div>
+    <div class="coc-table-section">
+        <div class="coc-table-header">
+            <h2 class="coc-table-title">Evidence List</h2>
+            <span class="coc-table-count">{{ evidence_list|length }} items</span>
+        </div>
+        <div class="coc-table-wrapper">
+            <table class="coc-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Case</th>
+                        <th>Description</th>
+                        <th>Media Type</th>
+                        <th>Uploaded By</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for evidence in evidence_list %}
+                    <tr>
+                        <td>{{ evidence.id }}</td>
+                        <td>
+                            <a href="{% url 'auditor:auditor_case_audit_logs' evidence.case.case_id %}">{{ evidence.case.case_id }}</a>
+                        </td>
+                        <td>{{ evidence.description|truncatechars:50 }}</td>
+                        <td>{{ evidence.media_type }}</td>
+                        <td>{{ evidence.uploaded_by.get_full_name|default:evidence.uploaded_by.username }}</td>
+                        <td>{{ evidence.date_uploaded|date:"M d, Y" }}</td>
+                        <td>
+                            {% if evidence.metadata_valid %}
+                            <span class="coc-status-badge coc-status-valid">
+                                <i class='bx bx-check'></i> Valid
+                            </span>
+                            {% else %}
+                            <span class="coc-status-badge coc-status-invalid">
+                                <i class='bx bx-x'></i> Invalid
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'auditor:evidence_custody_history' evidence.id %}" class="coc-action-btn" style="color: white; text-decoration: none;">
+                                <i class='bx bx-history'></i> History
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
+{% else %}
+<div class="coc-empty-state">
+    <i class='bx bx-archive'></i>
+    <p>No evidence found.</p>
+</div>
+{% endif %}
 {% endblock %}
