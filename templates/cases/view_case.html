@@ -134,7 +134,7 @@
           {% if user.is_staff %}
           <a href="{% url 'evidence:audit' media.id %}" class="evidence-btn evidence-btn-secondary">Audit Log</a>
           {% endif %}
-          {% if user.role == 'analyst' %}
+          {% if user.role == 'analyst' and not media.has_analysis %}
           <a href="{% url 'evidence:analyze' media.id %}" class="evidence-btn evidence-btn-secondary">Analyze</a>
           {% endif %}
           {% if user.is_staff or user.role == 'analyst' %}
