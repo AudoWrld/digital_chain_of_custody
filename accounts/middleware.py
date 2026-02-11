@@ -26,13 +26,13 @@ class Enforce2FAMiddleware:
                     if not request.user.two_factor_enabled:
                         # Allow access to 2FA setup pages and logout
                         allowed_paths = [
-                            reverse('second_authentication'),
-                            reverse('recovery_codes_view'),
-                            reverse('download_recovery_codes'),
-                            reverse('setup_new_2fa'),
-                            reverse('logout'),
+                            reverse('accounts:second_authentication'),
+                            reverse('accounts:recovery_codes_view'),
+                            reverse('accounts:download_recovery_codes'),
+                            reverse('accounts:setup_new_2fa'),
+                            reverse('accounts:logout'),
                         ]
                         if request.path not in allowed_paths and not request.path.startswith('/admin/login/'):
-                            return redirect('second_authentication')
+                            return redirect('accounts:second_authentication')
         response = self.get_response(request)
         return response
