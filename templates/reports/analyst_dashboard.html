@@ -127,7 +127,7 @@
           <div class="recent-item-content">
             <div class="recent-item-title">{{ case.get_title }}</div>
             <div class="recent-item-meta">
-              <span class="status-badge status-{{ case.stage }}">{{ case.get_stage_display }}</span>
+              <span class="status-badge status-{{ case.case_status|lower }}">{{ case.get_case_status_display }}</span>
               <span class="date">{{ case.created_at|date:"M d, Y" }}</span>
             </div>
           </div>
