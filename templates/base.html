@@ -179,19 +179,19 @@
         
         {% elif user.role == 'analyst' %}
         <nav class="sidebar-section">
-          <a href="{% url 'reports:dashboard' %}" class="sidebar-link {% if request.path == '/reports/dashboard/' %}active{% endif %}">
+          <a href="{% url 'reports:dashboard' %}" class="sidebar-link {% if request.path == '/reports/dashboard' %}active{% endif %}">
             <i class='bx bx-home'></i>
             <span>Dashboard</span>
           </a>
-          <a href="{% url 'evidence:all_evidence' %}" class="sidebar-link {% if request.path == '/evidence/all/' %}active{% endif %}">
+          <a href="{% url 'evidence:all_evidence' %}" class="sidebar-link {% if request.path == '/evidence/all' %}active{% endif %}">
             <i class='bx bx-archive'></i>
             <span>All Evidence</span>
           </a>
-          <a href="{% url 'cases:case_list' %}?stage=analysis" class="sidebar-link">
+          <a href="{% url 'cases:case_list' %}?stage=analysis" class="sidebar-link {% if '/cases/' in request.path and 'stage=analysis' in request.META.QUERY_STRING %}active{% endif %}">
             <i class='bx bx-analyse'></i>
             <span>Evidence Analysis</span>
           </a>
-          <a href="{% url 'cases:case_list' %}" class="sidebar-link">
+          <a href="#" class="sidebar-link">
             <i class='bx bx-file-blank'></i>
             <span>Analysis Reports</span>
           </a>
