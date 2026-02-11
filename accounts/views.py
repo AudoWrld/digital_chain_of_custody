@@ -246,6 +246,8 @@ def second_authentication(request):
 
                 if request.user.is_superuser:
                     return redirect("dashboard:dashboard")
+                elif request.user.role == "auditor":
+                    return redirect("auditor:dashboard")
                 elif request.user.role == "analyst":
                     return redirect("reports:dashboard")
                 elif request.user.role == "custodian":
