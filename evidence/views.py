@@ -81,13 +81,17 @@ def upload_evidence(request, case_id):
 
 
 @login_required
-@role_required("investigator", "analyst", "admin", "auditor", "regular_user")
+@role_required("investigator", "analyst", "admin", "regular_user")
 def view_evidence(request, evidence_id):
     evidence = get_object_or_404(Evidence, id=evidence_id)
 
     if request.user.role == 'regular_user':
         if request.user != evidence.case.created_by:
             return HttpResponseForbidden("You are not allowed to view this evidence!")
+    
+    # Auditors can only view metadata, not content
+    if request.user.role == 'auditor':
+        return HttpResponseForbidden("Auditors cannot view evidence content. Please use the audit view.")
     
     audit_logs = EvidenceAuditLog.objects.filter(evidence=evidence).order_by(
         "-timestamp"
@@ -233,7 +237,7 @@ def verify_evidence_integrity(request, evidence_id):
 
 
 @login_required
-@role_required("investigator", "analyst", "admin", "auditor", "regular_user")
+@role_required("investigator", "analyst", "admin", "regular_user")
 def view_evidence_file(request, evidence_id):
     evidence = get_object_or_404(Evidence, id=evidence_id)
 
@@ -241,6 +245,10 @@ def view_evidence_file(request, evidence_id):
     if request.user.role == 'regular_user':
         if request.user != evidence.case.created_by:
             return HttpResponseForbidden("You are not allowed to view this evidence file!")
+    
+    # Auditors cannot view evidence content
+    if request.user.role == 'auditor':
+        return HttpResponseForbidden("Auditors cannot view evidence content. Please use the audit view.")
     
     try:
         decrypted_file = evidence.get_decrypted_file()
@@ -273,13 +281,17 @@ def view_evidence_file(request, evidence_id):
 
 
 @login_required
-@role_required("investigator", "analyst", "admin", "auditor", "regular_user")
+@role_required("investigator", "analyst", "admin", "regular_user")
 def download_evidence_file(request, evidence_id):
     evidence = get_object_or_404(Evidence, id=evidence_id)
 
     if request.user.role == 'regular_user':
         if request.user != evidence.case.created_by:
             return HttpResponseForbidden("You are not allowed to download this evidence!")
+    
+    # Auditors cannot download evidence content
+    if request.user.role == 'auditor':
+        return HttpResponseForbidden("Auditors cannot download evidence content.")
     
     try:
         decrypted_file = evidence.get_decrypted_file()

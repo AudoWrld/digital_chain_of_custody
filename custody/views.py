@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from cases.permissions import custodian_required
+from cases.permissions import custodian_required, custodian_or_auditor_required
 from cases.models import Case
 from evidence.models import Evidence
 from .models import (
@@ -104,7 +104,7 @@ def view_case_storage(request, case_id):
 
 
 @login_required
-@custodian_required
+@custodian_or_auditor_required
 def evidence_custody_log(request, evidence_id):
     """Evidence custody log - audit trail for specific evidence"""
     evidence = get_object_or_404(Evidence, id=evidence_id)
@@ -120,7 +120,7 @@ def evidence_custody_log(request, evidence_id):
 
 
 @login_required
-@custodian_required
+@custodian_or_auditor_required
 def case_custody_log(request, case_id):
     """Case custody log - audit trail for all evidence in a case"""
     case = get_object_or_404(Case, case_id=case_id)

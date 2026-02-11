@@ -247,23 +247,19 @@
         
         {% elif user.role == 'auditor' %}
         <nav class="sidebar-section">
-          <a href="{% url 'dashboard:dashboard' %}" class="sidebar-link {% if request.path == '/dashboard/' %}active{% endif %}">
+          <a href="{% url 'auditor:dashboard' %}" class="sidebar-link {% if request.path == '/auditor/' %}active{% endif %}">
             <i class='bx bx-home'></i>
             <span>Dashboard</span>
           </a>
-          <a href="{% url 'evidence:all_evidence' %}" class="sidebar-link {% if request.path == '/evidence/all/' %}active{% endif %}">
-            <i class='bx bx-archive'></i>
-            <span>All Evidence</span>
-          </a>
-          <a href="#" class="sidebar-link">
+          <a href="{% url 'auditor:audit_logs' %}" class="sidebar-link {% if '/auditor/audit-logs/' in request.path %}active{% endif %}">
             <i class='bx bx-list-check'></i>
             <span>Audit Logs</span>
           </a>
-          <a href="#" class="sidebar-link">
-            <i class='bx bx-file-blank'></i>
+          <a href="{% url 'auditor:chain_of_custody' %}" class="sidebar-link {% if '/auditor/chain-of-custody/' in request.path %}active{% endif %}">
+            <i class='bx bx-transfer'></i>
             <span>Chain of Custody Reports</span>
           </a>
-          <a href="#" class="sidebar-link">
+          <a href="{% url 'auditor:integrity_check' %}" class="sidebar-link {% if '/auditor/integrity-check/' in request.path %}active{% endif %}">
             <i class='bx bx-check-shield'></i>
             <span>Integrity Checks</span>
           </a>

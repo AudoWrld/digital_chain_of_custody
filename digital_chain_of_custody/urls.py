@@ -12,6 +12,7 @@ urlpatterns = [
     path("custody/", include("custody.urls")),
     path("evidence/", include("evidence.urls")),
     path("reports/", include("reports.urls")),
+    path("auditor/", include("auditor.urls")),
 ]
 
 

@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Custody History - Evidence #{{ evidence.id }} - ChainProof{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/evidence/audit.css' %}?v={{ STATIC_VERSION }}">
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Custody History: Evidence #{{ evidence.id }}</h1>
+    <div class="header-actions">
+        <a href="{% url 'auditor:chain_of_custody' %}" class="btn btn-secondary">
+            <i class='bx bx-arrow-back'></i> Back to Chain of Custody
+        </a>
+        <a href="{% url 'auditor:integrity_check' %}" class="btn btn-primary">
+            <i class='bx bx-check-shield'></i> Integrity Check
+        </a>
+    </div>
+</div>
+
+<div class="evidence-details-card">
+    <div class="detail-section">
+        <h3>Evidence Information</h3>
+        <div class="detail-grid">
+            <div class="detail-item">
+                <span class="label">Case:</span>
+                <span class="value"><a href="{% url 'auditor:auditor_case_audit_logs' evidence.case.case_id %}">{{ evidence.case.case_id }}</a></span>
+            </div>
+            <div class="detail-item">
+                <span class="label">Description:</span>
+                <span class="value">{{ evidence.description }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="label">Original Filename:</span>
+                <span class="value">{{ evidence.original_filename }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="label">Media Type:</span>
+                <span class="value">{{ evidence.media_type }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="label">Uploaded By:</span>
+                <span class="value">{{ evidence.uploaded_by.get_full_name|default:evidence.uploaded_by.username }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="label">Upload Date:</span>
+                <span class="value">{{ evidence.date_uploaded|date:"M d, Y H:i:s" }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="label">Metadata Status:</span>
+                <span class="value">
+                    {% if evidence.metadata_valid %}
+                    <span class="badge badge-valid"><i class='bx bx-check'></i> Valid</span>
+                    {% else %}
+                    <span class="badge badge-invalid"><i class='bx bx-x'></i> Invalid</span>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="detail-section">
+        <h3>Hash Information</h3>
+        <div class="hash-display">
+            <div class="hash-row">
+                <span class="label">SHA256:</span>
+                <span class="value hash-value">{{ evidence.sha256_hash }}</span>
+            </div>
+            <div class="hash-row">
+                <span class="label">MD5:</span>
+                <span class="value hash-value">{{ evidence.md5_hash }}</span>
+            </div>
+        </div>
+    </div>
+    
+    {% if evidence.metadata_issues %}
+    <div class="detail-section issues">
+        <h3><i class='bx bx-error'></i> Metadata Issues</h3>
+        <ul>
+            {% for issue in evidence.metadata_issues %}
+            <li>{{ issue }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+
+<div class="timeline-section">
+    <h3><i class='bx bx-transfer'></i> Custody Transfer History</h3>
+    <div class="timeline">
+        {% for log in custody_logs %}
+        <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+                <div class="timeline-header">
+                    <span class="timeline-action">{{ log.action|title }}</span>
+                    <span class="timeline-date">{{ log.timestamp|date:"M d, Y H:i:s" }}</span>
+                </div>
+                <div class="timeline-body">
+                    <p><strong>User:</strong> {{ log.user.get_full_name|default:log.user.username }}</p>
+                    {% if log.from_location %}
+                    <p><strong>From:</strong> {{ log.from_location.name }}</p>
+                    {% endif %}
+                    {% if log.to_location %}
+                    <p><strong>To:</strong> {{ log.to_location.name }}</p>
+                    {% endif %}
+                    {% if log.details %}
+                    <p class="timeline-details">{{ log.details }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-timeline">
+            <p>No custody transfers recorded.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="timeline-section">
+    <h3><i class='bx bx-history'></i> Audit Log</h3>
+    <div class="timeline">
+        {% for log in audit_logs %}
+        <div class="timeline-item audit">
+            <div class="timeline-marker audit-marker"></div>
+            <div class="timeline-content">
+                <div class="timeline-header">
+                    <span class="timeline-action">{{ log.action }}</span>
+                    <span class="timeline-date">{{ log.timestamp|date:"M d, Y H:i:s" }}</span>
+                </div>
+                <div class="timeline-body">
+                    <p><strong>User:</strong> {{ log.user.get_full_name|default:log.user.username }}</p>
+                    {% if log.details %}
+                    <p class="timeline-details">{{ log.details }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-timeline">
+            <p>No audit logs recorded.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
