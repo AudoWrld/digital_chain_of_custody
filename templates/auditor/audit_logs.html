@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Audit Logs - ChainProof{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/evidence/audit.css' %}?v={{ STATIC_VERSION }}">
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Audit Logs</h1>
+    <div class="header-actions">
+        <div class="filter-tabs">
+            <a href="?type=all" class="tab {% if log_source == 'all' %}active{% endif %}">All</a>
+            <a href="?type=case" class="tab {% if log_source == 'case' %}active{% endif %}">Case Logs</a>
+            <a href="?type=evidence" class="tab {% if log_source == 'evidence' %}active{% endif %}">Evidence Logs</a>
+            <a href="?type=custody" class="tab {% if log_source == 'custody' %}active{% endif %}">Custody Logs</a>
+        </div>
+    </div>
+</div>
+
+<div class="audit-container">
+    {% if log_source == 'all' or log_source == 'case' %}
+    <div class="log-section">
+        <h2><i class='bx bx-briefcase'></i> Case Audit Logs</h2>
+        <div class="log-table-container">
+            <table class="log-table">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Case</th>
+                        <th>User</th>
+                        <th>Action</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in case_audit_logs %}
+                    <tr>
+                        <td>{{ log.timestamp|date:"M d, Y H:i:s" }}</td>
+                        <td>{% if log.case %}<a href="{% url 'auditor:auditor_case_audit_logs' log.case.case_id %}">{{ log.case.case_id }}</a>{% else %}-{% endif %}</td>
+                        <td>{{ log.user.get_full_name|default:log.user.username }}</td>
+                        <td>{{ log.action }}</td>
+                        <td>{{ log.details|truncatechars:100 }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="empty">No case audit logs found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if log_source == 'all' or log_source == 'evidence' %}
+    <div class="log-section">
+        <h2><i class='bx bx-archive'></i> Evidence Audit Logs</h2>
+        <div class="log-table-container">
+            <table class="log-table">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Evidence</th>
+                        <th>Case</th>
+                        <th>User</th>
+                        <th>Action</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in evidence_audit_logs %}
+                    <tr>
+                        <td>{{ log.timestamp|date:"M d, Y H:i:s" }}</td>
+                        <td><a href="{% url 'auditor:evidence_custody_history' log.evidence.id %}">{{ log.evidence.id }}</a></td>
+                        <td>{{ log.evidence.case.case_id }}</td>
+                        <td>{{ log.user.get_full_name|default:log.user.username }}</td>
+                        <td>{{ log.action }}</td>
+                        <td>{{ log.details|truncatechars:100 }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="empty">No evidence audit logs found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if log_source == 'all' or log_source == 'custody' %}
+    <div class="log-section">
+        <h2><i class='bx bx-transfer'></i> Custody Logs</h2>
+        <div class="log-table-container">
+            <table class="log-table">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Evidence</th>
+                        <th>Case</th>
+                        <th>User</th>
+                        <th>Action</th>
+                        <th>Location</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in custody_logs %}
+                    <tr>
+                        <td>{{ log.timestamp|date:"M d, Y H:i:s" }}</td>
+                        <td><a href="{% url 'auditor:evidence_custody_history' log.evidence.id %}">{{ log.evidence.id }}</a></td>
+                        <td>{{ log.case.case_id }}</td>
+                        <td>{{ log.user.get_full_name|default:log.user.username }}</td>
+                        <td>{{ log.action }}</td>
+                        <td>{{ log.to_location.name|default:"-" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="empty">No custody logs found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
