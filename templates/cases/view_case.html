@@ -182,6 +182,9 @@
         {% endif %}
         {% endif %}
         <a href="{% url 'cases:case_list' %}" class="view-case-action-btn view-case-action-secondary">Back to Cases</a>
+      {% elif user.role in 'analyst,auditor' %}
+        <a href="{% url 'auditor:auditor_case_audit_logs' case.case_id %}" class="view-case-action-btn view-case-action-secondary">Case Audit Log</a>
+        <a href="{% url 'cases:case_list' %}" class="view-case-action-btn view-case-action-secondary">Back to Cases</a>
       {% else %}
         {% if case.case_status not in 'Closed,Archived,Withdrawn,Invalid' %}
         <a href="{% url 'evidence:upload' case.case_id %}" class="view-case-action-btn view-case-action-primary">Upload Evidence</a>

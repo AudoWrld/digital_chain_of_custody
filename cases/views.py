@@ -588,7 +588,11 @@ def mark_invalid_case(request, case_id):
 def view_case_audit_log(request, case_id):
     case = get_object_or_404(Case, case_id=case_id)
 
-    if request.user != case.created_by and not request.user.is_staff:
+    if (
+        request.user != case.created_by
+        and not request.user.is_staff
+        and request.user.role not in ('analyst', 'auditor')
+    ):
         return HttpResponseForbidden("Not authorized to view this audit log.")
 
     audit_logs = case.audit_logs.order_by("-timestamp")
