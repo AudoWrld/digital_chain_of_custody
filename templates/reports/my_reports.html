@@ -10,35 +10,38 @@
 {% block content %}
 <div class="my-reports-container">
     <div class="my-reports-header">
-        <div class="my-reports-title">
-            <h1>My Reports</h1>
-        </div>
+        <h1>My Reports</h1>
         <span class="my-reports-count">{{ total_count }} Reports Submitted</span>
     </div>
 
     {% if reports %}
     <div class="my-reports-card">
         <div class="my-reports-section-header">
-            <i class='bx bx-file-alt'></i>
-            <h2 class="my-reports-section-title">Submitted Analysis Reports</h2>
+            <div class="header-left">
+                <i class='bx bx-file-alt'></i>
+                <h2 class="my-reports-section-title">Submitted Analysis Reports</h2>
+            </div>
             <span class="my-reports-count-badge">{{ reports|length }} items</span>
         </div>
         <div class="my-reports-list">
             {% for report in reports %}
             <a href="{% url 'reports:evidence_reports' report.evidence.id %}" class="my-report-item">
-                <div class="my-report-icon">
-                    <i class='bx bx-file'></i>
-                </div>
-                <div class="my-report-content">
-                    <div class="my-report-title">{{ report.title }}</div>
-                    <div class="my-report-meta">
-                        <span>Case: <a href="{% url 'cases:view_case' report.case.case_id %}">{{ report.case.case_id }}</a></span>
-                        {% if report.evidence %}
-                        <span>| Evidence: #{{ report.evidence.id }}</span>
-                        {% endif %}
+                <div class="my-report-main">
+                    <div class="my-report-icon">
+                        <i class='bx bx-file'></i>
+                    </div>
+                    <div class="my-report-info">
+                        <div class="my-report-title">{{ report.title }}</div>
+                        <div class="my-report-meta">
+                            <span>Case: <a href="{% url 'cases:view_case' report.case.case_id %}">{{ report.case.case_id }}</a></span>
+                            {% if report.evidence %}
+                            <span class="meta-separator">•</span>
+                            <span>Evidence: #{{ report.evidence.id }}</span>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
-                <div class="my-report-actions">
+                <div class="my-report-right">
                     <span class="cases-status-badge cases-status-{{ report.status }}">
                         {% if report.status == 'draft' %}
                             <i class='bx bx-pencil'></i>
