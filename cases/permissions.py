@@ -100,6 +100,20 @@ def auditor_required(view_func):
     return _wrapped_view
 
 
+def custodian_or_auditor_required(view_func):
+    @wraps(view_func)
+    @login_required
+    def _wrapped_view(request, *args, **kwargs):
+        if request.user.is_superuser:
+            return view_func(request, *args, **kwargs)
+        
+        if request.user.role not in ['custodian', 'auditor']:
+            return HttpResponseForbidden("Only custodians and auditors can access this page.")
+        
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view
+
+
 def custodian_required(view_func):
     @wraps(view_func)
     @login_required
